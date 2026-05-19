@@ -14,7 +14,7 @@ messages = db.messages
 conversations = db.conversations
 users = db.users
 
-# 🔥 Active WebSocket connections
+#  Active WebSocket connections
 connections = {}
 
 # ---------------------------
@@ -58,7 +58,8 @@ async def get_users():
         for u in all_users
     ]
 
-    from pydantic import BaseModel
+    
+from pydantic import BaseModel
 
 class User(BaseModel):
     email: str
