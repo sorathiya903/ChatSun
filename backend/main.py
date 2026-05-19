@@ -4,6 +4,7 @@ from pydantic import BaseModel
 import os
 from fastapi.middleware.cors import CORSMiddleware
 from datetime import datetime
+from zoneinfo import ZoneInfo
 import uuid
 import json
 
@@ -69,7 +70,7 @@ async def chat(ws: WebSocket, conversation_id: str):
                 "message_id": str(uuid.uuid4()),
                 "sender": data["sender"],
                 "text": data["text"],
-                "timestamp": datetime.utcnow().isoformat()
+                "timestamp": datetime.now(  ZoneInfo("Asia/Kolkata")  ).isoformat()
             }
 
             # find conversation
