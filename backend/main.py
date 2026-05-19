@@ -295,3 +295,40 @@ async def edit_message(
     return {
         "success": True
     }
+
+@app.get("/chats/{user_id}")
+async def get_chats(user_id: str):
+
+    all_conversations = conversations.find({
+        "users": user_id
+    })
+
+    result = []
+
+    for convo in all_conversations:
+
+        other_user = next(
+            u for u in convo["users"]
+            if u != user_id
+        )
+
+        last_message = None
+
+        if convo["messages"]:
+
+            last_message =
+                convo["messages"][-1]
+
+        result.append({
+
+            "conversation_id":
+                convo["conversation_id"],
+
+            "user_id":
+                other_user,
+
+            "last_message":
+                last_message
+        })
+
+    return result
