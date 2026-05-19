@@ -217,34 +217,52 @@ localStorage.setItem(
         usersDiv.appendChild(div);
     });
   }
-function searchUser(){
+async function searchUser() {
 
-    const value =
-        document.getElementById("search")
+    const userId =
+        document.getElementById("searchInput")
         .value
-        .toLowerCase()
-        .trim();
+        .toLowerCase();
 
-    const users =
-        document.querySelectorAll(".user");
+    const res = await fetch(
+        `https://chatsun.onrender.com/search/${userId}`
+    );
 
-    users.forEach(user=>{
+    const data = await res.json();
 
-        const name =
-            user.querySelector(".name")
-            .innerText
-            .toLowerCase();
+    const result =
+        document.getElementById("searchResult");
 
-        if(name.includes(value)){
+    result.innerHTML = "";
 
-            user.style.display = "block";
+    if (!data.success) {
 
-        }else{
+        result.innerHTML = "User not found";
 
-            user.style.display = "none";
-        }
-    });
-                      }
+        return;
+    }
+
+    const div = document.createElement("div");
+
+    div.className = "user";
+
+    div.innerText = data.user.user_id;
+
+    div.onclick = () => {
+
+        const conversationId = [
+            currentUser.user_id,
+            data.user.user_id
+        ]
+        .sort()
+        .join("_");
+
+        window.location.href =
+            `chat.html?id=${conversationId}`;
+    };
+
+    result.appendChild(div);
+                }
 
 
           
