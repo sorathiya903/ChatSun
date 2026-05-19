@@ -395,24 +395,71 @@ function copyMsg(text){
 // EDIT
 // ------------------
 
-function editMsg(id){
+async function editMsg(id){
 
-    alert(
-        "Edit backend not added yet"
-    );
-}
+    const newText =
+        prompt("Edit message");
 
-// ------------------
-// DELETE
-// ------------------
+    if(!newText) return;
 
-function deleteMsg(id){
+    const res =
+        await fetch(
+            `https://chatsun.onrender.com/message/${id}`,
+            {
+                method:"PUT",
 
-    alert(
-        "Delete backend not added yet"
-    );
-}
+                headers:{
+                    "Content-Type":
+                    "application/json"
+                },
 
+                body:JSON.stringify({
+                    text:newText
+                })
+            }
+        );
+
+    const data =
+        await res.json();
+
+    if(data.success){
+
+        location.reload();
+
+    }else{
+
+        alert("Edit failed");
+    }
+                        }
+
+
+                    async function deleteMsg(id){
+
+    const ok =
+        confirm("Delete message?");
+
+    if(!ok) return;
+
+    const res =
+        await fetch(
+            `https://chatsun.onrender.com/message/${id}`,
+            {
+                method:"DELETE"
+            }
+        );
+
+    const data =
+        await res.json();
+
+    if(data.success){
+
+        location.reload();
+
+    }else{
+
+        alert("Delete failed");
+    }
+                    }
 // ------------------
 // BACK
 // ------------------
