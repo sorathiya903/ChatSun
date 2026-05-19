@@ -61,18 +61,34 @@
 <!-- 💬 DASHBOARD SECTION -->
 <div id="dashboard" style="display:none; padding:20px;">
   <h2>Users</h2>
-  <div id="users"></div>
+  
   <input id="searchInput" placeholder="Search user id">
 
 <button onclick="searchUser()">
   Search
 </button>
-
+<div id="users"></div>
 <div id="searchResult"></div>
 </div>
 
 <script>
+const savedUser =
+    JSON.parse(
+        localStorage.getItem("user")
+    );
 
+if(savedUser){
+
+    currentUser = savedUser;
+
+    document.getElementById("loginBox")
+    .style.display = "none";
+
+    document.getElementById("dashboard")
+    .style.display = "block";
+
+    loadUsers();
+}
 let currentUser = null;
 
 // -------------------
