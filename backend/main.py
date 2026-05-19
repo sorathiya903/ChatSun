@@ -45,6 +45,8 @@ connections = {}
 # ---------------------------
 # WebSocket Chat Route
 # ---------------------------
+
+
 @app.websocket("/ws/{conversation_id}")
 async def chat(ws: WebSocket, conversation_id: str):
 
@@ -65,40 +67,62 @@ async def chat(ws: WebSocket, conversation_id: str):
 
             message = {
                 "message_id": str(uuid.uuid4()),
-                "conversation_id": conversation_id,
                 "sender": data["sender"],
                 "text": data["text"],
                 "timestamp": datetime.utcnow().isoformat()
             }
 
-            # save in mongodb
-            messages.insert_one(message)
+            # find conversation
+            convo = conversations.find_one({
+                "conversation_id": conversation_id
+            })
 
-            # remove mongodb _id before sending
-            safe_message = {
-                "message_id": message["message_id"],
-                "conversation_id": message["conversation_id"],
-                "sender": message["sender"],
-                "text": message["text"],
-                "timestamp": message["timestamp"]
-            }
+            # create if not exists
+            if not convo:
+
+                conversations.insert_one({
+
+                    "conversation_id":
+                        conversation_id,
+
+                    "users":
+                        conversation_id.split("_"),
+
+                    "messages":
+                        [message]
+                })
+
+            else:
+
+                conversations.update_one(
+                    {
+                        "conversation_id":
+                            conversation_id
+                    },
+                    {
+                        "$push": {
+                            "messages":
+                                message
+                        }
+                    }
+                )
 
             disconnected = []
 
-            # broadcast
+            # send to all sockets
             for conn in connections[conversation_id]:
 
                 try:
 
                     await conn.send_text(
-                        json.dumps(safe_message)
+                        json.dumps(message)
                     )
 
                 except:
 
                     disconnected.append(conn)
 
-            # cleanup dead sockets
+            # cleanup
             for conn in disconnected:
 
                 if conn in connections[conversation_id]:
@@ -110,6 +134,7 @@ async def chat(ws: WebSocket, conversation_id: str):
         if ws in connections[conversation_id]:
 
             connections[conversation_id].remove(ws)
+
 
 @app.get("/users")
 async def get_users():
@@ -210,19 +235,15 @@ async def search_user(user_id: str):
 @app.get("/messages/{conversation_id}")
 async def get_messages(conversation_id: str):
 
-    msgs = messages.find({
+    convo = conversations.find_one({
         "conversation_id": conversation_id
     })
 
-    return [
-        {
-            "message_id": m["message_id"],
-            "sender": m["sender"],
-            "text": m["text"],
-            "timestamp": m["timestamp"]
-        }
-        for m in msgs
-    ]
+    if not convo:
+
+        return []
+
+    return convo["messages"]
 
 @app.delete("/message/{message_id}")
 async def delete_message(message_id: str):
