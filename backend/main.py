@@ -12,9 +12,11 @@ app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
 
-    allow_origins=["*"],
+    allow_origins=[
+        "https://chatsun.netlify.app"
+    ],
 
-    allow_credentials=False,
+    allow_credentials=True,
 
     allow_methods=["*"],
 
