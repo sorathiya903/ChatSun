@@ -1,4 +1,4 @@
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Body
 from pymongo import MongoClient
 from pydantic import BaseModel
 import os
@@ -179,3 +179,53 @@ async def get_messages(conversation_id: str):
         }
         for m in msgs
     ]
+
+@app.delete("/message/{message_id}")
+async def delete_message(message_id: str):
+
+    msg = messages.find_one({
+        "message_id": message_id
+    })
+
+    if not msg:
+        return {
+            "success": False
+        }
+
+    messages.delete_one({
+        "message_id": message_id
+    })
+
+    return {
+        "success": True
+    }
+
+@app.put("/message/{message_id}")
+async def edit_message(
+    message_id: str,
+    data: dict = Body(...)
+):
+
+    msg = messages.find_one({
+        "message_id": message_id
+    })
+
+    if not msg:
+        return {
+            "success": False
+        }
+
+    messages.update_one(
+        {
+            "message_id": message_id
+        },
+        {
+            "$set": {
+                "text": data["text"]
+            }
+        }
+    )
+
+    return {
+        "success": True
+    }
