@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="UTF-8" />
+<head><meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <title>ChatSun Dashboard</title>
@@ -11,49 +10,125 @@
       font-family: Arial;
       background: #0f172a;
       color: white;
+      margin: 0;
+    }
+
+    .box {
+      max-width: 400px;
+      margin: 100px auto;
+      padding: 20px;
+      background: #1e293b;
+      border-radius: 10px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      background: #38bdf8;
+      border: none;
+      cursor: pointer;
     }
 
     .user {
       padding: 15px;
       margin: 10px;
-      background: #1e293b;
+      background: #334155;
       cursor: pointer;
       border-radius: 5px;
     }
 
-    .user:hover {
-      background: #334155;
-    }
   </style>
 </head>
 
 <body>
 
-<h2 style="padding:10px;">ChatSun Dashboard</h2>
+<!-- 🔐 LOGIN SECTION -->
+<div id="loginBox" class="box">
+  <h2>ChatSun Login</h2>
 
-<div id="users"></div>
+  <input id="email" placeholder="Email">
+  <input id="password" type="password" placeholder="Password">
+
+  <button onclick="login()">Login / Register</button>
+</div>
+
+<!-- 💬 DASHBOARD SECTION -->
+<div id="dashboard" style="display:none; padding:20px;">
+  <h2>Users</h2>
+  <div id="users"></div>
+</div>
 
 <script>
-  // For MVP → static list (later comes from backend API)
-  const users = [
-    { name: "Rahul", id: "conv1" },
-    { name: "Amit", id: "conv2" },
-    { name: "Priya", id: "conv3" }
-  ];
+
+let currentUser = null;
+
+// -------------------
+// LOGIN FUNCTION
+// -------------------
+async function login() {
+
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  const res = await fetch("http://127.0.0.1:8000/login", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ email, password })
+  });
+
+  const data = await res.json();
+
+  if (data.success) {
+    currentUser = data.user;
+
+    document.getElementById("loginBox").style.display = "none";
+    document.getElementById("dashboard").style.display = "block";
+
+    loadUsers();
+  } else {
+    alert("Login failed");
+  }
+}
+
+// -------------------
+// LOAD USERS
+// -------------------
+async function loadUsers() {
+
+  const res = await fetch("http://127.0.0.1:8000/users");
+  const users = await res.json();
 
   const container = document.getElementById("users");
+  container.innerHTML = "";
 
   users.forEach(u => {
+
+    if (u.email === currentUser.email) return;
+
     const div = document.createElement("div");
     div.className = "user";
-    div.innerText = u.name;
+    div.innerText = u.email;
 
     div.onclick = () => {
-      window.location.href = `chat.html?id=${u.id}`;
+
+      // create conversation id (simple)
+      const conversationId = [currentUser.email, u.email].sort().join("_");
+
+      window.location.href = `chat.html?id=${conversationId}`;
     };
 
     container.appendChild(div);
   });
+}
+
 </script>
 
 </body>
