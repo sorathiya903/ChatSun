@@ -12,6 +12,7 @@ db = client.chatsun
 
 messages = db.messages
 conversations = db.conversations
+users = db.users
 
 # 🔥 Active WebSocket connections
 connections = {}
@@ -45,3 +46,48 @@ async def chat(ws: WebSocket, conversation_id: str):
 
     except WebSocketDisconnect:
         connections[conversation_id].remove(ws)
+
+
+@app.get("/users")
+async def get_users():
+
+    all_users = users.find()
+
+    return [
+        {"email": u["email"]}
+        for u in all_users
+    ]
+
+    from pydantic import BaseModel
+
+class User(BaseModel):
+    email: str
+    password: str
+
+
+@app.post("/login")
+async def login(user: User):
+
+    existing = users.find_one({
+        "email": user.email,
+        "password": user.password
+    })
+
+    if existing:
+        return {
+            "success": True,
+            "user": {
+                "email": existing["email"]
+            }
+        }
+
+    # register if not exists
+    users.insert_one({
+        "email": user.email,
+        "password": user.password
+    })
+
+    return {
+        "success": True,
+        "user": {"email": user.email}
+    }
