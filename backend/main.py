@@ -47,6 +47,7 @@ connections = {}
 # ---------------------------
 @app.websocket("/ws/{conversation_id}")
 async def chat(ws: WebSocket, conversation_id: str):
+
     await ws.accept()
 
     if conversation_id not in connections:
@@ -55,19 +56,60 @@ async def chat(ws: WebSocket, conversation_id: str):
     connections[conversation_id].append(ws)
 
     try:
-        while True:
-            raw = await ws.receive_text()
-            data = json.loads(raw)
-            message = { "message_id": str(uuid.uuid4()), "conversation_id": conversation_id, "sender": data["sender"],  "text": data["text"],  "timestamp": datetime.utcnow().isoformat()}
-            messages.insert_one(message)
-            
-            for conn in connections[conversation_id]:
-                await conn.send_text(json.dumps(message))
 
+        while True:
+
+            raw = await ws.receive_text()
+
+            data = json.loads(raw)
+
+            message = {
+                "message_id": str(uuid.uuid4()),
+                "conversation_id": conversation_id,
+                "sender": data["sender"],
+                "text": data["text"],
+                "timestamp": datetime.utcnow().isoformat()
+            }
+
+            # save in mongodb
+            messages.insert_one(message)
+
+            # remove mongodb _id before sending
+            safe_message = {
+                "message_id": message["message_id"],
+                "conversation_id": message["conversation_id"],
+                "sender": message["sender"],
+                "text": message["text"],
+                "timestamp": message["timestamp"]
+            }
+
+            disconnected = []
+
+            # broadcast
+            for conn in connections[conversation_id]:
+
+                try:
+
+                    await conn.send_text(
+                        json.dumps(safe_message)
+                    )
+
+                except:
+
+                    disconnected.append(conn)
+
+            # cleanup dead sockets
+            for conn in disconnected:
+
+                if conn in connections[conversation_id]:
+
+                    connections[conversation_id].remove(conn)
 
     except WebSocketDisconnect:
-        connections[conversation_id].remove(ws)
 
+        if ws in connections[conversation_id]:
+
+            connections[conversation_id].remove(ws)
 
 @app.get("/users")
 async def get_users():
