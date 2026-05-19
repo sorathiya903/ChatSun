@@ -153,7 +153,7 @@ button{
 </div>
 
 <script>
-
+const renderedMessages = new Set();
 const currentUser =
     JSON.parse(localStorage.getItem("user"));
 
@@ -209,7 +209,17 @@ function formatDate(dateStr){
 // ------------------
 
 function addMessage(msg){
+if(
+    renderedMessages.has(
+        msg.message_id
+    )
+){
+    return;
+}
 
+renderedMessages.add(
+    msg.message_id
+);
     const msgDate =
         formatDate(msg.timestamp);
 
@@ -266,7 +276,7 @@ function addMessage(msg){
         "dropdown";
 
     dropdown.innerHTML = `
-        <button onclick="copyMsg('${msg.text}')">
+        <button onclick='copyMsg(${JSON.stringify(msg.text)})'>
             Copy
         </button>
     `;
@@ -277,11 +287,11 @@ function addMessage(msg){
     ){
 
         dropdown.innerHTML += `
-            <button onclick="editMsg('${msg.message_id}')">
+            <button onclick='editMsg("${msg.message_id}")'>
                 Edit
             </button>
 
-            <button onclick="deleteMsg('${msg.message_id}')">
+            <button onclick='deleteMsg("${msg.message_id}")'>
                 Delete
             </button>
         `;
@@ -333,7 +343,12 @@ async function loadMessages(){
     const data =
         await res.json();
 
-    data.forEach(addMessage);
+    data.sort((a,b)=>
+    new Date(a.timestamp)
+    -
+    new Date(b.timestamp)
+)
+.forEach(addMessage);
 }
 
 loadMessages();
