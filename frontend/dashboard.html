@@ -96,7 +96,10 @@ const user_id = document.getElementById("user_id").value.toLowerCase();
 
   if (data.success) {
     currentUser = data.user;
-
+localStorage.setItem(
+    "user",
+    JSON.stringify(data.user)
+);
     document.getElementById("loginBox").style.display = "none";
     document.getElementById("dashboard").style.display = "block";
 
