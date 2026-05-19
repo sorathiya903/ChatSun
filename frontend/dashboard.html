@@ -43,6 +43,15 @@
       border-radius: 5px;
     }
 
+    .logout-btn{
+    background:#ef4444;
+    color:white;
+    border:none;
+    padding:10px 15px;
+    border-radius:10px;
+    cursor:pointer;
+    }
+
   </style>
 </head>
 
@@ -61,7 +70,9 @@
 <!-- 💬 DASHBOARD SECTION -->
 <div id="dashboard" style="display:none; padding:20px;">
   <h2>Users</h2>
-  
+  <button class="logout-btn" onclick="logout()">
+    Logout
+  </button>
   <input id="searchInput" placeholder="Search user id">
 
 <button onclick="searchUser()">
@@ -216,6 +227,13 @@ userIdInput.addEventListener("input", () => {
         userIdInput.value.toLowerCase();
 
 });
+
+      function logout(){
+
+    localStorage.removeItem("user");
+
+    location.reload();
+      }
 </script>
 
 </body>
