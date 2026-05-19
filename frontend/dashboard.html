@@ -62,6 +62,13 @@
 <div id="dashboard" style="display:none; padding:20px;">
   <h2>Users</h2>
   <div id="users"></div>
+  <input id="searchInput" placeholder="Search user id">
+
+<button onclick="searchUser()">
+  Search
+</button>
+
+<div id="searchResult"></div>
 </div>
 
 <script>
@@ -129,7 +136,52 @@ async function loadUsers() {
     container.appendChild(div);
   });
 }
+async function searchUser() {
 
+    const userId =
+        document.getElementById("searchInput")
+        .value
+        .toLowerCase();
+
+    const res = await fetch(
+        `https://chatsun.onrender.com/search/${userId}`
+    );
+
+    const data = await res.json();
+
+    const result =
+        document.getElementById("searchResult");
+
+    result.innerHTML = "";
+
+    if (!data.success) {
+
+        result.innerHTML = "User not found";
+
+        return;
+    }
+
+    const div = document.createElement("div");
+
+    div.className = "user";
+
+    div.innerText = data.user.user_id;
+
+    div.onclick = () => {
+
+        const conversationId = [
+            currentUser.user_id,
+            data.user.user_id
+        ]
+        .sort()
+        .join("_");
+
+        window.location.href =
+            `chat.html?id=${conversationId}`;
+    };
+
+    result.appendChild(div);
+                }
 </script>
 
 </body>
