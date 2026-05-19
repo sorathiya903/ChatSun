@@ -70,11 +70,13 @@ async def chat(ws: WebSocket, conversation_id: str):
 
 @app.get("/users")
 async def get_users():
+
     all_users = users.find()
 
     return [
         {
-            "email": u.get("email")
+            "email": u["email"],
+            "user_id": u["user_id"]
         }
         for u in all_users
     ]
@@ -83,10 +85,13 @@ async def get_users():
 class User(BaseModel):
     email: str
     password: str
-
+    user_id: str
+    
 
 @app.post("/login")
 async def login(user: User):
+
+    # Existing user login
     existing = users.find_one({
         "email": user.email,
         "password": user.password
@@ -96,19 +101,44 @@ async def login(user: User):
         return {
             "success": True,
             "user": {
-                "email": existing.get("email")
+                "email": existing["email"],
+                "user_id": existing["user_id"]
             }
         }
 
-    # Register if not exists
+    # Email already exists
+    email_exists = users.find_one({
+        "email": user.email
+    })
+
+    if email_exists:
+        return {
+            "success": False,
+            "message": "Wrong password"
+        }
+
+    # User ID already taken
+    id_exists = users.find_one({
+        "user_id": user.user_id
+    })
+
+    if id_exists:
+        return {
+            "success": False,
+            "message": "User ID already taken"
+        }
+
+    # Register new user
     users.insert_one({
         "email": user.email,
-        "password": user.password
+        "password": user.password,
+        "user_id": user.user_id
     })
 
     return {
         "success": True,
         "user": {
-            "email": user.email
+            "email": user.email,
+            "user_id": user.user_id
         }
-            }
+    }
