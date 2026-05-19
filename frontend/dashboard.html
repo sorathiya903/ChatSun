@@ -128,8 +128,11 @@ async function loadUsers() {
     div.onclick = () => {
 
       // create conversation id (simple)
-      const conversationId = [currentUser.email, u.email].sort().join("_");
-
+      const conversationId =[
+ currentUser.user_id,
+ otherUser.user_id
+].sort().join("_");
+      
       window.location.href = `chat.html?id=${conversationId}`;
     };
 
