@@ -316,19 +316,15 @@ async def get_chats(user_id: str):
 
         if convo["messages"]:
 
-            last_message =
-                convo["messages"][-1]
+            last_message = convo["messages"][-1]
 
         result.append({
 
-            "conversation_id":
-                convo["conversation_id"],
+            "conversation_id":convo["conversation_id"],
 
-            "user_id":
-                other_user,
+            "user_id":other_user,
 
-            "last_message":
-                last_message
+            "last_message": last_message
         })
 
     return result
