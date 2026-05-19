@@ -72,6 +72,7 @@
 </div>
 
 <script>
+  let currentUser = null;
 const savedUser =
     JSON.parse(
         localStorage.getItem("user")
@@ -89,7 +90,7 @@ if(savedUser){
 
     loadUsers();
 }
-let currentUser = null;
+
 
 // -------------------
 // LOGIN FUNCTION
