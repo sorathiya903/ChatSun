@@ -5,9 +5,9 @@ import os
 app = FastAPI()
 
 # 🔗 MongoDB Connection (replace with your Atlas URL)
-MONGO_URL = os.getenv("MONGO_URL", "mongodb+srv://<user>:<pass>@cluster.mongodb.net/")
+MONGO_URL = os.getenv("MONGO_URI", "mongodb+srv://<user>:<pass>@cluster.mongodb.net/")
 
-client = MongoClient(MONGO_URL)
+client = MongoClient(MONGO_URI)
 db = client.chatsun
 
 messages = db.messages
