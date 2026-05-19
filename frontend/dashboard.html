@@ -140,84 +140,114 @@ localStorage.setItem(
 // -------------------
 // LOAD USERS
 // -------------------
-async function loadUsers() {
+  async function loadUsers(){
 
-  const res = await fetch("https://chatsun.onrender.com/users");
-  const users = await res.json();
+    const usersDiv =
+        document.getElementById("users");
 
-  const container = document.getElementById("users");
-  container.innerHTML = "";
+    usersDiv.innerHTML = "";
 
-  users.forEach(u => {
+    const res =
+        await fetch(
+            `https://chatsun.onrender.com/chats/${currentUser.user_id}`
+        );
 
-    if (u.email === currentUser.email) return;
+    const data =
+        await res.json();
 
-    const div = document.createElement("div");
-    div.className = "user";
-    div.innerText = u.email;
+    if(data.length === 0){
 
-    div.onclick = () => {
-
-      // create conversation id (simple)
-      const conversationId =[
- currentUser.user_id,
- otherUser.user_id
-].sort().join("_");
-      
-      window.location.href = `chat.html?id=${conversationId}`;
-    };
-
-    container.appendChild(div);
-  });
-}
-async function searchUser() {
-
-    const userId =
-        document.getElementById("searchInput")
-        .value
-        .toLowerCase();
-
-    const res = await fetch(
-        `https://chatsun.onrender.com/search/${userId}`
-    );
-
-    const data = await res.json();
-
-    const result =
-        document.getElementById("searchResult");
-
-    result.innerHTML = "";
-
-    if (!data.success) {
-
-        result.innerHTML = "User not found";
+        usersDiv.innerHTML = `
+            <p>
+                No chats yet
+            </p>
+        `;
 
         return;
     }
 
-    const div = document.createElement("div");
+    data.forEach(chat=>{
 
-    div.className = "user";
+        const div =
+            document.createElement("div");
 
-    div.innerText = data.user.user_id;
+        div.className = "user";
 
-    div.onclick = () => {
+        div.onclick = ()=>{
 
-        const conversationId = [
-            currentUser.user_id,
-            data.user.user_id
-        ]
-        .sort()
-        .join("_");
+            location.href =
+                `chat.html?id=${chat.conversation_id}`;
+        };
 
-        window.location.href =
-            `chat.html?id=${conversationId}`;
-    };
+        div.innerHTML = `
 
-    result.appendChild(div);
+            <div class="top">
+
+                <div class="name">
+                    ${chat.user_id}
+                </div>
+
+                <div class="time">
+                    ${
+                        chat.last_message
+                        ? new Date(
+                            chat.last_message.timestamp
+                        ).toLocaleTimeString([],{
+                            hour:"2-digit",
+                            minute:"2-digit",
+                            hour12:true
+                        })
+                        : ""
+                    }
+                </div>
+
+            </div>
+
+            <div class="last">
+
+                ${
+                    chat.last_message
+                    ? chat.last_message.text
+                    : "Start chatting"
                 }
 
+            </div>
+        `;
 
+        usersDiv.appendChild(div);
+    });
+  }
+function searchUser(){
+
+    const value =
+        document.getElementById("search")
+        .value
+        .toLowerCase()
+        .trim();
+
+    const users =
+        document.querySelectorAll(".user");
+
+    users.forEach(user=>{
+
+        const name =
+            user.querySelector(".name")
+            .innerText
+            .toLowerCase();
+
+        if(name.includes(value)){
+
+            user.style.display = "block";
+
+        }else{
+
+            user.style.display = "none";
+        }
+    });
+                      }
+
+
+          
   const userIdInput =
     document.getElementById("user_id");
 
