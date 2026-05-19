@@ -1,16 +1,24 @@
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from pymongo import MongoClient
+import os
 
 app = FastAPI()
 
-# MongoDB setup
-client = MongoClient("mongodb://Aditya:Qu1IZrvVdB0ajaCm@ac-zqtl0lb-shard-00-00.fz0oqsr.mongodb.net:27017,ac-zqtl0lb-shard-00-01.fz0oqsr.mongodb.net:27017,ac-zqtl0lb-shard-00-02.fz0oqsr.mongodb.net:27017/?ssl=true&replicaSet=atlas-10lbo4-shard-0&authSource=admin&appName=Cluster0")
-db = client.chatsun
-messages = db.messages
+# 🔗 MongoDB Connection (replace with your Atlas URL)
+MONGO_URL = os.getenv("MONGO_URL", "mongodb+srv://<user>:<pass>@cluster.mongodb.net/")
 
-# In-memory active connections
+client = MongoClient(MONGO_URL)
+db = client.chatsun
+
+messages = db.messages
+conversations = db.conversations
+
+# 🔥 Active WebSocket connections
 connections = {}
 
+# ---------------------------
+# WebSocket Chat Route
+# ---------------------------
 @app.websocket("/ws/{conversation_id}")
 async def chat(ws: WebSocket, conversation_id: str):
 
@@ -25,13 +33,13 @@ async def chat(ws: WebSocket, conversation_id: str):
         while True:
             data = await ws.receive_text()
 
-            # save message in MongoDB
+            # 💾 Save message in MongoDB
             messages.insert_one({
                 "conversation_id": conversation_id,
                 "text": data
             })
 
-            # broadcast to same chat
+            # 📡 Broadcast to same conversation
             for conn in connections[conversation_id]:
                 await conn.send_text(data)
 
