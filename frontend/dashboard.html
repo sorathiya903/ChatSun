@@ -76,7 +76,7 @@ async function login() {
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
 
-  const res = await fetch("http://127.0.0.1:8000/login", {
+  const res = await fetch("https://chatsun.onrender.com/login", {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
@@ -103,7 +103,7 @@ async function login() {
 // -------------------
 async function loadUsers() {
 
-  const res = await fetch("http://127.0.0.1:8000/users");
+  const res = await fetch("https://chatsun.onrender.com/users");
   const users = await res.json();
 
   const container = document.getElementById("users");
