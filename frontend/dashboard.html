@@ -54,7 +54,7 @@
 
   <input id="email" placeholder="Email">
   <input id="password" type="password" placeholder="Password">
-
+<input id="user_id" placeholder="User ID">
   <button onclick="login()">Login / Register</button>
 </div>
 
@@ -81,7 +81,7 @@ async function login() {
     headers: {
       "Content-Type": "application/json"
     },
-    body: JSON.stringify({ email, password })
+    body: JSON.stringify({ email, password, user_id })
   });
 
   const data = await res.json();
