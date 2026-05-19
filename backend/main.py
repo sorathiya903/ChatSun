@@ -3,7 +3,9 @@ from pymongo import MongoClient
 from pydantic import BaseModel
 import os
 from fastapi.middleware.cors import CORSMiddleware
-
+from datetime import datetime
+import uuid
+import json
 
 app = FastAPI()
 
@@ -52,17 +54,14 @@ async def chat(ws: WebSocket, conversation_id: str):
 
     try:
         while True:
-            data = await ws.receive_text()
-
-            # Save message in MongoDB
-            messages.insert_one({
-                "conversation_id": conversation_id,
-                "text": data
-            })
-
-            # Broadcast to same conversation
+            raw = await ws.receive_text()
+            data = json.loads(raw)
+            message = { "message_id": str(uuid.uuid4()), "conversation_id": conversation_id, "sender": data["sender"],  "text": data["text"],  "timestamp": datetime.utcnow().isoformat()}
+            messages.insert_one(message)
+            
             for conn in connections[conversation_id]:
-                await conn.send_text(data)
+                await conn.send_text(json.dumps(message))
+
 
     except WebSocketDisconnect:
         connections[conversation_id].remove(ws)
@@ -163,3 +162,20 @@ async def search_user(user_id: str):
             "user_id": user["user_id"]
         }
     }
+
+@app.get("/messages/{conversation_id}")
+async def get_messages(conversation_id: str):
+
+    msgs = messages.find({
+        "conversation_id": conversation_id
+    })
+
+    return [
+        {
+            "message_id": m["message_id"],
+            "sender": m["sender"],
+            "text": m["text"],
+            "timestamp": m["timestamp"]
+        }
+        for m in msgs
+    ]
