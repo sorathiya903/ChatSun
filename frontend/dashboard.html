@@ -89,7 +89,7 @@ const user_id = document.getElementById("user_id").value;
     headers: {
       "Content-Type": "application/json"
     },
-    body: JSON.stringify({ email, password, user_id })
+    body: JSON.stringify({ email, password, user_id.toLowerCase()})
   });
 
   const data = await res.json();
@@ -182,6 +182,17 @@ async function searchUser() {
 
     result.appendChild(div);
                 }
+
+
+  const userIdInput =
+    document.getElementById("user_id");
+
+userIdInput.addEventListener("input", () => {
+
+    userIdInput.value =
+        userIdInput.value.toLowerCase();
+
+});
 </script>
 
 </body>
