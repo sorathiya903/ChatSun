@@ -142,3 +142,24 @@ async def login(user: User):
             "user_id": user.user_id
         }
     }
+
+
+@app.get("/search/{user_id}")
+async def search_user(user_id: str):
+
+    user = users.find_one({
+        "user_id": user_id.lower()
+    })
+
+    if not user:
+        return {
+            "success": False
+        }
+
+    return {
+        "success": True,
+        "user": {
+            "email": user["email"],
+            "user_id": user["user_id"]
+        }
+    }
