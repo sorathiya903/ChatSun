@@ -1,94 +1,428 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>ChatSun - Chat</title>
+<title>ChatSun</title>
 
-  <style>
-    body {
-      font-family: Arial;
-      margin: 0;
-      background: #0f172a;
-      color: white;
-    }
+<style>
 
-    .header {
-      padding: 10px;
-      background: #1e293b;
-    }
+body{
+    margin:0;
+    font-family:Arial;
+    background:#0f172a;
+    color:white;
+    display:flex;
+    flex-direction:column;
+    height:100vh;
+}
 
-    #chat {
-      height: 80vh;
-      overflow-y: auto;
-      padding: 10px;
-    }
+.header{
+    background:#1e293b;
+    padding:12px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-size:18px;
+    font-weight:bold;
+}
 
-    .msg {
-      padding: 8px;
-      margin: 5px;
-      background: #334155;
-      border-radius: 5px;
-      width: fit-content;
-    }
+.back{
+    cursor:pointer;
+    font-size:20px;
+}
 
-    .input-box {
-      display: flex;
-      padding: 10px;
-      background: #1e293b;
-    }
+#chat{
+    flex:1;
+    overflow-y:auto;
+    padding:15px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
 
-    input {
-      flex: 1;
-      padding: 10px;
-    }
+.msg-wrap{
+    display:flex;
+    flex-direction:column;
+}
 
-    button {
-      padding: 10px;
-      background: #38bdf8;
-      border: none;
-      cursor: pointer;
-    }
-  </style>
+.me{
+    align-items:flex-end;
+}
+
+.other{
+    align-items:flex-start;
+}
+
+.msg{
+    max-width:75%;
+    padding:10px;
+    border-radius:15px;
+    position:relative;
+    word-wrap:break-word;
+}
+
+.me .msg{
+    background:#38bdf8;
+    color:black;
+    border-bottom-right-radius:5px;
+}
+
+.other .msg{
+    background:#1e293b;
+    border-bottom-left-radius:5px;
+}
+
+.sender{
+    font-size:12px;
+    font-weight:bold;
+    margin-bottom:5px;
+}
+
+.time{
+    font-size:11px;
+    opacity:0.7;
+    margin-top:5px;
+    text-align:right;
+}
+
+.date-separator{
+    text-align:center;
+    margin:10px 0;
+    opacity:0.7;
+    font-size:13px;
+}
+
+.input-box{
+    display:flex;
+    padding:10px;
+    background:#1e293b;
+    gap:10px;
+}
+
+input{
+    flex:1;
+    padding:12px;
+    border:none;
+    border-radius:10px;
+    outline:none;
+}
+
+button{
+    border:none;
+    padding:12px 18px;
+    border-radius:10px;
+    background:#38bdf8;
+    cursor:pointer;
+}
+
+.dropdown{
+    position:absolute;
+    top:0;
+    right:0;
+    background:#0f172a;
+    border-radius:10px;
+    display:none;
+    flex-direction:column;
+    z-index:100;
+}
+
+.dropdown button{
+    background:none;
+    color:white;
+    padding:10px;
+    text-align:left;
+}
+
+</style>
 </head>
 
 <body>
 
 <div class="header">
-  ChatSun Chat Room
+    <div class="back" onclick="goBack()">←</div>
+    <div id="chatUser">Chat</div>
 </div>
 
 <div id="chat"></div>
 
 <div class="input-box">
-  <input id="msg" placeholder="Type message...">
-  <button onclick="sendMsg()">Send</button>
+    <input id="msg" placeholder="Type message...">
+    <button onclick="sendMsg()">Send</button>
 </div>
 
 <script>
-  // 🔥 Example: conversation_id from URL
-  const conversationId = new URLSearchParams(window.location.search).get("id");
 
-  const ws = new WebSocket(
-  `wss://chatsun.onrender.com/ws/${conversationId}`
+const currentUser =
+    JSON.parse(localStorage.getItem("user"));
+
+const conversationId =
+    new URLSearchParams(location.search)
+    .get("id");
+
+const otherUser =
+    conversationId
+    .split("_")
+    .find(x => x !== currentUser.user_id);
+
+document.getElementById("chatUser")
+.innerText = otherUser;
+
+const ws = new WebSocket(
+    `wss://chatsun.onrender.com/ws/${conversationId}`
 );
-  const chatBox = document.getElementById("chat");
 
-  ws.onmessage = (event) => {
-    const div = document.createElement("div");
-    div.className = "msg";
-    div.innerText = event.data;
-    chatBox.appendChild(div);
+const chatBox =
+    document.getElementById("chat");
 
-    chatBox.scrollTop = chatBox.scrollHeight;
-  };
+let lastDate = "";
 
-  function sendMsg() {
-    const input = document.getElementById("msg");
-    ws.send(input.value);
+// ------------------
+// FORMAT TIME
+// ------------------
+
+function formatTime(dateStr){
+
+    const d = new Date(dateStr);
+
+    return d.toLocaleTimeString([],{
+        hour:"2-digit",
+        minute:"2-digit",
+        hour12:true
+    });
+}
+
+// ------------------
+// FORMAT DATE
+// ------------------
+
+function formatDate(dateStr){
+
+    const d = new Date(dateStr);
+
+    return d.toDateString();
+}
+
+// ------------------
+// ADD MESSAGE
+// ------------------
+
+function addMessage(msg){
+
+    const msgDate =
+        formatDate(msg.timestamp);
+
+    if(msgDate !== lastDate){
+
+        lastDate = msgDate;
+
+        const sep =
+            document.createElement("div");
+
+        sep.className =
+            "date-separator";
+
+        sep.innerText = msgDate;
+
+        chatBox.appendChild(sep);
+    }
+
+    const wrap =
+        document.createElement("div");
+
+    wrap.className =
+        "msg-wrap " +
+        (
+            msg.sender === currentUser.user_id
+            ? "me"
+            : "other"
+        );
+
+    const box =
+        document.createElement("div");
+
+    box.className = "msg";
+
+    box.innerHTML = `
+        <div class="sender">
+            ${msg.sender}
+        </div>
+
+        <div class="text">
+            ${msg.text}
+        </div>
+
+        <div class="time">
+            ${formatTime(msg.timestamp)}
+        </div>
+    `;
+
+    // dropdown
+    const dropdown =
+        document.createElement("div");
+
+    dropdown.className =
+        "dropdown";
+
+    dropdown.innerHTML = `
+        <button onclick="copyMsg('${msg.text}')">
+            Copy
+        </button>
+    `;
+
+    // owner actions
+    if(
+        msg.sender === currentUser.user_id
+    ){
+
+        dropdown.innerHTML += `
+            <button onclick="editMsg('${msg.message_id}')">
+                Edit
+            </button>
+
+            <button onclick="deleteMsg('${msg.message_id}')">
+                Delete
+            </button>
+        `;
+    }
+
+    box.appendChild(dropdown);
+
+    // hold menu
+    let timer;
+
+    box.addEventListener("touchstart",()=>{
+
+        timer = setTimeout(()=>{
+
+            dropdown.style.display =
+                dropdown.style.display === "flex"
+                ? "none"
+                : "flex";
+
+        },500);
+
+    });
+
+    box.addEventListener("touchend",()=>{
+
+        clearTimeout(timer);
+
+    });
+
+    wrap.appendChild(box);
+
+    chatBox.appendChild(wrap);
+
+    chatBox.scrollTop =
+        chatBox.scrollHeight;
+}
+
+// ------------------
+// LOAD OLD MESSAGES
+// ------------------
+
+async function loadMessages(){
+
+    const res =
+        await fetch(
+            `https://chatsun.onrender.com/messages/${conversationId}`
+        );
+
+    const data =
+        await res.json();
+
+    data.forEach(addMessage);
+}
+
+loadMessages();
+
+// ------------------
+// RECEIVE WS
+// ------------------
+
+ws.onmessage = (event)=>{
+
+    addMessage(
+        JSON.parse(event.data)
+    );
+};
+
+// ------------------
+// SEND MESSAGE
+// ------------------
+
+function sendMsg(){
+
+    if(
+        ws.readyState !== WebSocket.OPEN
+    ){
+        alert("Socket not connected");
+        return;
+    }
+
+    const input =
+        document.getElementById("msg");
+
+    if(!input.value.trim()) return;
+
+    ws.send(JSON.stringify({
+
+        sender:
+            currentUser.user_id,
+
+        text:
+            input.value
+
+    }));
+
     input.value = "";
-  }
+}
+
+// ------------------
+// COPY
+// ------------------
+
+function copyMsg(text){
+
+    navigator.clipboard.writeText(text);
+
+    alert("Copied");
+}
+
+// ------------------
+// EDIT
+// ------------------
+
+function editMsg(id){
+
+    alert(
+        "Edit backend not added yet"
+    );
+}
+
+// ------------------
+// DELETE
+// ------------------
+
+function deleteMsg(id){
+
+    alert(
+        "Delete backend not added yet"
+    );
+}
+
+// ------------------
+// BACK
+// ------------------
+
+function goBack(){
+
+    location.href =
+        "dashboard.html";
+}
+
 </script>
 
 </body>
