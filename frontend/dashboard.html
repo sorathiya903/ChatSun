@@ -75,6 +75,7 @@ async function login() {
 
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
+const user_id = document.getElementById("user_id").value;
 
   const res = await fetch("https://chatsun.onrender.com/login", {
     method: "POST",
