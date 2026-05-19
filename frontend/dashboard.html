@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ChatSun Dashboard</title>
+
+  <style>
+    body {
+      font-family: Arial;
+      background: #0f172a;
+      color: white;
+    }
+
+    .user {
+      padding: 15px;
+      margin: 10px;
+      background: #1e293b;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    .user:hover {
+      background: #334155;
+    }
+  </style>
+</head>
+
+<body>
+
+<h2 style="padding:10px;">ChatSun Dashboard</h2>
+
+<div id="users"></div>
+
+<script>
+  // For MVP → static list (later comes from backend API)
+  const users = [
+    { name: "Rahul", id: "conv1" },
+    { name: "Amit", id: "conv2" },
+    { name: "Priya", id: "conv3" }
+  ];
+
+  const container = document.getElementById("users");
+
+  users.forEach(u => {
+    const div = document.createElement("div");
+    div.className = "user";
+    div.innerText = u.name;
+
+    div.onclick = () => {
+      window.location.href = `chat.html?id=${u.id}`;
+    };
+
+    container.appendChild(div);
+  });
+</script>
+
+</body>
+</html>
