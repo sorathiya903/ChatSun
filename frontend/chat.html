@@ -70,8 +70,9 @@
   // 🔥 Example: conversation_id from URL
   const conversationId = new URLSearchParams(window.location.search).get("id");
 
-  const ws = new WebSocket(`ws://127.0.0.1:8000/ws/${conversationId}`);
-
+  const ws = new WebSocket(
+  `wss://chatsun.onrender.com/ws/${conversationId}`
+);
   const chatBox = document.getElementById("chat");
 
   ws.onmessage = (event) => {
