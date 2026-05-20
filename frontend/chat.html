@@ -394,7 +394,8 @@ body{
     color:white;
 }
 .{
-.dropdown{
+
+    .dropdown{
     position: fixed;
     display: none;
     flex-direction: column;
@@ -403,10 +404,13 @@ body{
     border: 1px solid rgba(51,65,85,.9);
     border-radius: 18px;
     z-index: 999999;
-}
+
+    transform: translate(0,0);
+    }
 
     .input-box{
-    transition: transform 0.25s ease, opacity 0.25s ease;
+    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+                opacity 0.25s ease;
     }
 </style>
 </head>
@@ -757,9 +761,13 @@ function addMessage(msg){
 
         const touch = e.touches[0];
 
-        dropdown.style.display = "flex";
-        dropdown.style.left = touch.clientX + "px";
-        dropdown.style.top = touch.clientY + "px";
+
+
+
+dropdown.style.display = "flex";
+
+
+positionDropdown(dropdown, touch.clientX, touch.clientY);
 
     }, 500);
 
@@ -780,7 +788,6 @@ function addMessage(msg){
     `;
 
     if(msg.sender === currentUser.user_id){
-
         dropdown.innerHTML += `
             <button onclick='openEditModal("${msg.message_id}",${JSON.stringify(msg.text)})'>Edit</button>
             <button onclick='openDeleteModal("${msg.message_id}")'>Delete</button>
@@ -789,9 +796,8 @@ function addMessage(msg){
 
     dropdown.style.display = "flex";
 
-    // 🔥 POSITION FIX (VERY IMPORTANT)
-    dropdown.style.left = e.clientX + "px";
-    dropdown.style.top = e.clientY + "px";
+    //  USE FUNCTION HERE
+    positionDropdown(dropdown, e.clientX, e.clientY);
 });
 
     wrap.appendChild(box);
@@ -1021,7 +1027,19 @@ async function confirmDelete(){
 /* ---------------- */
 /* BACK */
 /* ---------------- */
+function positionDropdown(dropdown, x, y) {
 
+    const padding = 10;
+
+    const maxX = window.innerWidth - 160;
+    const maxY = window.innerHeight - 120;
+
+    const left = Math.min(x, maxX);
+    const top = Math.min(y, maxY);
+
+    dropdown.style.left = left + "px";
+    dropdown.style.top = top + "px";
+}
 function goBack(){
 
     location.href =
@@ -1045,8 +1063,8 @@ if (isAtBottom()) {
     // scrolling up
     if (currentScroll < lastScrollTop && inputVisible) {
 
-        inputBox.style.transform = "translateY(120px)";
-        inputBox.style.opacity = "0";
+        inputBox.style.transform = "translateY(100%)";
+inputBox.style.opacity = "0";
 
         inputVisible = false;
     }
