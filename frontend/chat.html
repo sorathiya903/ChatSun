@@ -98,15 +98,15 @@ body{
 /* CHAT */
 
 #chat{
-    flex:1;
-    overflow-y:auto;
-    
-    display:flex;
-    flex-direction:column;
-    gap:14px;
-    padding:20px 16px calc(var(--input-height) + 20px);
-    }
+    position: relative;
+    overflow-y: auto;
+    overflow-x: hidden;
 
+    border: 1px solid rgba(99,102,241,.25);
+    border-radius: 18px;
+
+    margin: 10px;
+}
 
 /* DATE */
 
@@ -395,16 +395,24 @@ body{
 }
 .dropdown{
     position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.95);
+
     display: none;
     flex-direction: column;
-    min-width: 140px;
+
+    min-width: 180px;
     background: #0f172a;
     border: 1px solid rgba(51,65,85,.9);
     border-radius: 18px;
-    z-index: 9999;
-    box-shadow: 0 10px 30px rgba(0,0,0,.35);
-}
 
+    z-index: 99999;
+    box-shadow: 0 20px 60px rgba(0,0,0,.5);
+
+    opacity: 0;
+    transition: all 0.2s ease;
+    }
     .input-box{
     transition: transform 0.25s ease, opacity 0.25s ease;
     }
@@ -572,7 +580,25 @@ body{
 </div>
 
 <script>
+function hideDropdown(dropdown) {
+    dropdown.style.opacity = "0";
+    dropdown.style.transform = "translate(-50%, -50%) scale(0.95)";
 
+    setTimeout(() => {
+        dropdown.style.display = "none";
+    }, 200);
+}
+    function showDropdown(dropdown, html) {
+
+    dropdown.innerHTML = html;
+
+    dropdown.style.display = "flex";
+
+    requestAnimationFrame(() => {
+        dropdown.style.opacity = "1";
+        dropdown.style.transform = "translate(-50%, -50%) scale(1)";
+    });
+    }
 const renderedMessages = new Set();
 
 const currentUser =
