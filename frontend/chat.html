@@ -712,7 +712,11 @@ function formatDate(dateStr){
 /* ---------------- */
 
 function addMessage(msg){
-
+let holdTimer;
+let startX = 0;
+let startY = 0;
+let moved = false;
+    
     if(renderedMessages.has(msg.message_id)) return;
 
     renderedMessages.add(msg.message_id);
@@ -743,14 +747,7 @@ function addMessage(msg){
         <div class="time">${formatTime(msg.timestamp)}</div>
     `;
 
-    /* ------------------ */
-    /* DROPDOWN (FIXED)   */
-    /* ------------------ */
-
     
-    /* ------------------ */
-    /* HOLD / LONG PRESS  */
-    /* ------------------ */
 
     
 
@@ -764,16 +761,36 @@ function addMessage(msg){
     showDropdown(dropdown, buildDropdown(msg));;
 });
     box.addEventListener("touchstart", (e) => {
+    const touch = e.touches[0];
+
+    startX = touch.clientX;
+    startY = touch.clientY;
+    moved = false;
 
     holdTimer = setTimeout(() => {
 
-        const dropdown = document.getElementById("globalDropdown");
+        if (moved) return; //  cancel if user moved
 
+        const dropdown = document.getElementById("globalDropdown");
         showDropdown(dropdown, buildDropdown(msg));
 
-    }, 500);
+    }, 600); // slightly higher delay = better UX
 });
+    box.addEventListener("touchend", () => {
+    clearTimeout(holdTimer);
+});
+    box.addEventListener("touchmove", (e) => {
+    const touch = e.touches[0];
 
+    const dx = Math.abs(touch.clientX - startX);
+    const dy = Math.abs(touch.clientY - startY);
+
+    // if finger moved, it's scrolling → cancel long press
+    if (dx > 10 || dy > 10) {
+        moved = true;
+        clearTimeout(holdTimer);
+    }
+});
 
     wrap.appendChild(box);
     chatBox.appendChild(wrap);
