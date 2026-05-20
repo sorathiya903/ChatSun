@@ -7,6 +7,7 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 import uuid
 import json
+import re
 
 app = FastAPI()
 
@@ -25,7 +26,6 @@ app.add_middleware(
 )
 
 # MongoDB Connection
-# Replace with your Atlas URL if env variable is not set
 MONGO_URI = os.getenv(
     "MONGO_URI",
     "mongodb+srv://<user>:<pass>@cluster.mongodb.net/"
@@ -151,44 +151,113 @@ async def get_users():
     ]
 
 
-class User(BaseModel):
+
+
+
+
+
+# -----------------------------
+# MODELS
+# -----------------------------
+
+class RegisterModel(BaseModel):
+    full_name: str
     email: str
     password: str
     user_id: str
-    
 
-@app.post("/login")
-async def login(user: User):
+class LoginModel(BaseModel):
+    email: str
+    password: str
 
-    # Existing user login
-    existing = users.find_one({
-        "email": user.email,
-        "password": user.password
-    })
+# -----------------------------
+# VALIDATION
+# -----------------------------
 
-    if existing:
+def validate_email(email):
+
+    pattern = r"^[^\s@]+@[^\s@]+\.[^\s@]+$"
+
+    return re.match(pattern, email)
+
+def validate_user_id(user_id):
+
+    pattern = r"^[a-z0-9_]{3,20}$"
+
+    return re.match(pattern, user_id)
+
+# -----------------------------
+# REGISTER
+# -----------------------------
+
+@app.post("/register")
+async def register(data: RegisterModel):
+
+    full_name = data.full_name.strip()
+
+    email = data.email.strip().lower()
+
+    password = data.password.strip()
+
+    user_id = data.user_id.strip().lower()
+
+    # -----------------------------
+    # SECURITY CHECKS
+    # -----------------------------
+
+    if (
+        not full_name or
+        not email or
+        not password or
+        not user_id
+    ):
         return {
-            "success": True,
-            "user": {
-                "email": existing["email"],
-                "user_id": existing["user_id"]
-            }
+            "success": False,
+            "message": "All fields required"
         }
 
-    # Email already exists
+    if len(full_name) < 2:
+        return {
+            "success": False,
+            "message": "Invalid full name"
+        }
+
+    if not validate_email(email):
+        return {
+            "success": False,
+            "message": "Invalid email"
+        }
+
+    if not validate_user_id(user_id):
+        return {
+            "success": False,
+            "message":
+            "User ID must contain only lowercase letters, numbers and underscore"
+        }
+
+    if len(password) < 6:
+        return {
+            "success": False,
+            "message":
+            "Password must be at least 6 characters"
+        }
+
+    # -----------------------------
+    # CHECK EXISTING
+    # -----------------------------
+
     email_exists = users.find_one({
-        "email": user.email
+        "email": email
     })
 
     if email_exists:
         return {
             "success": False,
-            "message": "Wrong password"
+            "message": "Email already exists"
         }
 
-    # User ID already taken
     id_exists = users.find_one({
-        "user_id": user.user_id
+        "user_id": user_id
     })
 
     if id_exists:
@@ -197,20 +266,82 @@ async def login(user: User):
             "message": "User ID already taken"
         }
 
-    # Register new user
+    # -----------------------------
+    # CREATE USER
+    # -----------------------------
+
     users.insert_one({
-        "email": user.email,
-        "password": user.password,
-        "user_id": user.user_id
+        "full_name": full_name,
+        "email": email,
+        "password": password,
+        "user_id": user_id
     })
 
     return {
         "success": True,
         "user": {
-            "email": user.email,
-            "user_id": user.user_id
+            "full_name": full_name,
+            "email": email,
+            "user_id": user_id
         }
     }
+
+# -----------------------------
+# LOGIN
+# -----------------------------
+
+@app.post("/login")
+async def login(data: LoginModel):
+
+    email = data.email.strip().lower()
+
+    password = data.password.strip()
+
+    # -----------------------------
+    # SECURITY CHECKS
+    # -----------------------------
+
+    if not email or not password:
+        return {
+            "success": False,
+            "message": "All fields required"
+        }
+
+    if not validate_email(email):
+        return {
+            "success": False,
+            "message": "Invalid email"
+        }
+
+    if len(password) < 6:
+        return {
+            "success": False,
+            "message": "Invalid password"
+        }
+
+    # -----------------------------
+    # FIND USER
+    # -----------------------------
+
+    user = users.find_one({
+        "email": email,
+        "password": password
+    })
+
+    if not user:
+        return {
+            "success": False,
+            "message": "Wrong email or password"
+        }
+
+    return {
+        "success": True,
+        "user": {
+            "full_name": user["full_name"],
+            "email": user["email"],
+            "user_id": user["user_id"]
+        }
+        }
 
 
 @app.get("/search/{user_id}")
