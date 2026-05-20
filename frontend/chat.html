@@ -407,9 +407,11 @@ body{
     box-shadow: 0 10px 30px rgba(0,0,0,.35);
     }
 
-    .input-box{
+    .input-box {
+    transform: translateY(0);
     transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
                 opacity 0.25s ease;
+    will-change: transform, opacity;
     }
 </style>
 </head>
@@ -1025,66 +1027,60 @@ async function confirmDelete(){
 /* ---------------- */
 /* BACK */
 /* ---------------- */
- function positionDropdown(dropdown, targetEl) {
-    const rect = targetEl.getBoundingClientRect();
+ function positionDropdown(dropdown, box) {
+
+    const rect = box.getBoundingClientRect();
 
     const padding = 8;
-    const dropdownWidth = 160;
-    const dropdownHeight = 120;
 
-    let left = rect.right - dropdownWidth;
+    let left = rect.right - 160; // align right side
     let top = rect.bottom + 6;
 
-    // prevent right overflow
-    if (left < 8) left = 8;
-    if (left + dropdownWidth > window.innerWidth) {
-        left = window.innerWidth - dropdownWidth - 8;
+    // prevent overflow right
+    if (left < padding) left = padding;
+    if (left + 160 > window.innerWidth) {
+        left = window.innerWidth - 160 - padding;
     }
 
-    // prevent bottom overflow (IMPORTANT FIX)
-    if (top + dropdownHeight > window.innerHeight) {
-        top = rect.top - dropdownHeight - 6;
+    // prevent overflow bottom
+    if (top + 120 > window.innerHeight) {
+        top = rect.top - 120;
     }
 
     dropdown.style.left = left + "px";
     dropdown.style.top = top + "px";
- }
+}
 function goBack(){
 
     location.href =
         "dashboard.html";
 }
+let lastScrollTop = 0;
 
-    let lastScrollTop = 0;
-let inputVisible = true;
-const inputBox = document.querySelector(".input-box");
-function isAtBottom() {
-    return chatBox.scrollHeight - chatBox.scrollTop === chatBox.clientHeight;
-}
-    chatBox.addEventListener("scroll", () => {
+chatBox.addEventListener("scroll", () => {
 
     const currentScroll = chatBox.scrollTop;
-if (isAtBottom()) {
-    inputBox.style.transform = "translateY(0)";
-    inputBox.style.opacity = "1";
-    inputVisible = true;
-}
-    // scrolling up
-    if (currentScroll < lastScrollTop && inputVisible) {
 
-        inputBox.style.transform = "translateY(100%)";
-inputBox.style.opacity = "0";
+    const inputBox = document.querySelector(".input-box");
 
-        inputVisible = false;
-    }
+    const atBottom =
+        chatBox.scrollHeight - chatBox.scrollTop - chatBox.clientHeight < 10;
 
-    // scrolling down
-    if (currentScroll > lastScrollTop && !inputVisible) {
-
+    if (atBottom) {
         inputBox.style.transform = "translateY(0)";
         inputBox.style.opacity = "1";
+    }
 
-        inputVisible = true;
+    else if (currentScroll > lastScrollTop) {
+        // scrolling down → hide
+        inputBox.style.transform = "translateY(120%)";
+        inputBox.style.opacity = "0";
+    }
+
+    else if (currentScroll < lastScrollTop) {
+        // scrolling up → show
+        inputBox.style.transform = "translateY(0)";
+        inputBox.style.opacity = "1";
     }
 
     lastScrollTop = currentScroll;
