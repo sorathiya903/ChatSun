@@ -401,7 +401,17 @@ body{
     background:#ef4444;
     color:white;
 }
-
+.dropdown{
+    position: fixed;
+    display: none;
+    flex-direction: column;
+    min-width: 140px;
+    background: #0f172a;
+    border: 1px solid rgba(51,65,85,.9);
+    border-radius: 18px;
+    z-index: 9999;
+    box-shadow: 0 10px 30px rgba(0,0,0,.35);
+}
 </style>
 </head>
 
@@ -443,7 +453,7 @@ body{
 <!-- CHAT -->
 
 <div id="chat"></div>
-
+<div id="globalDropdown" class="dropdown"></div>
 <!-- TYPING -->
 
 <div id="typingIndicator" class="typing-wrap">
@@ -668,71 +678,42 @@ function formatDate(dateStr){
 
 function addMessage(msg){
 
-    if(renderedMessages.has(
-        msg.message_id
-    )) return;
+    if(renderedMessages.has(msg.message_id)) return;
 
-    renderedMessages.add(
-        msg.message_id
-    );
+    renderedMessages.add(msg.message_id);
 
-    const msgDate =
-        formatDate(msg.timestamp);
+    const msgDate = formatDate(msg.timestamp);
 
     if(msgDate !== lastDate){
 
         lastDate = msgDate;
 
-        const sep =
-            document.createElement("div");
-
-        sep.className =
-            "date-separator";
-
-        sep.innerText =
-            msgDate;
+        const sep = document.createElement("div");
+        sep.className = "date-separator";
+        sep.innerText = msgDate;
 
         chatBox.appendChild(sep);
     }
 
-    const wrap =
-        document.createElement("div");
+    const wrap = document.createElement("div");
+    wrap.className = "msg-wrap " +
+        (msg.sender === currentUser.user_id ? "me" : "other");
 
-    wrap.className =
-        "msg-wrap " +
-        (
-            msg.sender === currentUser.user_id
-            ? "me"
-            : "other"
-        );
-
-    const box =
-        document.createElement("div");
-
+    const box = document.createElement("div");
     box.className = "msg";
 
     box.innerHTML = `
-
-        <div class="sender">
-            ${msg.sender}
-        </div>
-
-        <div class="text">
-            ${msg.text}
-        </div>
-
-        <div class="time">
-            ${formatTime(msg.timestamp)}
-        </div>
+        <div class="sender">${msg.sender}</div>
+        <div class="text">${msg.text}</div>
+        <div class="time">${formatTime(msg.timestamp)}</div>
     `;
 
-    /* DROPDOWN */
+    /* ------------------ */
+    /* DROPDOWN (FIXED)   */
+    /* ------------------ */
 
-    const dropdown =
-        document.createElement("div");
-
-    dropdown.className =
-        "dropdown";
+    const dropdown = document.createElement("div");
+    dropdown.className = "dropdown";
 
     dropdown.innerHTML = `
         <button onclick='copyMsg(${JSON.stringify(msg.text)})'>
@@ -740,9 +721,7 @@ function addMessage(msg){
         </button>
     `;
 
-    if(
-        msg.sender === currentUser.user_id
-    ){
+    if(msg.sender === currentUser.user_id){
 
         dropdown.innerHTML += `
             <button onclick='openEditModal("${msg.message_id}",${JSON.stringify(msg.text)})'>
@@ -757,58 +736,43 @@ function addMessage(msg){
 
     box.appendChild(dropdown);
 
-    /* HOLD */
+    /* ------------------ */
+    /* HOLD / LONG PRESS  */
+    /* ------------------ */
 
     let holdTimer;
 
-    box.addEventListener("touchstart",()=>{
+    box.addEventListener("touchstart", (e) => {
 
-        holdTimer =
-            setTimeout(()=>{
+        holdTimer = setTimeout(() => {
 
-                document
-                .querySelectorAll(".dropdown")
-                .forEach(d=>{
+            document.querySelectorAll(".dropdown")
+                .forEach(d => d.style.display = "none");
 
-                    d.style.display =
-                        "none";
-                });
+            dropdown.style.display = "flex";
 
-                dropdown.style.display =
-                    "flex";
-
-            },500);
+        }, 500);
     });
 
-    box.addEventListener("touchend",()=>{
-
+    box.addEventListener("touchend", () => {
         clearTimeout(holdTimer);
-
     });
 
-    box.addEventListener("contextmenu",(e)=>{
+    box.addEventListener("contextmenu", (e) => {
 
         e.preventDefault();
 
-        document
-        .querySelectorAll(".dropdown")
-        .forEach(d=>{
+        document.querySelectorAll(".dropdown")
+            .forEach(d => d.style.display = "none");
 
-            d.style.display =
-                "none";
-        });
-
-        dropdown.style.display =
-            "flex";
+        dropdown.style.display = "flex";
     });
 
     wrap.appendChild(box);
-
     chatBox.appendChild(wrap);
 
-    chatBox.scrollTop =
-        chatBox.scrollHeight;
-}
+    chatBox.scrollTop = chatBox.scrollHeight;
+        }
 
 /* ---------------- */
 /* LOAD */
