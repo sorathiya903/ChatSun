@@ -1,288 +1,513 @@
 <!DOCTYPE html>
-<html>
-<head><meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+<html lang="en" class="dark">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <title>ChatSun Dashboard</title>
 
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@500;600;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            inter: ['Inter', 'sans-serif'],
+            poppins: ['Poppins', 'sans-serif'],
+            manrope: ['Manrope', 'sans-serif'],
+          },
+          animation: {
+            float: 'float 6s ease-in-out infinite',
+            pulseSoft: 'pulseSoft 2s infinite',
+          },
+          keyframes: {
+            float: {
+              '0%,100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-10px)' },
+            },
+            pulseSoft: {
+              '0%,100%': { opacity: '.8' },
+              '50%': { opacity: '1' },
+            }
+          }
+        }
+      }
+    }
+  </script>
+
   <style>
     body {
-      font-family: Arial;
-      background: #0f172a;
-      color: white;
-      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: #020617;
+      overflow-x: hidden;
     }
 
-    .box {
-      max-width: 400px;
-      margin: 100px auto;
-      padding: 20px;
-      background: #1e293b;
-      border-radius: 10px;
+    .glass {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(18px);
     }
 
-    input {
-      width: 100%;
-      padding: 10px;
-      margin: 10px 0;
+    .bubble {
+      position: absolute;
+      border-radius: 9999px;
+      background: rgba(99, 102, 241, 0.08);
+      border: 1px solid rgba(99, 102, 241, 0.15);
+      backdrop-filter: blur(12px);
     }
 
-    button {
-      width: 100%;
-      padding: 10px;
-      background: #38bdf8;
-      border: none;
-      cursor: pointer;
+    .user-card {
+      transition: all .25s ease;
     }
 
-    .user {
-      padding: 15px;
-      margin: 10px;
-      background: #334155;
-      cursor: pointer;
-      border-radius: 5px;
+    .user-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(99, 102, 241, 0.4);
+      background: rgba(30, 41, 59, 0.95);
     }
 
-    .logout-btn{
-    background:#ef4444;
-    color:white;
-    border:none;
-    padding:10px 15px;
-    border-radius:10px;
-    cursor:pointer;
+    .input-focus:focus {
+      box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12);
     }
-
   </style>
 </head>
 
-<body>
+<body class="bg-slate-950 text-white min-h-screen">
 
-<!-- 🔐 LOGIN SECTION -->
-<div id="loginBox" class="box">
-  <h2>ChatSun Login</h2>
+  <!-- Background -->
+  <div class="bubble w-72 h-72 top-10 left-10 animate-float fixed"></div>
+  <div class="bubble w-52 h-52 bottom-10 right-10 animate-float fixed"></div>
 
-  <input id="email" placeholder="Email">
-  <input id="password" type="password" placeholder="Password">
-<input id="user_id" placeholder="User ID">
-  <button onclick="login()">Login / Register</button>
-</div>
+  <!-- Dashboard -->
+  <div id="dashboard" class="relative z-10 min-h-screen p-6 lg:p-10">
 
-<!-- 💬 DASHBOARD SECTION -->
-<div id="dashboard" style="display:none; padding:20px;">
-  <h2>Users</h2>
-  <button class="logout-btn" onclick="logout()">
-    Logout
-  </button>
-  <input id="searchInput" placeholder="Search user id">
+    <!-- Top Navbar -->
+    <div class="glass border border-slate-800 rounded-3xl px-6 py-5 mb-8">
 
-<button onclick="searchUser()">
-  Search
-</button>
-<div id="users"></div>
-<div id="searchResult"></div>
-</div>
+      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
 
-<script>
-  let currentUser = null;
-const savedUser =
-    JSON.parse(
-        localStorage.getItem("user")
-    );
+        <!-- Left -->
+        <div class="flex items-center gap-4">
 
-if(savedUser){
+          <div class="w-14 h-14 rounded-2xl bg-indigo-500/15 border border-indigo-500/20 flex items-center justify-center">
 
-    currentUser = savedUser;
+            <svg xmlns="http://www.w3.org/2000/svg"
+              class="w-7 h-7 text-indigo-400"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor">
 
-    document.getElementById("loginBox")
-    .style.display = "none";
+              <path stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-4l-4 4-4-4z" />
 
-    document.getElementById("dashboard")
-    .style.display = "block";
+            </svg>
 
-    loadUsers();
-}
+          </div>
 
+          <div>
+            <h1 class="font-manrope text-3xl font-bold tracking-tight">
+              ChatSun Dashboard
+            </h1>
 
-// -------------------
-// LOGIN FUNCTION
-// -------------------
-async function login() {
-
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
-const user_id = document.getElementById("user_id").value.toLowerCase();
-
-  const res = await fetch("https://chatsun.onrender.com/login", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ email, password, user_id})
-  });
-
-  const data = await res.json();
-
-  if (data.success) {
-    currentUser = data.user;
-localStorage.setItem(
-    "user",
-    JSON.stringify(data.user)
-);
-    document.getElementById("loginBox").style.display = "none";
-    document.getElementById("dashboard").style.display = "block";
-
-    loadUsers();
-  } else {
-    alert("Login failed");
-  }
-}
-
-// -------------------
-// LOAD USERS
-// -------------------
-  async function loadUsers(){
-
-    const usersDiv =
-        document.getElementById("users");
-
-    usersDiv.innerHTML = "";
-
-    const res =
-        await fetch(
-            `https://chatsun.onrender.com/chats/${currentUser.user_id}`
-        );
-
-    const data =
-        await res.json();
-
-    if(data.length === 0){
-
-        usersDiv.innerHTML = `
-            <p>
-                No chats yet
+            <p class="text-slate-400 text-sm">
+              Realtime conversations with modern UI.
             </p>
-        `;
+          </div>
 
-        return;
+        </div>
+
+        <!-- Right -->
+        <div class="flex items-center gap-4">
+
+          <button onclick="logout()"
+            class="bg-rose-500/10 hover:bg-rose-500 hover:text-white border border-rose-500/20 transition-all px-5 py-3 rounded-2xl text-rose-400 font-medium">
+
+            Logout
+
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Search -->
+    <div class="glass border border-slate-800 rounded-3xl p-6 mb-8">
+
+      <div class="flex flex-col lg:flex-row gap-4">
+
+        <div class="flex-1 relative">
+
+          <input
+            id="searchInput"
+            type="text"
+            placeholder="Search by user id..."
+            class="input-focus w-full bg-slate-900 border border-slate-700 rounded-2xl px-5 py-4 text-white outline-none transition-all focus:border-indigo-500"
+          />
+
+        </div>
+
+        <button onclick="searchUser()"
+          class="bg-indigo-500 hover:bg-indigo-400 active:scale-[0.98] transition-all rounded-2xl px-8 py-4 font-semibold shadow-lg shadow-indigo-500/10">
+
+          Search User
+
+        </button>
+
+      </div>
+
+      <!-- Search Result -->
+      <div id="searchResult" class="mt-6 space-y-4"></div>
+
+    </div>
+
+    <!-- Users -->
+    <div class="glass border border-slate-800 rounded-3xl p-6">
+
+      <div class="flex items-center justify-between mb-6">
+
+        <div>
+          <h2 class="text-2xl font-bold font-manrope">
+            Recent Chats
+          </h2>
+
+          <p class="text-slate-400 text-sm mt-1">
+            Continue your conversations instantly.
+          </p>
+        </div>
+
+        <div class="flex items-center gap-2">
+
+          <div class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
+
+          <span class="text-sm text-slate-400">
+            Live Sync Active
+          </span>
+
+        </div>
+
+      </div>
+
+      <div id="users" class="space-y-4"></div>
+
+    </div>
+
+  </div>
+
+  <script>
+
+    let currentUser = null;
+
+    const savedUser =
+      JSON.parse(
+        localStorage.getItem("user")
+      );
+
+    // -------------------
+    // CHECK LOGIN
+    // -------------------
+
+    if (!savedUser) {
+
+      location.href = "index.html";
+
+    } else {
+
+      currentUser = savedUser;
+
+      loadUsers();
     }
 
-    data.forEach(chat=>{
+    // -------------------
+    // LOAD USERS
+    // -------------------
 
-        const div =
+    async function loadUsers() {
+
+      const usersDiv =
+        document.getElementById("users");
+
+      usersDiv.innerHTML = `
+        <div class="text-slate-400 text-center py-10">
+          Loading chats...
+        </div>
+      `;
+
+      try {
+
+        const res =
+          await fetch(
+            `https://chatsun.onrender.com/chats/${currentUser.user_id}`
+          );
+
+        const data =
+          await res.json();
+
+        usersDiv.innerHTML = "";
+
+        // Empty
+        if (data.length === 0) {
+
+          usersDiv.innerHTML = `
+            <div class="border border-slate-800 rounded-3xl p-10 text-center bg-slate-900/40">
+
+              <div class="w-16 h-16 rounded-2xl bg-indigo-500/10 flex items-center justify-center mx-auto mb-5">
+
+                <svg xmlns="http://www.w3.org/2000/svg"
+                  class="w-8 h-8 text-indigo-400"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor">
+
+                  <path stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-4l-4 4-4-4z" />
+
+                </svg>
+
+              </div>
+
+              <h3 class="text-xl font-semibold mb-2">
+                No conversations yet
+              </h3>
+
+              <p class="text-slate-400">
+                Search users and start chatting instantly.
+              </p>
+
+            </div>
+          `;
+
+          return;
+        }
+
+        // Chats
+        data.forEach(chat => {
+
+          const div =
             document.createElement("div");
 
-        div.className = "user";
+          div.className =
+            "user-card border border-slate-800 bg-slate-900/60 rounded-3xl p-5 cursor-pointer";
 
-        div.onclick = ()=>{
+          div.onclick = () => {
 
             location.href =
-                `chat.html?id=${chat.conversation_id}`;
+              `chat.html?id=${chat.conversation_id}`;
+          };
+
+          div.innerHTML = `
+
+            <div class="flex items-center justify-between gap-4">
+
+              <div class="flex items-center gap-4">
+
+                <div class="w-14 h-14 rounded-2xl bg-indigo-500/15 border border-indigo-500/20 flex items-center justify-center text-indigo-300 font-semibold text-lg">
+
+                  ${chat.user_id.charAt(0).toUpperCase()}
+
+                </div>
+
+                <div>
+
+                  <h3 class="font-semibold text-lg text-white">
+                    ${chat.user_id}
+                  </h3>
+
+                  <p class="text-sm text-slate-400 mt-1 line-clamp-1">
+
+                    ${
+                      chat.last_message
+                        ? chat.last_message.text
+                        : "Start chatting now 🚀"
+                    }
+
+                  </p>
+
+                </div>
+
+              </div>
+
+              <div class="text-right">
+
+                <div class="text-xs text-slate-500">
+
+                  ${
+                    chat.last_message
+                      ? new Date(
+                          chat.last_message.timestamp
+                        ).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                          hour12: true
+                        })
+                      : ""
+                  }
+
+                </div>
+
+              </div>
+
+            </div>
+          `;
+
+          usersDiv.appendChild(div);
+
+        });
+
+      } catch (err) {
+
+        console.log(err);
+
+        usersDiv.innerHTML = `
+          <div class="text-rose-400 text-center py-10">
+            Failed to load chats.
+          </div>
+        `;
+      }
+    }
+
+    // -------------------
+    // SEARCH USER
+    // -------------------
+
+    async function searchUser() {
+
+      const userId =
+        document.getElementById("searchInput")
+        .value
+        .trim()
+        .toLowerCase();
+
+      if (!userId) return;
+
+      const result =
+        document.getElementById("searchResult");
+
+      result.innerHTML = `
+        <div class="text-slate-400">
+          Searching...
+        </div>
+      `;
+
+      try {
+
+        const res =
+          await fetch(
+            `https://chatsun.onrender.com/search/${userId}`
+          );
+
+        const data =
+          await res.json();
+
+        result.innerHTML = "";
+
+        // Not found
+        if (!data.success) {
+
+          result.innerHTML = `
+            <div class="border border-rose-500/20 bg-rose-500/10 text-rose-300 rounded-2xl px-5 py-4">
+              User not found
+            </div>
+          `;
+
+          return;
+        }
+
+        // Found
+        const div =
+          document.createElement("div");
+
+        div.className =
+          "user-card border border-slate-800 bg-slate-900/60 rounded-3xl p-5 cursor-pointer";
+
+        div.onclick = () => {
+
+          const conversationId = [
+            currentUser.user_id,
+            data.user.user_id
+          ]
+            .sort()
+            .join("_");
+
+          window.location.href =
+            `chat.html?id=${conversationId}`;
         };
 
         div.innerHTML = `
 
-            <div class="top">
+          <div class="flex items-center justify-between">
 
-                <div class="name">
-                    ${chat.user_id}
-                </div>
+            <div class="flex items-center gap-4">
 
-                <div class="time">
-                    ${
-                        chat.last_message
-                        ? new Date(
-                            chat.last_message.timestamp
-                        ).toLocaleTimeString([],{
-                            hour:"2-digit",
-                            minute:"2-digit",
-                            hour12:true
-                        })
-                        : ""
-                    }
-                </div>
+              <div class="w-14 h-14 rounded-2xl bg-indigo-500/15 border border-indigo-500/20 flex items-center justify-center text-indigo-300 font-semibold text-lg">
 
-            </div>
+                ${data.user.user_id.charAt(0).toUpperCase()}
 
-            <div class="last">
+              </div>
 
-                ${
-                    chat.last_message
-                    ? chat.last_message.text
-                    : "Start chatting"
-                }
+              <div>
+
+                <h3 class="font-semibold text-lg text-white">
+                  ${data.user.user_id}
+                </h3>
+
+                <p class="text-sm text-slate-400">
+                  Click to start conversation
+                </p>
+
+              </div>
 
             </div>
+
+            <button class="bg-indigo-500 hover:bg-indigo-400 transition-all px-5 py-3 rounded-2xl text-sm font-semibold">
+
+              Message
+
+            </button>
+
+          </div>
         `;
 
-        usersDiv.appendChild(div);
-    });
-  }
-async function searchUser() {
+        result.appendChild(div);
 
-    const userId =
-        document.getElementById("searchInput")
-        .value
-        .toLowerCase();
+      } catch (err) {
 
-    const res = await fetch(
-        `https://chatsun.onrender.com/search/${userId}`
-    );
+        console.log(err);
 
-    const data = await res.json();
-
-    const result =
-        document.getElementById("searchResult");
-
-    result.innerHTML = "";
-
-    if (!data.success) {
-
-        result.innerHTML = "User not found";
-
-        return;
+        result.innerHTML = `
+          <div class="border border-rose-500/20 bg-rose-500/10 text-rose-300 rounded-2xl px-5 py-4">
+            Server error
+          </div>
+        `;
+      }
     }
 
-    const div = document.createElement("div");
+    // -------------------
+    // LOGOUT
+    // -------------------
 
-    div.className = "user";
+    function logout() {
 
-    div.innerText = data.user.user_id;
+      localStorage.removeItem("user");
 
-    div.onclick = () => {
+      location.href = "index.html";
+    }
 
-        const conversationId = [
-            currentUser.user_id,
-            data.user.user_id
-        ]
-        .sort()
-        .join("_");
-
-        window.location.href =
-            `chat.html?id=${conversationId}`;
-    };
-
-    result.appendChild(div);
-                }
-
-
-          
-  const userIdInput =
-    document.getElementById("user_id");
-
-userIdInput.addEventListener("input", () => {
-
-    userIdInput.value =
-        userIdInput.value.toLowerCase();
-
-});
-
-      function logout(){
-
-    localStorage.removeItem("user");
-
-    location.reload();
-      }
-</script>
+  </script>
 
 </body>
-</html>
+  </html>
