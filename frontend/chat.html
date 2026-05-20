@@ -98,14 +98,13 @@ body{
 /* CHAT */
 
 #chat{
-    position: relative;
-    overflow-y: auto;
-    overflow-x: hidden;
-
-    border: 1px solid rgba(99,102,241,.25);
-    border-radius: 18px;
-gap:14px;
-    margin: 10px;
+    flex:1;
+    overflow-y:auto;
+    
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+    padding:20px 16px calc(var(--input-height) + 100px);
 }
 
 /* DATE */
