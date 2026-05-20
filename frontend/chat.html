@@ -407,9 +407,26 @@ body{
     box-shadow: 0 10px 30px rgba(0,0,0,.35);
     }
 
-        .input-box{
-    transition: 0.5s ;
-        }
+.input-box{
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 14px 16px 20px;
+    background: linear-gradient(to top,#020617,rgba(2,6,23,.92));
+    backdrop-filter: blur(20px);
+
+    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+                opacity 0.35s ease;
+
+    will-change: transform, opacity;
+}
+
+.input-box.hidden{
+    transform: translateY(120%);
+    opacity: 0;
+    pointer-events: none;
+    }
 </style>
 </head>
 
@@ -1052,39 +1069,42 @@ function goBack(){
     location.href =
         "dashboard.html";
 }
-let lastScrollTop = 0;
-let inputVisible = true;
-const inputBox = document.querySelector(".input-box");
-function isAtBottom() {
-    return chatBox.scrollHeight - chatBox.scrollTop === chatBox.clientHeight;
-}
-    chatBox.addEventListener("scroll", () => {
 
-    const currentScroll = chatBox.scrollTop;
-if (isAtBottom()) {
-    inputBox.style.transform = "translateY(0)";
-    inputBox.style.opacity = "1";
-    inputVisible = true;
-}
-    // scrolling up
-    if (currentScroll < lastScrollTop && inputVisible) {
 
-        inputBox.style.transform = "translateY(120px)";
-        inputBox.style.opacity = "0";
+    let lastScrollTop = 0;
+let hideTimeout = null;
 
-        inputVisible = false;
+chatBox.addEventListener("scroll", () => {
+
+    const current = chatBox.scrollTop;
+
+    const isAtBottom =
+        chatBox.scrollHeight - chatBox.scrollTop <= chatBox.clientHeight + 5;
+
+    if (isAtBottom) {
+        inputBox.classList.remove("hidden");
+        return;
     }
 
-    // scrolling down
-    if (currentScroll > lastScrollTop && !inputVisible) {
+    // scrolling down → show
+    if (current > lastScrollTop) {
 
-        inputBox.style.transform = "translateY(0)";
-        inputBox.style.opacity = "1";
+        clearTimeout(hideTimeout);
 
-        inputVisible = true;
+        inputBox.classList.remove("hidden");
     }
 
-    lastScrollTop = currentScroll;
+    // scrolling up → hide (delayed for smoothness)
+    if (current < lastScrollTop) {
+
+        clearTimeout(hideTimeout);
+
+        hideTimeout = setTimeout(() => {
+            inputBox.classList.add("hidden");
+        }, 120);
+    }
+
+    lastScrollTop = current;
 });
 </script>
 
