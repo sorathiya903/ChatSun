@@ -395,17 +395,16 @@ body{
 }
 .{
 
-    .dropdown{
-    position: fixed;
+    .dropdown {
+    position: absolute;
     display: none;
     flex-direction: column;
-    min-width: 140px;
+    min-width: 160px;
     background: #0f172a;
     border: 1px solid rgba(51,65,85,.9);
     border-radius: 18px;
-    z-index: 999999;
-
-    transform: translate(0,0);
+    z-index: 9999;
+    box-shadow: 0 10px 30px rgba(0,0,0,.35);
     }
 
     .input-box{
@@ -767,8 +766,7 @@ function addMessage(msg){
 dropdown.style.display = "flex";
 
 
-positionDropdown(dropdown, touch.clientX, touch.clientY);
-
+positionDropdown(dropdown, box);
     }, 500);
 
 });
@@ -797,7 +795,7 @@ positionDropdown(dropdown, touch.clientX, touch.clientY);
     dropdown.style.display = "flex";
 
     //  USE FUNCTION HERE
-    positionDropdown(dropdown, e.clientX, e.clientY);
+    positionDropdown(dropdown, box);
 });
 
     wrap.appendChild(box);
@@ -1027,19 +1025,30 @@ async function confirmDelete(){
 /* ---------------- */
 /* BACK */
 /* ---------------- */
-function positionDropdown(dropdown, x, y) {
+ function positionDropdown(dropdown, targetEl) {
+    const rect = targetEl.getBoundingClientRect();
 
-    const padding = 10;
+    const padding = 8;
+    const dropdownWidth = 160;
+    const dropdownHeight = 120;
 
-    const maxX = window.innerWidth - 160;
-    const maxY = window.innerHeight - 120;
+    let left = rect.right - dropdownWidth;
+    let top = rect.bottom + 6;
 
-    const left = Math.min(x, maxX);
-    const top = Math.min(y, maxY);
+    // prevent right overflow
+    if (left < 8) left = 8;
+    if (left + dropdownWidth > window.innerWidth) {
+        left = window.innerWidth - dropdownWidth - 8;
+    }
+
+    // prevent bottom overflow (IMPORTANT FIX)
+    if (top + dropdownHeight > window.innerHeight) {
+        top = rect.top - dropdownHeight - 6;
+    }
 
     dropdown.style.left = left + "px";
     dropdown.style.top = top + "px";
-}
+ }
 function goBack(){
 
     location.href =
