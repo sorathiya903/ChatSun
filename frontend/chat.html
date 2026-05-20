@@ -579,6 +579,20 @@ body{
 </div>
 
 <script>
+    function buildDropdown(msg) {
+    let html = `
+        <button onclick='copyMsg(${JSON.stringify(msg.text)})'>Copy</button>
+    `;
+
+    if (msg.sender === currentUser.user_id) {
+        html += `
+            <button onclick='openEditModal("${msg.message_id}",${JSON.stringify(msg.text)})'>Edit</button>
+            <button onclick='openDeleteModal("${msg.message_id}")'>Delete</button>
+        `;
+    }
+
+    return html;
+    }
 function hideDropdown(dropdown) {
     dropdown.style.opacity = "0";
     dropdown.style.transform = "translate(-50%, -50%) scale(0.95)";
@@ -745,13 +759,9 @@ function addMessage(msg){
 
     const dropdown = document.getElementById("globalDropdown");
 
-    const html = `
-        <button onclick='copyMsg(${JSON.stringify(msg.text)})'>Copy</button>
-        <button onclick='openEditModal("${msg.message_id}",${JSON.stringify(msg.text)})'>Edit</button>
-        <button onclick='openDeleteModal("${msg.message_id}")'>Delete</button>
-    `;
+    
 
-    showDropdown(dropdown, html);
+    showDropdown(dropdown, buildDropdown(msg));;
 });
     box.addEventListener("touchstart", (e) => {
 
@@ -759,17 +769,10 @@ function addMessage(msg){
 
         const dropdown = document.getElementById("globalDropdown");
 
-        const touch = e.touches[0];
-
-        const html = `
-            <button onclick='copyMsg(${JSON.stringify(msg.text)})'>Copy</button>
-            <button onclick='openEditModal("${msg.message_id}",${JSON.stringify(msg.text)})'>Edit</button>
-            <button onclick='openDeleteModal("${msg.message_id}")'>Delete</button>
-        `;
-
-        showDropdown(dropdown, html);
+        showDropdown(dropdown, buildDropdown(msg));
 
     }, 500);
+});
 });
 
     wrap.appendChild(box);
