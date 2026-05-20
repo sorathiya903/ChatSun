@@ -740,29 +740,59 @@ function addMessage(msg){
 
     box.addEventListener("touchstart", (e) => {
 
-        holdTimer = setTimeout(() => {
+    holdTimer = setTimeout(() => {
 
-            document.querySelectorAll(".dropdown")
-                .forEach(d => d.style.display = "none");
+        const dropdown = document.getElementById("globalDropdown");
 
-            dropdown.style.display = "flex";
+        dropdown.innerHTML = `
+            <button onclick='copyMsg(${JSON.stringify(msg.text)})'>Copy</button>
+        `;
 
-        }, 500);
-    });
+        if(msg.sender === currentUser.user_id){
+            dropdown.innerHTML += `
+                <button onclick='openEditModal("${msg.message_id}",${JSON.stringify(msg.text)})'>Edit</button>
+                <button onclick='openDeleteModal("${msg.message_id}")'>Delete</button>
+            `;
+        }
 
+        const touch = e.touches[0];
+
+        dropdown.style.display = "flex";
+        dropdown.style.left = touch.clientX + "px";
+        dropdown.style.top = touch.clientY + "px";
+
+    }, 500);
+
+});
+    
     box.addEventListener("touchend", () => {
         clearTimeout(holdTimer);
     });
 
     box.addEventListener("contextmenu", (e) => {
 
-        e.preventDefault();
+    e.preventDefault();
 
-        document.querySelectorAll(".dropdown")
-            .forEach(d => d.style.display = "none");
+    const dropdown = document.getElementById("globalDropdown");
 
-        dropdown.style.display = "flex";
-    });
+    dropdown.innerHTML = `
+        <button onclick='copyMsg(${JSON.stringify(msg.text)})'>Copy</button>
+    `;
+
+    if(msg.sender === currentUser.user_id){
+
+        dropdown.innerHTML += `
+            <button onclick='openEditModal("${msg.message_id}",${JSON.stringify(msg.text)})'>Edit</button>
+            <button onclick='openDeleteModal("${msg.message_id}")'>Delete</button>
+        `;
+    }
+
+    dropdown.style.display = "flex";
+
+    // 🔥 POSITION FIX (VERY IMPORTANT)
+    dropdown.style.left = e.clientX + "px";
+    dropdown.style.top = e.clientY + "px";
+});
 
     wrap.appendChild(box);
     chatBox.appendChild(wrap);
