@@ -790,7 +790,10 @@ async function loadMessages(){
 }
 
 loadMessages();
-
+chatBox.scrollTo({
+    top: chatBox.scrollHeight,
+    behavior: "smooth"
+});
 /* ---------------- */
 /* WS */
 /* ---------------- */
@@ -860,6 +863,10 @@ function sendMsg(){
     }));
 
     input.value = "";
+    chatBox.scrollTo({
+    top: chatBox.scrollHeight,
+    behavior: "smooth"
+});
 }
 
 /* ---------------- */
