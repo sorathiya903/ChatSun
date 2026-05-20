@@ -404,6 +404,10 @@ body{
     z-index: 9999;
     box-shadow: 0 10px 30px rgba(0,0,0,.35);
 }
+
+    .input-box{
+    transition: transform 0.25s ease, opacity 0.25s ease;
+    }
 </style>
 </head>
 
@@ -994,6 +998,40 @@ function goBack(){
         "dashboard.html";
 }
 
+    let lastScrollTop = 0;
+let inputVisible = true;
+
+function isAtBottom() {
+    return chatBox.scrollHeight - chatBox.scrollTop === chatBox.clientHeight;
+}
+    chatBox.addEventListener("scroll", () => {
+
+    const currentScroll = chatBox.scrollTop;
+if (isAtBottom()) {
+    inputBox.style.transform = "translateY(0)";
+    inputBox.style.opacity = "1";
+    inputVisible = true;
+}
+    // scrolling up
+    if (currentScroll < lastScrollTop && inputVisible) {
+
+        inputBox.style.transform = "translateY(120px)";
+        inputBox.style.opacity = "0";
+
+        inputVisible = false;
+    }
+
+    // scrolling down
+    if (currentScroll > lastScrollTop && !inputVisible) {
+
+        inputBox.style.transform = "translateY(0)";
+        inputBox.style.opacity = "1";
+
+        inputVisible = true;
+    }
+
+    lastScrollTop = currentScroll;
+});
 </script>
 
 </body>
