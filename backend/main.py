@@ -65,13 +65,22 @@ async def chat(ws: WebSocket, conversation_id: str):
             raw = await ws.receive_text()
 
             data = json.loads(raw)
+            # typing event
+            if data.get("type") == "typing":
+                for conn in connections[conversation_id]:
+                    await conn.send_text(json.dumps({ "type": "typing", "sender": data["sender"]  }))
+                    
+                continue
 
+# normal message
             message = {
                 "message_id": str(uuid.uuid4()),
+                "conversation_id": conversation_id,
                 "sender": data["sender"],
                 "text": data["text"],
-                "timestamp": datetime.now(  ZoneInfo("Asia/Kolkata")  ).isoformat()
-            }
+                "timestamp": datetime.utcnow().isoformat()}
+
+            
 
             # find conversation
             convo = conversations.find_one({
