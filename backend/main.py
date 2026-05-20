@@ -388,21 +388,27 @@ async def get_messages(conversation_id: str):
 
     return convo["messages"]
 
+
 @app.delete("/message/{message_id}")
 async def delete_message(message_id: str):
 
-    msg = messages.find_one({
-        "message_id": message_id
-    })
+    result = conversations.update_one(
+        {},
+        {
+            "$pull": {
+                "messages": {
+                    "message_id":
+                        message_id
+                }
+            }
+        }
+    )
 
-    if not msg:
+    if result.modified_count == 0:
+
         return {
             "success": False
         }
-
-    messages.delete_one({
-        "message_id": message_id
-    })
 
     return {
         "success": True
@@ -414,25 +420,24 @@ async def edit_message(
     data: dict = Body(...)
 ):
 
-    msg = messages.find_one({
-        "message_id": message_id
-    })
-
-    if not msg:
-        return {
-            "success": False
-        }
-
-    messages.update_one(
+    result = conversations.update_one(
         {
-            "message_id": message_id
+            "messages.message_id":
+                message_id
         },
         {
             "$set": {
-                "text": data["text"]
+                "messages.$.text":
+                    data["text"]
             }
         }
     )
+
+    if result.modified_count == 0:
+
+        return {
+            "success": False
+        }
 
     return {
         "success": True
