@@ -389,59 +389,35 @@ async def get_messages(conversation_id: str):
     return convo["messages"]
 
 
+@app.put("/message/{message_id}")
+async def edit_message(message_id: str, data: dict = Body(...)):
+
+    result = conversations.update_one(
+        {"messages.message_id": message_id},
+        {
+            "$set": {
+                "messages.$.text": data["text"]
+            }
+        }
+    )
+
+    if result.modified_count == 0:
+        return {"success": False}
+
+    return {"success": True}
+
 @app.delete("/message/{message_id}")
 async def delete_message(message_id: str):
 
     result = conversations.update_one(
-        {},
-        {
-            "$pull": {
-                "messages": {
-                    "message_id":
-                        message_id
-                }
-            }
-        }
+        {"messages.message_id": message_id},
+        {"$pull": {"messages": {"message_id": message_id}}}
     )
 
     if result.modified_count == 0:
+        return {"success": False}
 
-        return {
-            "success": False
-        }
-
-    return {
-        "success": True
-    }
-
-@app.put("/message/{message_id}")
-async def edit_message(
-    message_id: str,
-    data: dict = Body(...)
-):
-
-    result = conversations.update_one(
-        {
-            "messages.message_id":
-                message_id
-        },
-        {
-            "$set": {
-                "messages.$.text":
-                    data["text"]
-            }
-        }
-    )
-
-    if result.modified_count == 0:
-
-        return {
-            "success": False
-        }
-
-    return {
-        "success": True
-    }
+    return {"success": True}
 
 @app.get("/chats/{user_id}")
 async def get_chats(user_id: str):
