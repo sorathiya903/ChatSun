@@ -733,61 +733,44 @@ function addMessage(msg){
     /* DROPDOWN (FIXED)   */
     /* ------------------ */
 
-    const dropdown = document.createElement("div");
-    dropdown.className = "dropdown";
-
-    dropdown.innerHTML = `
-        <button onclick='copyMsg(${JSON.stringify(msg.text)})'>
-            Copy
-        </button>
-    `;
-
-    if(msg.sender === currentUser.user_id){
-
-        dropdown.innerHTML += `
-            <button onclick='openEditModal("${msg.message_id}",${JSON.stringify(msg.text)})'>
-                Edit
-            </button>
-
-            <button onclick='openDeleteModal("${msg.message_id}")'>
-                Delete
-            </button>
-        `;
-    }
-
-    box.appendChild(dropdown);
-
+    
     /* ------------------ */
     /* HOLD / LONG PRESS  */
     /* ------------------ */
 
-    let holdTimer;
-
-    box.addEventListener("touchstart", (e) => {
-
-        holdTimer = setTimeout(() => {
-
-            document.querySelectorAll(".dropdown")
-                .forEach(d => d.style.display = "none");
-
-            dropdown.style.display = "flex";
-
-        }, 500);
-    });
-
-    box.addEventListener("touchend", () => {
-        clearTimeout(holdTimer);
-    });
+    
 
     box.addEventListener("contextmenu", (e) => {
+    e.preventDefault();
 
-        e.preventDefault();
+    const dropdown = document.getElementById("globalDropdown");
 
-        document.querySelectorAll(".dropdown")
-            .forEach(d => d.style.display = "none");
+    const html = `
+        <button onclick='copyMsg(${JSON.stringify(msg.text)})'>Copy</button>
+        <button onclick='openEditModal("${msg.message_id}",${JSON.stringify(msg.text)})'>Edit</button>
+        <button onclick='openDeleteModal("${msg.message_id}")'>Delete</button>
+    `;
 
-        dropdown.style.display = "flex";
-    });
+    showDropdown(dropdown, html);
+});
+    box.addEventListener("touchstart", (e) => {
+
+    holdTimer = setTimeout(() => {
+
+        const dropdown = document.getElementById("globalDropdown");
+
+        const touch = e.touches[0];
+
+        const html = `
+            <button onclick='copyMsg(${JSON.stringify(msg.text)})'>Copy</button>
+            <button onclick='openEditModal("${msg.message_id}",${JSON.stringify(msg.text)})'>Edit</button>
+            <button onclick='openDeleteModal("${msg.message_id}")'>Delete</button>
+        `;
+
+        showDropdown(dropdown, html);
+
+    }, 500);
+});
 
     wrap.appendChild(box);
     chatBox.appendChild(wrap);
