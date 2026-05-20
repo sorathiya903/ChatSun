@@ -104,7 +104,7 @@ body{
     display:flex;
     flex-direction:column;
     gap:14px;
-    padding:20px 16px calc(var(--input-height) + 100px);
+    padding:20px 16px calc(var(--input-height) + 20px);
     }
 
 
@@ -393,39 +393,20 @@ body{
     background:#ef4444;
     color:white;
 }
-.{
-
-    .dropdown {
-    position: absolute;
+.dropdown{
+    position: fixed;
     display: none;
     flex-direction: column;
-    min-width: 160px;
+    min-width: 140px;
     background: #0f172a;
     border: 1px solid rgba(51,65,85,.9);
     border-radius: 18px;
     z-index: 9999;
     box-shadow: 0 10px 30px rgba(0,0,0,.35);
-    }
-
-.input-box{
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    padding: 14px 16px 20px;
-    background: linear-gradient(to top,#020617,rgba(2,6,23,.92));
-    backdrop-filter: blur(20px);
-
-    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
-                opacity 0.35s ease;
-
-    will-change: transform, opacity;
 }
 
-.input-box.hidden{
-    transform: translateY(120%);
-    opacity: 0;
-    pointer-events: none;
+    .input-box{
+    transition: transform 0.25s ease, opacity 0.25s ease;
     }
 </style>
 </head>
@@ -749,7 +730,7 @@ function addMessage(msg){
         `;
     }
 
-
+    box.appendChild(dropdown);
 
     /* ------------------ */
     /* HOLD / LONG PRESS  */
@@ -759,60 +740,29 @@ function addMessage(msg){
 
     box.addEventListener("touchstart", (e) => {
 
-    holdTimer = setTimeout(() => {
+        holdTimer = setTimeout(() => {
 
-        const dropdown = document.getElementById("globalDropdown");
+            document.querySelectorAll(".dropdown")
+                .forEach(d => d.style.display = "none");
 
-        dropdown.innerHTML = `
-            <button onclick='copyMsg(${JSON.stringify(msg.text)})'>Copy</button>
-        `;
+            dropdown.style.display = "flex";
 
-        if(msg.sender === currentUser.user_id){
-            dropdown.innerHTML += `
-                <button onclick='openEditModal("${msg.message_id}",${JSON.stringify(msg.text)})'>Edit</button>
-                <button onclick='openDeleteModal("${msg.message_id}")'>Delete</button>
-            `;
-        }
+        }, 500);
+    });
 
-        const touch = e.touches[0];
-
-
-
-
-dropdown.style.display = "flex";
-
-
-positionDropdown(dropdown, box);
-    }, 500);
-
-});
-    
     box.addEventListener("touchend", () => {
         clearTimeout(holdTimer);
     });
 
     box.addEventListener("contextmenu", (e) => {
 
-    e.preventDefault();
+        e.preventDefault();
 
-    const dropdown = document.getElementById("globalDropdown");
+        document.querySelectorAll(".dropdown")
+            .forEach(d => d.style.display = "none");
 
-    dropdown.innerHTML = `
-        <button onclick='copyMsg(${JSON.stringify(msg.text)})'>Copy</button>
-    `;
-
-    if(msg.sender === currentUser.user_id){
-        dropdown.innerHTML += `
-            <button onclick='openEditModal("${msg.message_id}",${JSON.stringify(msg.text)})'>Edit</button>
-            <button onclick='openDeleteModal("${msg.message_id}")'>Delete</button>
-        `;
-    }
-
-    dropdown.style.display = "flex";
-
-    //  USE FUNCTION HERE
-    positionDropdown(dropdown, box);
-});
+        dropdown.style.display = "flex";
+    });
 
     wrap.appendChild(box);
     chatBox.appendChild(wrap);
@@ -1041,70 +991,46 @@ async function confirmDelete(){
 /* ---------------- */
 /* BACK */
 /* ---------------- */
- function positionDropdown(dropdown, box) {
 
-    const rect = box.getBoundingClientRect();
-
-    const padding = 8;
-
-    let left = rect.right - 160; // align right side
-    let top = rect.bottom + 6;
-
-    // prevent overflow right
-    if (left < padding) left = padding;
-    if (left + 160 > window.innerWidth) {
-        left = window.innerWidth - 160 - padding;
-    }
-
-    // prevent overflow bottom
-    if (top + 120 > window.innerHeight) {
-        top = rect.top - 120;
-    }
-
-    dropdown.style.left = left + "px";
-    dropdown.style.top = top + "px";
-}
 function goBack(){
 
     location.href =
         "dashboard.html";
 }
 
-
     let lastScrollTop = 0;
-let hideTimeout = null;
+let inputVisible = true;
 const inputBox = document.querySelector(".input-box");
-chatBox.addEventListener("scroll", () => {
+function isAtBottom() {
+    return chatBox.scrollHeight - chatBox.scrollTop === chatBox.clientHeight;
+}
+    chatBox.addEventListener("scroll", () => {
 
-    const current = chatBox.scrollTop;
+    const currentScroll = chatBox.scrollTop;
+if (isAtBottom()) {
+    inputBox.style.transform = "translateY(0)";
+    inputBox.style.opacity = "1";
+    inputVisible = true;
+}
+    // scrolling up
+    if (currentScroll < lastScrollTop && inputVisible) {
 
-    const isAtBottom =
-        chatBox.scrollHeight - chatBox.scrollTop <= chatBox.clientHeight + 5;
+        inputBox.style.transform = "translateY(120px)";
+        inputBox.style.opacity = "0";
 
-    if (isAtBottom) {
-        inputBox.classList.remove("hidden");
-        return;
+        inputVisible = false;
     }
 
-    // scrolling down → show
-    if (current > lastScrollTop) {
+    // scrolling down
+    if (currentScroll > lastScrollTop && !inputVisible) {
 
-        clearTimeout(hideTimeout);
+        inputBox.style.transform = "translateY(0)";
+        inputBox.style.opacity = "1";
 
-        inputBox.classList.remove("hidden");
+        inputVisible = true;
     }
 
-    // scrolling up → hide (delayed for smoothness)
-    if (current < lastScrollTop) {
-
-        clearTimeout(hideTimeout);
-
-        hideTimeout = setTimeout(() => {
-            inputBox.classList.add("hidden");
-        }, 120);
-    }
-
-    lastScrollTop = current;
+    lastScrollTop = currentScroll;
 });
 </script>
 
