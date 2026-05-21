@@ -163,9 +163,30 @@ async def get_users():
 
 
 
+@app.get("/status/{user_id}")
+async def get_status(user_id: str):
 
+    return {
+        "online": user_id in online_users
+    }
 
+@app.post("/online/{user_id}")
+async def set_online(user_id: str):
 
+    online_users.add(user_id)
+
+    return {
+        "success": True
+    }
+
+@app.post("/offline/{user_id}")
+async def set_offline(user_id: str):
+
+    online_users.discard(user_id)
+
+    return {
+        "success": True
+    }
 
 # -----------------------------
 # MODELS
