@@ -303,11 +303,18 @@
           div.className =
             "user-card border border-slate-800 bg-slate-900/60 rounded-3xl p-5 cursor-pointer";
 
-          div.onclick = () => {
+           
 
-            location.href =
-              `chat.html?id=${chat.conversation_id}`;
-          };
+            div.onclick = async () => {
+
+  await fetch(
+    `${API_URL}/clear-unread/${chat.conversation_id}/${currentUser.user_id}`,
+    { method: "POST" }
+  );
+
+  location.href =
+    `chat.html?id=${chat.conversation_id}`;
+};
 
           div.innerHTML = `
 
@@ -547,7 +554,7 @@ function connectChatSocket(conversationId) {
 
       location.href = "index.html";
     }
-
+setInterval(loadUsers, 10000);
   </script>
 
 </body>
