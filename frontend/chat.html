@@ -443,9 +443,12 @@ body{
 }
 
 .read{
-    background:red;
-    box-shadow:0 0 8px #8b5cf6;
+    background:#38BDF8;
+    box-shadow: 0 0 6px rgba(0,255,149,0.4);
 }
+   .deliver{
+       background:#D1D5DB;box-shadow: 0 0 6px rgba(0,255,149,0.4);
+   
 </style>
 </head>
 
@@ -621,7 +624,7 @@ body{
 });
 
     function observeMessage(box, msg){
-alert("observe function called")
+console.log("observe function called")
 if(
     msg.sender === currentUser.user_id
 ) return;
@@ -650,7 +653,7 @@ const observer =
 
 observer.observe(box);
 
-  alert("request sent")  }
+  console.log("request sent")  }
 
     function getStatusDots(status){
 
@@ -658,25 +661,25 @@ observer.observe(box);
 
     if(status === "read"){
 
-        alert("Message was READ");
+        console.log("Message was READ");
 
         return `
             <span class="dots">
                 <span class="dot active"></span>
                 <span class="dot active"></span>
-                <span class="dot active read"></span>
+                <span class="dot read"></span>
             </span>
         `;
     }
 
     if(status === "delivered"){
 
-        alert("Message was DELIVERED");
+        console.log("Message was DELIVERED");
 
         return `
             <span class="dots">
                 <span class="dot active"></span>
-                <span class="dot active"></span>
+                <span class="dot deliver"></span>
                 <span class="dot"></span>
             </span>
         `;
@@ -684,7 +687,7 @@ observer.observe(box);
 
     if(status === "sent"){
 
-        alert("Message was SENT");
+        console.log("Message was SENT");
 
         return `
             <span class="dots">
