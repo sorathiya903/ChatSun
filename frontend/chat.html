@@ -953,7 +953,9 @@ ws.onmessage = (event)=>{
 
         return;
     }
-if(data.type === "status_update"){
+
+
+    if(data.type === "status_update"){
 
     const msgEl = document.querySelector(
         `[data-id="${data.message_id}"]`
@@ -964,12 +966,16 @@ if(data.type === "status_update"){
         const statusEl =
             msgEl.querySelector(".status");
 
-        statusEl.innerHTML =
-            getStatusDots(data.status);
+        if(statusEl){
+
+            statusEl.innerHTML =
+                getStatusDots(data.status);
+        }
     }
 
     return;
-                }
+    }
+                
     if(
     data.sender !== currentUser.user_id
 ){
