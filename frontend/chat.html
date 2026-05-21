@@ -457,6 +457,30 @@ body{
   background:#00e5ff;
   box-shadow:0 0 10px rgba(0,229,255,1);
 }
+
+    .unread-separator{
+    align-self:center;
+
+    background:rgba(99,102,241,.14);
+
+    border:1px solid rgba(99,102,241,.32);
+
+    color:#c4b5fd;
+
+    font-size:12px;
+
+    font-weight:600;
+
+    padding:8px 16px;
+
+    border-radius:999px;
+
+    margin:4px 0 10px;
+
+    backdrop-filter:blur(10px);
+
+    box-shadow:0 4px 18px rgba(99,102,241,.12);
+    }
 </style>
 </head>
 
@@ -637,6 +661,12 @@ if(
     msg.sender === currentUser.user_id
 ) return;
 
+
+        let unreadSeparatorAdded = false;
+
+        let lastDate = "";
+
+        
 const observer =
     new IntersectionObserver((entries)=>{
 
@@ -860,7 +890,26 @@ let moved = false;
 
         chatBox.appendChild(sep);
     }
+if(
+    !unreadSeparatorAdded &&
+    msg.sender !== currentUser.user_id &&
+    msg.status !== "read"
+){
 
+    unreadSeparatorAdded = true;
+
+    const unreadDiv =
+        document.createElement("div");
+
+    unreadDiv.className =
+        "unread-separator";
+
+    unreadDiv.innerText =
+        `${window.unreadCount} unread messages`;
+
+    chatBox.appendChild(unreadDiv);
+            }
+    
     const wrap = document.createElement("div");
     wrap.className = "msg-wrap " +
         (msg.sender === currentUser.user_id ? "me" : "other");
@@ -950,13 +999,19 @@ async function loadMessages(){
     const data =
         await res.json();
 
-    data
-    .sort((a,b)=>
-        new Date(a.timestamp)
-        -
-        new Date(b.timestamp)
-    )
-    .forEach(addMessage);
+    data.sort((a,b)=>
+    new Date(a.timestamp)
+    -
+    new Date(b.timestamp)
+);
+
+window.unreadCount = data.filter(
+    m =>
+        m.sender !== currentUser.user_id &&
+        m.status !== "read"
+).length;
+
+data.forEach(addMessage);
 }
 
 loadMessages();
