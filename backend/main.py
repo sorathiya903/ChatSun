@@ -102,7 +102,7 @@ async def chat(ws: WebSocket, conversation_id: str):
 
                 users_list = conversation_id.split("_")
                 unread_map = {u: 0 for u in users_list}
-                conversations.insert_one({   "conversation_id": conversation_id,  "users": users_list,  "messages": [],  "unread": unread_map})
+                conversations.insert_one({   "conversation_id": conversation_id,  "users": users_list,  "messages": [],  "unread": {   users_list[0]: 0,users_list[1]: 0    }})
 
             else:
 
