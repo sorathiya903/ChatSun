@@ -589,6 +589,10 @@ body{
 </div>
 
 <script>
+    const currentUser =
+    JSON.parse(localStorage.getItem("user"));
+
+    
     fetch(`${API_URL}/online/${currentUser.user_id}`, {
     method: "POST"
 });
@@ -627,8 +631,6 @@ function hideDropdown(dropdown) {
     }
 const renderedMessages = new Set();
 
-const currentUser =
-    JSON.parse(localStorage.getItem("user"));
 
 const conversationId =
     new URLSearchParams(location.search)
