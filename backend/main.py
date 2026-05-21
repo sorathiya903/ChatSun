@@ -42,6 +42,8 @@ users = db["users"]
 # Active WebSocket connections
 connections = {}
 
+online_users = set()
+
 
 # ---------------------------
 # WebSocket Chat Route
