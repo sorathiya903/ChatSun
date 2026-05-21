@@ -82,6 +82,7 @@ async def chat(ws: WebSocket, conversation_id: str):
                 "conversation_id": conversation_id,
                 "sender": data["sender"],
                 "text": data["text"],
+                "status": "sent",
                 "timestamp": datetime.now(  ZoneInfo("Asia/Kolkata")  ).isoformat()
           
             }
@@ -174,6 +175,7 @@ async def set_online(user_id: str):
     last_seen[user_id] = time.time()
 
     return {"success": True}
+
 
 @app.get("/status/{user_id}")
 async def get_status(user_id: str):
@@ -483,3 +485,52 @@ async def get_chats(user_id: str):
         })
 
     return result
+
+
+@app.post("/read/{message_id}")
+async def mark_read(message_id: str):
+
+    conversations.update_one(
+        {
+            "messages.message_id": message_id
+        },
+        {
+            "$set": {
+                "messages.$.status": "read"
+            }
+        }
+    )
+
+    return {
+        "success": True
+    }
+
+
+@app.post("/delivered/{conversation_id}/{user_id}")
+async def mark_delivered(
+    conversation_id: str,
+    user_id: str
+):
+
+    conversations.update_one(
+        {
+            "conversation_id": conversation_id
+        },
+        {
+            "$set": {
+                "messages.$[msg].status":
+                "delivered"
+            }
+        },
+        array_filters=[
+            {
+                "msg.sender": {
+                    "$ne": user_id
+                },
+
+                "msg.status": "sent"
+            }
+        ]
+    )
+
+    return {"success": True}
