@@ -657,7 +657,7 @@ body{
 
     let unreadSeparatorAdded = false;
 
-        
+        let unreadSeparatorElement = null;
 
 
     function observeMessage(box, msg){
@@ -899,17 +899,19 @@ if(
 ){
 
     unreadSeparatorAdded = true;
+const unreadDiv =
+    document.createElement("div");
 
-    const unreadDiv =
-        document.createElement("div");
+unreadDiv.className =
+    "unread-separator";
 
-    unreadDiv.className =
-        "unread-separator";
+unreadDiv.innerText =
+    `${window.unreadCount} unread messages`;
 
-    unreadDiv.innerText =
-        `${window.unreadCount} unread messages`;
+unreadSeparatorElement = unreadDiv;
 
-    chatBox.appendChild(unreadDiv);
+chatBox.appendChild(unreadDiv);
+    
             }
     
     const wrap = document.createElement("div");
@@ -1016,11 +1018,27 @@ window.unreadCount = data.filter(
 data.forEach(addMessage);
 }
 
-loadMessages();
-chatBox.scrollTo({
-    top: chatBox.scrollHeight,
-    behavior: "smooth"
-});
+async function initChat(){
+
+    await loadMessages();
+
+    if(unreadSeparatorElement){
+
+        unreadSeparatorElement.scrollIntoView({
+            behavior:"smooth",
+            block:"center"
+        });
+
+    }else{
+
+        chatBox.scrollTo({
+            top: chatBox.scrollHeight,
+            behavior:"smooth"
+        });
+    }
+}
+
+initChat();
 /* ---------------- */
 /* WS */
 /* ---------------- */
