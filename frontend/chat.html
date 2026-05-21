@@ -1065,7 +1065,21 @@ chatBox.appendChild(unreadDiv);
 
     let messageContent = "";
 
-if(msg.type === "file"){
+if(
+    msg.type === "file"
+    &&
+    msg.text
+    &&
+    (
+        msg.text.startsWith("http://")
+        ||
+        msg.text.startsWith("https://")
+        ||
+        msg.text.startsWith("/uploads/")
+        ||
+        msg.text.startsWith("uploads/")
+    )
+){
 
     const url = msg.text;
 
@@ -1228,6 +1242,15 @@ if(msg.type === "file"){
 
             </a>
         `;
+    }
+
+    else{
+
+    messageContent = `
+        <div class="text">
+            ${msg.text}
+        </div>
+    `;
     }
 
         }
