@@ -52,6 +52,8 @@ online_users = set()
 # ---------------------------
 
 
+
+
 @app.websocket("/ws/{conversation_id}")
 async def chat(ws: WebSocket, conversation_id: str):
 
@@ -65,87 +67,108 @@ async def chat(ws: WebSocket, conversation_id: str):
     try:
 
         while True:
-
             raw = await ws.receive_text()
-
             data = json.loads(raw)
-            # typing event
+
+            # -------------------------
+            # TYPING EVENT
+            # -------------------------
             if data.get("type") == "typing":
                 for conn in connections[conversation_id]:
-                    await conn.send_text(json.dumps({ "type": "typing", "sender": data["sender"]  }))
-                    
+                    await conn.send_text(json.dumps({
+                        "type": "typing",
+                        "sender": data["sender"]
+                    }))
                 continue
 
-# normal message
+            # -------------------------
+            # NORMAL MESSAGE
+            # -------------------------
+            sender = data["sender"]
+            text = data["text"]
+
+            users_list = conversation_id.split("_")
+
+            # safer receiver detection
+            receiver = next(u for u in users_list if u != sender)
+
             message = {
                 "message_id": str(uuid.uuid4()),
                 "conversation_id": conversation_id,
-                "sender": data["sender"],
-                "text": data["text"],
+                "sender": sender,
+                "text": text,
                 "status": "sent",
-                "timestamp": datetime.now(  ZoneInfo("Asia/Kolkata")  ).isoformat()
-          
+                "timestamp": datetime.now(
+                    ZoneInfo("Asia/Kolkata")
+                ).isoformat()
             }
-            sender = data["sender"]
-            users_list = conversation_id.split("_")
-            receiver = users_list[0] if users_list[1] == sender else users_list[1]
 
-            
-
-            # find conversation
+            # -------------------------
+            # FIND CONVERSATION
+            # -------------------------
             convo = conversations.find_one({
                 "conversation_id": conversation_id
             })
 
-            # create if not exists
+            # -------------------------
+            # CREATE IF NOT EXISTS
+            # -------------------------
             if not convo:
 
                 users_list = conversation_id.split("_")
-                unread_map = {u: 0 for u in users_list}
-                conversations.insert_one({   "conversation_id": conversation_id,  "users": users_list,  "messages": [],  "unread": {   users_list[0]: 0,users_list[1]: 0    }})
+
+                conversations.insert_one({
+                    "conversation_id": conversation_id,
+                    "users": users_list,
+                    "messages": [message],
+                    "unread": {u: 0 for u in users_list}
+                })
 
             else:
 
                 conversations.update_one(
-                    {
-                        "conversation_id":
-                            conversation_id
-                    },
-                    {
-                        "$push": {
-                            "messages":
-                                message
-                        }
-                    }
+                    {"conversation_id": conversation_id},
+                    {"$push": {"messages": message}}
                 )
-                conversations.update_one( {"conversation_id": conversation_id}, { "$inc": {   f"unread.{receiver}": 1  } })
 
+                # increment unread for receiver
+                conversations.update_one(
+                    {"conversation_id": conversation_id},
+                    {"$inc": {f"unread.{receiver}": 1}}
+                )
+
+            # -------------------------
+            # REALTIME BROADCAST MESSAGE
+            # -------------------------
             disconnected = []
 
-            # send to all sockets
             for conn in connections[conversation_id]:
-
                 try:
-
-                    await conn.send_text(
-                        json.dumps(message)
-                    )
-
+                    await conn.send_text(json.dumps(message))
                 except:
-
                     disconnected.append(conn)
 
-            # cleanup
             for conn in disconnected:
-
                 if conn in connections[conversation_id]:
-
                     connections[conversation_id].remove(conn)
 
+            # -------------------------
+            # REALTIME UNREAD UPDATE
+            # -------------------------
+            update = {
+                "type": "unread_update",
+                "conversation_id": conversation_id,
+                "receiver": receiver
+            }
+
+            for conn in connections[conversation_id]:
+                try:
+                    await conn.send_text(json.dumps(update))
+                except:
+                    pass
+
     except WebSocketDisconnect:
-
         if ws in connections[conversation_id]:
-
             connections[conversation_id].remove(ws)
 
 
