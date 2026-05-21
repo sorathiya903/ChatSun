@@ -620,6 +620,38 @@ body{
     method: "POST"
 });
 
+    function observeMessage(box, msg){
+alert("observe function called")
+if(
+    msg.sender === currentUser.user_id
+) return;
+
+const observer =
+    new IntersectionObserver((entries)=>{
+
+        entries.forEach(async(entry)=>{
+
+            if(entry.isIntersecting){
+
+                await fetch(
+                    `${API_URL}/read/${msg.message_id}`,
+                    {
+                        method:"POST"
+                    }
+                );
+
+                observer.unobserve(box);
+            }
+        });
+
+    },{
+        threshold:0.8
+    });
+
+observer.observe(box);
+
+  alert("request sent")  }
+
     function getStatusDots(status){
 
     if(status === "sent"){
@@ -881,7 +913,7 @@ let moved = false;
 
     wrap.appendChild(box);
     chatBox.appendChild(wrap);
-
+observeMessage(box, msg);
     chatBox.scrollTop = chatBox.scrollHeight;
         }
 
