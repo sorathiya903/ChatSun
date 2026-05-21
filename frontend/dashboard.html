@@ -248,8 +248,8 @@
       try {
 
         const res =
-          await fetch(
-            `https://chatsun.onrender.com/chats/${currentUser.user_id}`
+          await fetch(       
+            `${API_URL}/chats/${currentUser.user_id}`
           );
 
         const data =
@@ -407,7 +407,7 @@
 
         const res =
           await fetch(
-            `https://chatsun.onrender.com/search/${userId}`
+            `${API_URL}/search/${userId}`
           );
 
         const data =
