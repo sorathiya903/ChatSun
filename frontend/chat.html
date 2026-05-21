@@ -953,7 +953,7 @@ async function confirmEdit(){
 
     const res =
         await fetch(
-            `https://chatsun.onrender.com/message/${selectedMessageId}`,
+            `${API_URL}/message/${selectedMessageId}`,
             {
                 method:"PUT",
 
@@ -1001,7 +1001,7 @@ async function confirmDelete(){
 
     const res =
         await fetch(
-            `https://chatsun.onrender.com/message/${selectedMessageId}`,
+            `${API_URL}/message/${selectedMessageId}`,
             {
                 method:"DELETE"
             }
