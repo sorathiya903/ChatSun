@@ -132,6 +132,8 @@ async def chat(ws: WebSocket, conversation_id: str):
                 "conversation_id": conversation_id,
                 "sender": sender,
                 "text": text,
+                "type": data.get("type", "text"),
+                "file_name": data.get("file_name"),
                 "status": "sent",
                 "timestamp": datetime.now(
                     ZoneInfo("Asia/Kolkata")
