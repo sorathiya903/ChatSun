@@ -585,5 +585,33 @@ async def mark_delivered(message_id: str):
         "success": True
     }
     
+@app.get("/api/unread-count/{conversation_id}")
+async def get_unread_count(
+    conversation_id: str,
+    api_user=Depends(get_api_user)
+):
 
+    chat = db["chats"].find_one({
+        "conversation_id": conversation_id
+    })
+
+    if not chat:
+        raise HTTPException(404, "Chat not found")
+
+    current_user = api_user["email"].replace(".", "_")
+
+    unread_count = 0
+
+    for msg in chat.get("messages", []):
+
+        if (
+            msg.get("sender") != current_user
+            and msg.get("status") in ["sent", "delivered"]
+        ):
+            unread_count += 1
+
+    return {
+        "conversation_id": conversation_id,
+        "unread_count": unread_count
+                                           }
 
