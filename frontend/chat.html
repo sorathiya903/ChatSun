@@ -817,7 +817,8 @@ let moved = false;
 
     const box = document.createElement("div");
     box.className = "msg";
-
+    box.setAttribute("data-id", msg.message_id);
+    
     box.innerHTML = `
         <div class="sender">${msg.sender}</div>
         <div class="text">${msg.text}</div>
