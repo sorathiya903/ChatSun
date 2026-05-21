@@ -747,21 +747,20 @@ document.addEventListener("click",(e)=>{
 /* TYPING */
 /* ---------------- */
 
-input.addEventListener("input",()=>{
+input.addEventListener("input", () => {
 
     clearTimeout(typingTimer);
 
-    ws.send(JSON.stringify({
+    if (ws.readyState === WebSocket.OPEN) {
 
-        type:"typing",
+        ws.send(JSON.stringify({
+            type: "typing",
+            sender: currentUser.user_id
+        }));
 
-        sender:
-            currentUser.user_id
+    }
 
-    }));
-
-    typingTimer =
-        setTimeout(()=>{},1000);
+    typingTimer = setTimeout(() => {}, 1000);
 });
 
 /* ---------------- */
@@ -980,31 +979,25 @@ if(data.type === "status_update"){
 
 function sendMsg(){
 
-    if(
-        ws.readyState !== WebSocket.OPEN
-    ){
+    if(ws.readyState !== WebSocket.OPEN){
+        console.log("WebSocket not connected");
         return;
     }
 
     if(!input.value.trim()) return;
 
     ws.send(JSON.stringify({
-
-        sender:
-            currentUser.user_id,
-
-        text:
-            input.value
-
+        sender: currentUser.user_id,
+        text: input.value
     }));
 
     input.value = "";
-    chatBox.scrollTo({
-    top: chatBox.scrollHeight,
-    behavior: "smooth"
-});
-}
 
+    chatBox.scrollTo({
+        top: chatBox.scrollHeight,
+        behavior: "smooth"
+    });
+}
 /* ---------------- */
 /* COPY */
 /* ---------------- */
@@ -1190,6 +1183,17 @@ setInterval(updateStatus, 5000);
         `${API_URL}/offline/${currentUser.user_id}`
     );
 });
+    ws.onopen = () => {
+    console.log("WS Connected");
+};
+
+ws.onerror = (e) => {
+    console.log("WS Error", e);
+};
+
+ws.onclose = () => {
+    console.log("WS Closed");
+};
 </script>
 
 </body>
