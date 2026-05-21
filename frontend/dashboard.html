@@ -343,23 +343,30 @@
 
               <div class="text-right">
 
-                <div class="text-xs text-slate-500">
+  <!-- UNREAD BADGE -->
+  ${
+    chat.unread && chat.unread[currentUser.user_id] > 0
+      ? `
+        <div class="bg-indigo-500 text-white text-xs px-3 py-1 rounded-full mb-2">
+          ${chat.unread[currentUser.user_id]}
+        </div>
+      `
+      : ""
+  }
 
-                  ${
-                    chat.last_message
-                      ? new Date(
-                          chat.last_message.timestamp
-                        ).toLocaleTimeString([], {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                          hour12: true
-                        })
-                      : ""
-                  }
+  <div class="text-xs text-slate-500">
+    ${
+      chat.last_message
+        ? new Date(chat.last_message.timestamp).toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true
+          })
+        : ""
+    }
+  </div>
 
-                </div>
-
-              </div>
+</div>
 
             </div>
           `;
@@ -367,6 +374,9 @@
           usersDiv.appendChild(div);
 
         });
+        data.forEach(chat => {
+  connectChatSocket(chat.conversation_id);
+});
 
       } catch (err) {
 
@@ -383,7 +393,38 @@
     // -------------------
     // SEARCH USER
     // -------------------
+const conversationSockets = {};
 
+function connectChatSocket(conversationId) {
+
+  if (conversationSockets[conversationId]) return;
+
+  const ws = new WebSocket(
+    `${WS_URL}/ws/${conversationId}`
+  );
+
+  conversationSockets[conversationId] = ws;
+
+  ws.onmessage = (event) => {
+
+    const data = JSON.parse(event.data);
+
+    // 🔥 UNREAD UPDATE
+    if (data.type === "unread_update") {
+      loadUsers(); // refresh chat list instantly
+    }
+
+    // optional: typing
+    if (data.type === "typing") {
+      console.log("typing:", data.sender);
+    }
+
+    // optional: new message
+    if (data.message_id) {
+      loadUsers();
+    }
+  };
+  }
     async function searchUser() {
 
       const userId =
