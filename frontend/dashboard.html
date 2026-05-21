@@ -351,15 +351,15 @@
               <div class="text-right">
 
   <!-- UNREAD BADGE -->
-  ${
-    chat.unread && chat.unread[currentUser.user_id] > 0
-      ? `
-        <div class="bg-indigo-500 text-white text-xs inline-flex items-center justify-center rounded-full bg-blue-500 text-white px-4 h-12 min-w-12">
-          ${chat.unread[currentUser.user_id]}
-        </div>
-      `
-      : ""
-  }
+${
+  chat.unread && chat.unread[currentUser.user_id] > 0
+    ? `
+      <div class="bg-indigo-500 text-white text-xs font-medium inline-flex items-center justify-center rounded-full min-w-[20px] h-5 px-1.5">
+        ${chat.unread[currentUser.user_id]}
+      </div>
+    `
+    : ""
+            }
 
   <div class="text-xs text-slate-500">
     ${
