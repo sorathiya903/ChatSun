@@ -15,7 +15,7 @@
 
 <!-- Tailwind -->
 <script src="https://cdn.tailwindcss.com"></script>
-
+<script src="config.js"></script>
 <style>
 :root{
     --input-height: 110px;
@@ -634,7 +634,7 @@ document.getElementById("avatarLetter")
     otherUser.charAt(0).toUpperCase();
 
 const ws = new WebSocket(
-    `wss://chatsun.onrender.com/ws/${conversationId}`
+    `${WS_URL}/ws/${conversationId}`
 );
 
 const chatBox =
@@ -806,7 +806,7 @@ async function loadMessages(){
 
     const res =
         await fetch(
-            `https://chatsun.onrender.com/messages/${conversationId}`
+            `${API_URL}/messages/${conversationId}`
         );
 
     const data =
