@@ -423,6 +423,29 @@ body{
 .offline{
     color:#ef4444;
             }
+
+    .dots{
+    display:inline-flex;
+    gap:3px;
+    margin-left:6px;
+    vertical-align:middle;
+}
+
+.dot{
+    width:6px;
+    height:6px;
+    border-radius:50%;
+    background:rgba(255,255,255,.25);
+}
+
+.dot.active{
+    background:#c4b5fd;
+}
+
+.dot.read{
+    background:#a78bfa;
+    box-shadow:0 0 8px #8b5cf6;
+}
 </style>
 </head>
 
@@ -596,6 +619,45 @@ body{
     fetch(`${API_URL}/online/${currentUser.user_id}`, {
     method: "POST"
 });
+
+    function getStatusDots(status){
+
+    if(status === "sent"){
+
+        return `
+            <span class="dots">
+                <span class="dot active"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+            </span>
+        `;
+    }
+
+    if(status === "delivered"){
+
+        return `
+            <span class="dots">
+                <span class="dot active"></span>
+                <span class="dot active"></span>
+                <span class="dot"></span>
+            </span>
+        `;
+    }
+
+    if(status === "read"){
+
+        return `
+            <span class="dots">
+                <span class="dot active"></span>
+                <span class="dot active"></span>
+                <span class="dot active read"></span>
+            </span>
+        `;
+    }
+
+    return "";
+    }
+
     function buildDropdown(msg) {
     let html = `
         <button onclick='copyMsg(${JSON.stringify(msg.text)})'>Copy</button>
@@ -759,7 +821,17 @@ let moved = false;
     box.innerHTML = `
         <div class="sender">${msg.sender}</div>
         <div class="text">${msg.text}</div>
-        <div class="time">${formatTime(msg.timestamp)}</div>
+  <div class="time">
+    ${formatTime(msg.timestamp)}
+
+    ${
+        msg.sender === currentUser.user_id
+        ? `<span class="status">
+              ${getStatusDots(msg.status)}
+           </span>`
+        : ""
+    }
+</div>
     `;
 
     
@@ -881,7 +953,23 @@ ws.onmessage = (event)=>{
 
         return;
     }
+if(data.type === "status_update"){
 
+    const msgEl = document.querySelector(
+        `[data-id="${data.message_id}"]`
+    );
+
+    if(msgEl){
+
+        const statusEl =
+            msgEl.querySelector(".status");
+
+        statusEl.innerHTML =
+            getStatusDots(data.status);
+    }
+
+    return;
+                }
     addMessage(data);
 };
 
