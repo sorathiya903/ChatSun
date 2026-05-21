@@ -490,6 +490,13 @@ async def get_chats(user_id: str):
 @app.post("/read/{message_id}")
 async def mark_read(message_id: str):
 
+    convo = conversations.find_one({
+        "messages.message_id": message_id
+    })
+
+    if not convo:
+        return {"success": False}
+
     conversations.update_one(
         {
             "messages.message_id": message_id
@@ -501,36 +508,80 @@ async def mark_read(message_id: str):
         }
     )
 
-    return {
-        "success": True
+    update_data = {
+        "type": "status_update",
+        "message_id": message_id,
+        "status": "read"
     }
 
+    for conn in connections[
+        convo["conversation_id"]
+    ]:
 
-@app.post("/delivered/{conversation_id}/{user_id}")
-async def mark_delivered(
-    conversation_id: str,
-    user_id: str
-):
+        await conn.send_text(
+            json.dumps(update_data)
+        )
+
+    return {"success": True}
+
+@app.post("/delivered/{message_id}")
+async def mark_delivered(message_id: str):
+
+    convo = conversations.find_one({
+        "messages.message_id": message_id
+    })
+
+    if not convo:
+        return {"success": False}
 
     conversations.update_one(
         {
-            "conversation_id": conversation_id
+            "messages.message_id": message_id
         },
         {
             "$set": {
-                "messages.$[msg].status":
-                "delivered"
+                "messages.$.status": "delivered"
             }
-        },
-        array_filters=[
-            {
-                "msg.sender": {
-                    "$ne": user_id
-                },
-
-                "msg.status": "sent"
-            }
-        ]
+        }
     )
 
-    return {"success": True}
+    update_data = {
+        "type": "status_update",
+        "message_id": message_id,
+        "status": "delivered"
+    }
+
+    disconnected = []
+
+    for conn in connections.get(
+        convo["conversation_id"],
+        []
+    ):
+
+        try:
+
+            await conn.send_text(
+                json.dumps(update_data)
+            )
+
+        except:
+
+            disconnected.append(conn)
+
+    # cleanup dead sockets
+    for conn in disconnected:
+
+        if conn in connections[
+            convo["conversation_id"]
+        ]:
+
+            connections[
+                convo["conversation_id"]
+            ].remove(conn)
+
+    return {
+        "success": True
+    }
+    }
+
+
