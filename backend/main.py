@@ -104,6 +104,7 @@ async def chat(ws: WebSocket, conversation_id: str):
 
                     "users":
                         conversation_id.split("_"),
+                    "unreads":[]
 
                     "messages":
                         [message]
