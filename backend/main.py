@@ -489,6 +489,7 @@ async def delete_message(message_id: str):
     return {"success": True}
 
 @app.get("/chats/{user_id}")
+@app.get("/chats/{user_id}")
 async def get_chats(user_id: str):
 
     all_conversations = conversations.find({
@@ -506,21 +507,19 @@ async def get_chats(user_id: str):
 
         last_message = None
 
-        if convo["messages"]:
-
+        if convo.get("messages"):
             last_message = convo["messages"][-1]
 
+        unread_map = convo.get("unread", {})
+
         result.append({
-
-            "conversation_id":convo["conversation_id"],
-
-            "user_id":other_user,
-
-            "last_message": last_message
+            "conversation_id": convo["conversation_id"],
+            "user_id": other_user,
+            "last_message": last_message,
+            "unread": unread_map  
         })
 
     return result
-
 
 @app.post("/read/{message_id}")
 async def mark_read(message_id: str):
