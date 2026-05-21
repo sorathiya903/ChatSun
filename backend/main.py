@@ -8,7 +8,9 @@ from zoneinfo import ZoneInfo
 import uuid
 import json
 import re
+import time
 
+last_seen = {}
 app = FastAPI()
 
 app.add_middleware(
@@ -165,20 +167,27 @@ async def get_users():
 
 
 
-@app.get("/status/{user_id}")
-async def get_status(user_id: str):
-
-    return {
-        "online": user_id in online_users
-    }
 
 @app.post("/online/{user_id}")
 async def set_online(user_id: str):
 
-    online_users.add(user_id)
+    last_seen[user_id] = time.time()
+
+    return {"success": True}
+
+@app.get("/status/{user_id}")
+async def get_status(user_id: str):
+
+    online = False
+
+    if user_id in last_seen:
+
+        online = (
+            time.time() - last_seen[user_id]
+        ) < 30
 
     return {
-        "success": True
+        "online": online
     }
 
 @app.post("/offline/{user_id}")
