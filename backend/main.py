@@ -82,7 +82,7 @@ async def upload_file(file: UploadFile = File(...)):
 
     return {
         "url":
-        f"{BASE_URL}/uploads/{filename}",
+        f"https://chatsun-production.up.railway.app//uploads/{filename}",
 
         "name":
         file.filename
