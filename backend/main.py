@@ -86,6 +86,9 @@ async def chat(ws: WebSocket, conversation_id: str):
                 "timestamp": datetime.now(  ZoneInfo("Asia/Kolkata")  ).isoformat()
           
             }
+            sender = data["sender"]
+            users_list = conversation_id.split("_")
+            receiver = users_list[0] if users_list[1] == sender else users_list[1]
 
             
 
@@ -115,6 +118,7 @@ async def chat(ws: WebSocket, conversation_id: str):
                         }
                     }
                 )
+                conversations.update_one( {"conversation_id": conversation_id}, { "$inc": {   f"unread.{receiver}": 1  } })
 
             disconnected = []
 
@@ -143,6 +147,22 @@ async def chat(ws: WebSocket, conversation_id: str):
         if ws in connections[conversation_id]:
 
             connections[conversation_id].remove(ws)
+
+
+@app.post("/clear-unread/{conversation_id}/{user_id}")
+async def clear_unread(conversation_id: str, user_id: str):
+
+    conversations.update_one(
+        {"conversation_id": conversation_id},
+        {
+            "$set": {
+                f"unread.{user_id}": 0
+            }
+        }
+    )
+
+    return {"success": True}
+
 
 
 @app.get("/users")
