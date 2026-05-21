@@ -589,6 +589,9 @@ body{
 </div>
 
 <script>
+    fetch(`${API_URL}/online/${currentUser.user_id}`, {
+    method: "POST"
+});
     function buildDropdown(msg) {
     let html = `
         <button onclick='copyMsg(${JSON.stringify(msg.text)})'>Copy</button>
@@ -1071,32 +1074,31 @@ if (isAtBottom()) {
     lastScrollTop = currentScroll;
 });
 
-    const statusText =
-    document.getElementById("statusText");
+    async function updateStatus() {
 
-ws.onopen = () => {
+    const res = await fetch(
+        `${API_URL}/status/${otherUser}`
+    );
 
-    statusText.innerText = "Online";
+    const data = await res.json();
 
-    statusText.classList.remove("offline");
-    statusText.classList.add("online");
-};
+    document.getElementById("statusText")
+        .innerText =
+        data.online
+        ? "Online"
+        : "Offline";
+}
 
-ws.onclose = () => {
+updateStatus();
 
-    statusText.innerText = "Offline";
+setInterval(updateStatus, 5000);
 
-    statusText.classList.remove("online");
-    statusText.classList.add("offline");
-};
+    window.addEventListener("beforeunload", () => {
 
-ws.onerror = () => {
-
-    statusText.innerText = "Offline";
-
-    statusText.classList.remove("online");
-    statusText.classList.add("offline");
-};
+    navigator.sendBeacon(
+        `${API_URL}/offline/${currentUser.user_id}`
+    );
+});
 </script>
 
 </body>
