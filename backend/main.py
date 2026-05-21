@@ -97,18 +97,9 @@ async def chat(ws: WebSocket, conversation_id: str):
             # create if not exists
             if not convo:
 
-                conversations.insert_one({
-
-                    "conversation_id":
-                        conversation_id,
-
-                    "users":
-                        conversation_id.split("_"),
-                    "unreads":[]
-
-                    "messages":
-                        [message]
-                })
+                users_list = conversation_id.split("_")
+                unread_map = {u: 0 for u in users_list}
+                conversations.insert_one({   "conversation_id": conversation_id,  "users": users_list,  "messages": [],  "unread": unread_map})
 
             else:
 
@@ -586,33 +577,19 @@ async def mark_delivered(message_id: str):
         "success": True
     }
     
-@app.get("/api/unread-count/{conversation_id}")
-async def get_unread_count(
-    conversation_id: str,
-    api_user=Depends(get_api_user)
-):
+@app.get("/api/unread-count/{conversation_id}/{user_id}")
+async def get_unread_count(conversation_id: str, user_id: str):
 
-    chat = db["chats"].find_one({
+    chat = conversations.find_one({
         "conversation_id": conversation_id
     })
 
     if not chat:
-        raise HTTPException(404, "Chat not found")
+        return {"unread_count": 0}
 
-    current_user = api_user["email"].replace(".", "_")
-
-    unread_count = 0
-
-    for msg in chat.get("messages", []):
-
-        if (
-            msg.get("sender") != current_user
-            and msg.get("status") in ["sent", "delivered"]
-        ):
-            unread_count += 1
+    unread_count = chat.get("unread", {}).get(user_id, 0)
 
     return {
         "conversation_id": conversation_id,
         "unread_count": unread_count
-                                           }
-
+        }
