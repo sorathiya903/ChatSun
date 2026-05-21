@@ -493,6 +493,8 @@ async def mark_read(message_id: str):
     convo = conversations.find_one({
         "messages.message_id": message_id
     })
+    print(message_id)
+    print(conversations.find_one({ "messages.message_id": message_id}))
 
     if not convo:
         return {"success": False}
