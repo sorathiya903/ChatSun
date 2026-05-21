@@ -11,14 +11,14 @@ import re
 import time
 from fastapi.staticfiles import StaticFiles
 
-
+app = FastAPI()
 app.mount(
     "/uploads",
     StaticFiles(directory="uploads"),
     name="uploads"
 )
 last_seen = {}
-app = FastAPI()
+
 
 app.add_middleware(
     CORSMiddleware,
