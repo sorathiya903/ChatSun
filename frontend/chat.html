@@ -1030,6 +1030,10 @@ ws.onmessage = (event)=>{
     
     console.log("WS DATA:", data);
 
+if(!data.message_id || !data.text || !data.sender) {
+        console.log("Bad WS packet ignored:", data);
+        return;
+    }
 
     addMessage(data);
 };
