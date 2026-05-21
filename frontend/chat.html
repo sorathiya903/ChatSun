@@ -654,35 +654,43 @@ observer.observe(box);
 
     function getStatusDots(status){
 
-    if(status === "sent"){
-
-        return `
-            <span class="dots">
-                <span class="dot active"></span>
-                <span class="dot"></span>
-                <span class="dot"></span>
-            </span>
-        `;
-    }
-
-    if(status === "delivered"){
-
-        return `
-            <span class="dots">
-                <span class="dot active"></span>
-                <span class="dot active"></span>
-                <span class="dot"></span>
-            </span>
-        `;
-    }
+    console.log("STATUS UPDATE:", status);
 
     if(status === "read"){
+
+        alert("Message was READ");
 
         return `
             <span class="dots">
                 <span class="dot active"></span>
                 <span class="dot active"></span>
                 <span class="dot active read"></span>
+            </span>
+        `;
+    }
+
+    if(status === "delivered"){
+
+        alert("Message was DELIVERED");
+
+        return `
+            <span class="dots">
+                <span class="dot active"></span>
+                <span class="dot active"></span>
+                <span class="dot"></span>
+            </span>
+        `;
+    }
+
+    if(status === "sent"){
+
+        alert("Message was SENT");
+
+        return `
+            <span class="dots">
+                <span class="dot active"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
             </span>
         `;
     }
