@@ -506,17 +506,71 @@ body{
 .file-btn:hover{
     background:rgba(99,102,241,.2);
 }
-    .chat-image{
-    max-width:240px;
-    border-radius:18px;
-    margin-top:6px;
-}
-
+    
 .file-link{
     color:#c4b5fd;
     text-decoration:none;
     font-weight:600;
     }
+
+    .file-card{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+
+    margin-top:8px;
+
+    text-decoration:none;
+    color:white;
+}
+
+.chat-image{
+    width:100%;
+    max-width:260px;
+
+    border-radius:18px;
+
+    object-fit:cover;
+
+    border:1px solid rgba(255,255,255,.08);
+}
+
+.chat-video{
+    width:100%;
+    max-width:260px;
+
+    border-radius:18px;
+
+    background:black;
+}
+
+.file-preview{
+    width:72px;
+    height:72px;
+
+    border-radius:20px;
+
+    background:rgba(255,255,255,.08);
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:34px;
+}
+
+.file-name{
+    font-size:14px;
+    word-break:break-word;
+
+    color:#e2e8f0;
+}
+
+.file-download{
+    font-size:13px;
+    color:#c4b5fd;
+    text-decoration:none;
+        }
 </style>
 </head>
 
@@ -1013,37 +1067,170 @@ chatBox.appendChild(unreadDiv);
 
 if(msg.type === "file"){
 
+    const url = msg.text;
+
+    const fileName =
+        msg.file_name || "File";
+
+    /* IMAGE */
+
     if(
-        msg.text.match(
+        url.match(
             /\.(jpg|jpeg|png|gif|webp)$/i
         )
     ){
 
         messageContent = `
-            <img
-                src="${msg.text}"
-                class="chat-image"
-            >
-        `;
+            <div class="file-card">
 
-    }else{
+                <img
+                    src="${url}"
+                    class="chat-image"
+                >
+
+                <a
+                    href="${url}"
+                    target="_blank"
+                    class="file-download"
+                >
+                    Open Image
+                </a>
+
+            </div>
+        `;
+    }
+
+    /* VIDEO */
+
+    else if(
+        url.match(
+            /\.(mp4|webm|ogg)$/i
+        )
+    ){
+
+        messageContent = `
+            <div class="file-card">
+
+                <video
+                    class="chat-video"
+                    controls
+                >
+                    <source
+                        src="${url}"
+                    >
+                </video>
+
+                <div class="file-name">
+                    🎥 ${fileName}
+                </div>
+
+            </div>
+        `;
+    }
+
+    /* AUDIO */
+
+    else if(
+        url.match(
+            /\.(mp3|wav|m4a)$/i
+        )
+    ){
+
+        messageContent = `
+            <div class="file-card">
+
+                <div class="file-preview">
+                    🎵
+                </div>
+
+                <audio controls>
+                    <source src="${url}">
+                </audio>
+
+                <div class="file-name">
+                    ${fileName}
+                </div>
+
+            </div>
+        `;
+    }
+
+    /* PDF */
+
+    else if(
+        url.match(/\.pdf$/i)
+    ){
 
         messageContent = `
             <a
-                href="${msg.text}"
+                href="${url}"
                 target="_blank"
-                class="file-link"
+                class="file-card"
             >
-                📄 ${msg.file_name || "File"}
+
+                <div class="file-preview">
+                    📕
+                </div>
+
+                <div class="file-name">
+                    ${fileName}
+                </div>
+
             </a>
         `;
     }
 
-}else{
+    /* ZIP */
 
-    messageContent =
-        `<div class="text">${msg.text}</div>`;
+    else if(
+        url.match(
+            /\.(zip|rar|7z)$/i
+        )
+    ){
+
+        messageContent = `
+            <a
+                href="${url}"
+                target="_blank"
+                class="file-card"
+            >
+
+                <div class="file-preview">
+                    🗜️
+                </div>
+
+                <div class="file-name">
+                    ${fileName}
+                </div>
+
+            </a>
+        `;
     }
+
+    /* DEFAULT FILE */
+
+    else{
+
+        messageContent = `
+            <a
+                href="${url}"
+                target="_blank"
+                class="file-card"
+            >
+
+                <div class="file-preview">
+                    📄
+                </div>
+
+                <div class="file-name">
+                    ${fileName}
+                </div>
+
+            </a>
+        `;
+    }
+
+        }
     
     box.innerHTML = `
         <div class="sender">${msg.sender}</div>
