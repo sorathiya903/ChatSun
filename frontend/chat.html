@@ -1643,7 +1643,7 @@ if(!data.message_id || !data.text || !data.sender) {
 /* SEND */
 /* ---------------- */
 
-function sendMsg(){
+async function sendMsg(){
 
     if(ws.readyState !== WebSocket.OPEN){
         console.log("WebSocket not connected");
