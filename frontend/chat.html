@@ -481,6 +481,42 @@ body{
 
     box-shadow:0 4px 18px rgba(99,102,241,.12);
     }
+
+    .file-btn{
+    width:48px;
+    height:48px;
+
+    border-radius:16px;
+
+    background:rgba(99,102,241,.12);
+
+    border:1px solid rgba(99,102,241,.2);
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    cursor:pointer;
+
+    font-size:20px;
+
+    transition:.2s;
+}
+
+.file-btn:hover{
+    background:rgba(99,102,241,.2);
+}
+    .chat-image{
+    max-width:240px;
+    border-radius:18px;
+    margin-top:6px;
+}
+
+.file-link{
+    color:#c4b5fd;
+    text-decoration:none;
+    font-weight:600;
+    }
 </style>
 </head>
 
@@ -542,7 +578,17 @@ body{
 <div class="input-box">
 
     <div class="input-inner">
+<label class="file-btn">
 
+    <input
+        type="file"
+        id="fileInput"
+        hidden
+    >
+
+    📎
+
+</label>
         <input id="msg" placeholder="Type a message...">
 
         <button class="send-btn" onclick="sendMsg()">
@@ -659,7 +705,47 @@ body{
 
         let unreadSeparatorElement = null;
 
+async function uploadFile(){
 
+    const file = fileInput.files[0];
+
+    if(!file) return;
+
+    const formData = new FormData();
+
+    formData.append("file", file);
+
+    const res = await fetch(
+        `${API_URL}/upload`,
+        {
+            method:"POST",
+            body:formData
+        }
+    );
+
+    const data = await res.json();
+
+    ws.send(JSON.stringify({
+
+        sender: currentUser.user_id,
+
+        text: data.url,
+
+        file_name: data.name,
+
+        type: "file"
+    }));
+
+    fileInput.value = "";
+}
+
+    const fileInput =
+    document.getElementById("fileInput");
+
+fileInput.addEventListener(
+    "change",
+    uploadFile
+);
     function observeMessage(box, msg){
 console.log("observe function called")
 if(
@@ -921,10 +1007,47 @@ chatBox.appendChild(unreadDiv);
     const box = document.createElement("div");
     box.className = "msg";
     box.setAttribute("data-id", msg.message_id);
+
+
+    let messageContent = "";
+
+if(msg.type === "file"){
+
+    if(
+        msg.text.match(
+            /\.(jpg|jpeg|png|gif|webp)$/i
+        )
+    ){
+
+        messageContent = `
+            <img
+                src="${msg.text}"
+                class="chat-image"
+            >
+        `;
+
+    }else{
+
+        messageContent = `
+            <a
+                href="${msg.text}"
+                target="_blank"
+                class="file-link"
+            >
+                📄 ${msg.file_name || "File"}
+            </a>
+        `;
+    }
+
+}else{
+
+    messageContent =
+        `<div class="text">${msg.text}</div>`;
+    }
     
     box.innerHTML = `
         <div class="sender">${msg.sender}</div>
-        <div class="text">${msg.text}</div>
+        <div class="text">${messageContent}</div>
   <div class="time">
     ${formatTime(msg.timestamp)}
 
