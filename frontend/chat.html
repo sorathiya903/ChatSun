@@ -976,24 +976,36 @@ ws.onmessage = (event)=>{
     return;
     }
                 
-    if(
-    data.sender !== currentUser.user_id
+    
+    console.log("WS DATA:", data);
+
+if(
+data.sender !== currentUser.user_id
 ){
 
-    fetch(
-        `${API_URL}/delivered/${data.message_id}`,
-        {
-            method:"POST"
-        }
-    );
+console.log("SENDING READ FOR:", data.message_id);
 
-    fetch(
-        `${API_URL}/read/${data.message_id}`,
-        {
-            method:"POST"
-        }
-    );
+fetch(
+    `${API_URL}/delivered/${data.message_id}`,
+    {
+        method:"POST"
     }
+)
+.then(r => r.json())
+.then(d => console.log("DELIVERED:", d))
+.catch(e => console.log(e));
+
+fetch(
+    `${API_URL}/read/${data.message_id}`,
+    {
+        method:"POST"
+    }
+)
+.then(r => r.json())
+.then(d => console.log("READ:", d))
+.catch(e => console.log(e));
+
+}
     addMessage(data);
 };
 
