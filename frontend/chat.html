@@ -438,17 +438,28 @@ body{
     background:rgba(255,255,255,.25);
 }
 
-.active{
-    background:#666666;
+/* default inactive dot */
+.active {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #6b7280;
+  opacity: 0.55;
 }
 
-.read{
-    background:#38BDF8;
-    box-shadow: 0 0 6px rgba(0,255,149,0.4);
+/* delivered */
+.deliver {
+  background: #d1d5db;
+  opacity: 0.95;
+  box-shadow: 0 0 6px rgba(255,255,255,0.35);
 }
-   .deliver{
-       background:#D1D5DB;box-shadow: 0 0 6px rgba(0,255,149,0.4);
-   
+
+/* read */
+.read {
+  background: #38bdf8;
+  opacity: 1;
+  box-shadow: 0 0 8px rgba(56,189,248,0.7);
+        }
 </style>
 </head>
 
