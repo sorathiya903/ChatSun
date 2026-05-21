@@ -655,6 +655,11 @@ body{
     method: "POST"
 });
 
+    let unreadSeparatorAdded = false;
+
+        let lastDate = "";
+
+
     function observeMessage(box, msg){
 console.log("observe function called")
 if(
@@ -662,10 +667,7 @@ if(
 ) return;
 
 
-        let unreadSeparatorAdded = false;
-
-        let lastDate = "";
-
+        
         
 const observer =
     new IntersectionObserver((entries)=>{
