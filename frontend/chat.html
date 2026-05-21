@@ -970,6 +970,24 @@ if(data.type === "status_update"){
 
     return;
                 }
+    if(
+    data.sender !== currentUser.user_id
+){
+
+    fetch(
+        `${API_URL}/delivered/${data.message_id}`,
+        {
+            method:"POST"
+        }
+    );
+
+    fetch(
+        `${API_URL}/read/${data.message_id}`,
+        {
+            method:"POST"
+        }
+    );
+    }
     addMessage(data);
 };
 
