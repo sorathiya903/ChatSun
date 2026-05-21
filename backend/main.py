@@ -1,4 +1,4 @@
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Body
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Body, UploadFile, File
 from pymongo import MongoClient
 from pydantic import BaseModel
 import os
@@ -9,7 +9,14 @@ import uuid
 import json
 import re
 import time
+from fastapi.staticfiles import StaticFiles
 
+
+app.mount(
+    "/uploads",
+    StaticFiles(directory="uploads"),
+    name="uploads"
+)
 last_seen = {}
 app = FastAPI()
 
@@ -52,6 +59,34 @@ online_users = set()
 # ---------------------------
 
 
+
+
+UPLOAD_DIR = "uploads"
+
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+@app.post("/upload")
+async def upload_file(file: UploadFile = File(...)):
+
+    ext = file.filename.split(".")[-1]
+
+    filename = f"{uuid.uuid4()}.{ext}"
+
+    path = os.path.join(
+        UPLOAD_DIR,
+        filename
+    )
+
+    with open(path, "wb") as f:
+        f.write(await file.read())
+
+    return {
+        "url":
+        f"{BASE_URL}/uploads/{filename}",
+
+        "name":
+        file.filename
+    }
 
 
 @app.websocket("/ws/{conversation_id}")
