@@ -415,6 +415,14 @@ body{
     .input-box{
     transition: transform 0.25s ease, opacity 0.25s ease;
     }
+
+        .online{
+    color:#22c55e;
+}
+
+.offline{
+    color:#ef4444;
+            }
 </style>
 </head>
 
@@ -448,7 +456,9 @@ body{
 
     <div class="user-info">
         <h2 id="chatUser">Chat</h2>
-        <p>Online</p>
+        <p id="statusText" class="online-status">
+    Connecting...
+        </p>
     </div>
 
 </div>
@@ -1060,6 +1070,33 @@ if (isAtBottom()) {
 
     lastScrollTop = currentScroll;
 });
+
+    const statusText =
+    document.getElementById("statusText");
+
+ws.onopen = () => {
+
+    statusText.innerText = "Online";
+
+    statusText.classList.remove("offline");
+    statusText.classList.add("online");
+};
+
+ws.onclose = () => {
+
+    statusText.innerText = "Offline";
+
+    statusText.classList.remove("online");
+    statusText.classList.add("offline");
+};
+
+ws.onerror = () => {
+
+    statusText.innerText = "Offline";
+
+    statusText.classList.remove("online");
+    statusText.classList.add("offline");
+};
 </script>
 
 </body>
