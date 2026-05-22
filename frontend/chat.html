@@ -1894,6 +1894,7 @@ if(
     unreadSeparatorElement &&
     data.seen_by.includes(currentUser.user_id)
 ){
+    ignoreNextScroll = true;
 
     window.unreadCount--;
 
@@ -1902,7 +1903,6 @@ if(
     const oldHeight = chatBox.scrollHeight;
     const oldScroll = chatBox.scrollTop;
 
-    ignoreNextScroll = true;
 
     unreadSeparatorElement.remove();
 
