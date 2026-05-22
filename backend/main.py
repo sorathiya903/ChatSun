@@ -525,38 +525,100 @@ async def delete_message(message_id: str):
 
     return {"success": True}
 
-@app.get("/chats/{user_id}")
+
 @app.get("/chats/{user_id}")
 async def get_chats(user_id: str):
 
-    all_conversations = conversations.find({
-        "users": user_id
-    })
+    conversations = list(
+        db.conversations.find({
+            "users": user_id
+        })
+    )
 
-    result = []
+    chats = []
 
-    for convo in all_conversations:
+    for convo in conversations:
 
-        other_user = next(
-            u for u in convo["users"]
-            if u != user_id
+        messages = convo.get("messages", [])
+
+        last_message = (
+            messages[-1]
+            if messages
+            else None
         )
 
-        last_message = None
+        # GROUP CHAT
+        if convo.get("is_group"):
 
-        if convo.get("messages"):
-            last_message = convo["messages"][-1]
+            chats.append({
 
-        unread_map = convo.get("unread", {})
+                "conversation_id":   convo["conversation_id"],
 
-        result.append({
-            "conversation_id": convo["conversation_id"],
-            "user_id": other_user,
-            "last_message": last_message,
-            "unread": unread_map  
-        })
+                "is_group": True,
 
-    return result
+                "group_name"  convo.get(
+                        "group_name",
+                        "Group"
+                    ),
+
+                "group_avatar": convo.get(
+                        "group_avatar"
+                    ),
+
+                "members":  convo.get(
+                        "users",
+                        []
+                    ),
+
+                "last_message":   last_message,
+
+                "unread":  convo.get(
+                        "unread",
+                        {}
+                    )
+            })
+
+        # PRIVATE CHAT
+        else:
+
+            other_user = next(
+                (
+                    u for u in convo["users"]
+                    if u != user_id
+                ),
+                "Unknown"
+            )
+
+            chats.append({
+
+                "conversation_id":  convo["conversation_id"],
+
+                "is_group": False,
+
+                "user_id":other_user,
+
+                "last_message":  last_message,
+
+                "unread":convo.get(
+                        "unread",
+                        {}
+                    )
+            })
+
+    chats.sort(
+
+        key=lambda x:
+
+        x["last_message"]["timestamp"]
+
+        if x["last_message"]
+
+        else "",
+
+        reverse=True
+    )
+
+    return chats
 
 @app.post("/read/{message_id}")
 async def mark_read(message_id: str):
