@@ -750,7 +750,36 @@ body{
     color:#e2e8f0;
     font-weight:500;
 }
+#showInputBtn{
+    position:fixed;
+    bottom:24px;
+    right:18px;
 
+    z-index:999999;
+
+    border:none;
+    border-radius:18px;
+
+    padding:14px 18px;
+
+    background:#6366f1;
+    color:white;
+
+    font-size:14px;
+    font-weight:600;
+
+    display:none;
+
+    cursor:pointer;
+
+    box-shadow:0 10px 30px rgba(0,0,0,.35);
+
+    transition:.25s;
+}
+
+#showInputBtn:hover{
+    transform:scale(1.03);
+}
 .group-seen-btn{
     cursor:pointer;
 
@@ -2292,8 +2321,8 @@ ws.onclose = () => {
     console.log("WS Closed");
 };
 
-    let lastScrollTop = 0;
-let inputVisible = true;
+     lastScrollTop = 0;
+ inputVisible = true;
 
 const inputBox =
     document.querySelector(".input-box");
