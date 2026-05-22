@@ -1116,18 +1116,47 @@ const conversationId =
     new URLSearchParams(location.search)
     .get("id");
 
-const otherUser =
-    conversationId
-    .split("_")
-    .find(x => x !== currentUser.user_id);
 
-document.getElementById("chatUser")
-.innerText = otherUser;
+let otherUser = "";
+let isGroup = false;
 
-document.getElementById("avatarLetter")
-.innerText =
-    otherUser.charAt(0).toUpperCase();
+if(conversationId.startsWith("grp_")){
 
+    isGroup = true;
+
+    const groupData =
+        JSON.parse(
+            localStorage.getItem("current_group")
+        );
+
+    document.getElementById("chatUser")
+    .innerText =
+        groupData.group_name;
+
+    document.getElementById("avatarLetter")
+    .innerText = "👥";
+
+    document.getElementById("statusText")
+    .innerText =
+        groupData.members.join(", ");
+
+}else{
+
+    otherUser =
+        conversationId
+        .split("_")
+        .find(
+            x => x !== currentUser.user_id
+        );
+
+    document.getElementById("chatUser")
+    .innerText = otherUser;
+
+    document.getElementById("avatarLetter")
+    .innerText =
+        otherUser.charAt(0).toUpperCase();
+}
+    
 const ws = new WebSocket(
     `${WS_URL}/ws/${conversationId}`
 );
