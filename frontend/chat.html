@@ -951,21 +951,30 @@ body{
     function buildSeenPopup(msg){
 
     if(
-        !msg.viewed_by ||
-        msg.viewed_by.length === 0
+        !msg.seen_by ||
+        msg.seen_by.length <= 1
     ){
+        return "";
+    }
+
+    const viewers =
+        msg.seen_by.filter(
+            user => user !== msg.sender
+        );
+
+    if(viewers.length === 0){
         return "";
     }
 
     return `
         <div class="group-seen-btn">
-            Seen by ${msg.viewed_by.length}
+            👁 ${viewers.length}
         </div>
 
         <div class="seen-popup">
 
             ${
-                msg.viewed_by.map(user => `
+                viewers.map(user => `
                     <div class="seen-user">
 
                         <div class="seen-avatar">
@@ -982,7 +991,7 @@ body{
 
         </div>
     `;
-    }
+}
 
 
     
@@ -1154,7 +1163,7 @@ const observer =
             if(entry.isIntersecting){
 
                 await fetch(
-                    `${API_URL}/read/${msg.message_id}`,
+                    `${API_URL}/read/${msg.message_id}/${currentUser.user_id}`,
                     {
                         method:"POST"
                     }
@@ -1653,26 +1662,36 @@ if(
         }
     
     box.innerHTML = `
-        <div class="sender">${msg.sender}</div>
-        <div class="text">${messageContent}</div>
-  <div class="time">
-    ${formatTime(msg.timestamp)}
+    <div class="sender">${msg.sender}</div>
 
-    ${
-    msg.sender === currentUser.user_id
-    ? `
-        <span class="status">
+    <div class="text">
+        ${messageContent}
+    </div>
 
-            ${
-                isGroup
-                ? buildSeenPopup(msg)
-                : getStatusDots(msg.status)
-            }
+    <div class="time">
 
-        </span>
-      `
-    : ""
-    }
+        ${formatTime(msg.timestamp)}
+
+        ${
+            msg.sender === currentUser.user_id
+            ? `
+                <span class="status">
+
+                    ${
+                        isGroup
+                        ? buildSeenPopup(msg)
+                        : getStatusDots(msg.status)
+                    }
+
+                </span>
+            `
+            : ""
+        }
+
+    </div>
+`;
+
+    
 </div>
     `;
 
