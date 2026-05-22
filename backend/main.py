@@ -556,7 +556,7 @@ async def get_chats(user_id: str):
 
                 "is_group": True,
 
-                "group_name"  convo.get(
+                "group_name" : convo.get(
                         "group_name",
                         "Group"
                     ),
