@@ -1825,6 +1825,8 @@ async function initChat(){
 
     await loadMessages();
 await loadConversationInfo();
+    lastScrollTop = chatBox.scrollTop;
+inputVisible = true;
     if(unreadSeparatorElement){
 
         unreadSeparatorElement.scrollIntoView({
@@ -2182,40 +2184,47 @@ const inputBox = document.querySelector(".input-box");
     }
 
     
-    chatBox.addEventListener("scroll", () => {
-if(ignoreNextScroll){
 
+chatBox.addEventListener("scroll", () => {
+    if (ignoreNextScroll) {
         ignoreNextScroll = false;
+        lastScrollTop = chatBox.scrollTop;
         return;
-}
-    const currentScroll = chatBox.scrollTop;
-        
-if (isAtBottom()) {
-    inputBox.style.transform = "translateY(0)";
-    inputBox.style.opacity = "1";
-    inputVisible = true;
-}
-    // scrolling up
-    if (currentScroll < lastScrollTop && inputVisible) {
+    }
 
+    const currentScroll = chatBox.scrollTop;
+
+    const diff = currentScroll - lastScrollTop;
+
+    // ignore tiny jumps (VERY IMPORTANT)
+    if (Math.abs(diff) < 5) return;
+
+    const atBottom = isAtBottom();
+
+    if (atBottom) {
+        inputBox.style.transform = "translateY(0)";
+        inputBox.style.opacity = "1";
+        inputVisible = true;
+    }
+
+    // scrolling up
+    if (diff < 0 && inputVisible) {
         inputBox.style.transform = "translateY(120px)";
         inputBox.style.opacity = "0";
-
         inputVisible = false;
     }
 
     // scrolling down
-    if (currentScroll > lastScrollTop && !inputVisible) {
-
+    if (diff > 0 && !inputVisible) {
         inputBox.style.transform = "translateY(0)";
         inputBox.style.opacity = "1";
-
         inputVisible = true;
     }
 
     lastScrollTop = currentScroll;
 });
 
+    
     async function updateStatus() {
 
     const res = await fetch(
