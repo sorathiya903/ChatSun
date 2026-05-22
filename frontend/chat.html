@@ -1854,6 +1854,13 @@ async function initChat(){
 await loadConversationInfo();
     lastScrollTop = chatBox.scrollTop;
 inputVisible = true;
+    lastScrollTop = chatBox.scrollTop;
+
+if (isAtBottom()) {
+    showInput();
+} else {
+    hideInput();
+    }
     if(unreadSeparatorElement){
 
         unreadSeparatorElement.scrollIntoView({
@@ -2216,45 +2223,34 @@ const inputBox = document.querySelector(".input-box");
     }
 
     
+function showInput() {
+    inputBox.style.transform = "translateY(0)";
+    inputBox.style.opacity = "1";
+    inputVisible = true;
+}
+
+function hideInput() {
+    inputBox.style.transform = "translateY(120px)";
+    inputBox.style.opacity = "0";
+    inputVisible = false;
+}
+
+
+
 
 chatBox.addEventListener("scroll", () => {
-   if (ignoreNextScroll || lockScrollHandler) {
-        ignoreNextScroll = false;
-        lastScrollTop = chatBox.scrollTop;
-        return;
-   }
 
-    const currentScroll = chatBox.scrollTop;
-
-    const diff = currentScroll - lastScrollTop;
-
-    // ignore tiny jumps (VERY IMPORTANT)
-    if (Math.abs(diff) < 5) return;
+    if (scrollLocked) return;
 
     const atBottom = isAtBottom();
 
     if (atBottom) {
-        inputBox.style.transform = "translateY(0)";
-        inputBox.style.opacity = "1";
-        inputVisible = true;
+        showInput();
+    } else {
+        hideInput();
     }
-
-    // scrolling up
-    if (diff < 0 && inputVisible) {
-        inputBox.style.transform = "translateY(120px)";
-        inputBox.style.opacity = "0";
-        inputVisible = false;
-    }
-
-    // scrolling down
-    if (diff > 0 && !inputVisible) {
-        inputBox.style.transform = "translateY(0)";
-        inputBox.style.opacity = "1";
-        inputVisible = true;
-    }
-
-    lastScrollTop = currentScroll;
 });
+    
 
     const chat = chatBox;
 
