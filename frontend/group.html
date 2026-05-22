@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Create Group • ChatSun</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700&display=swap" rel="stylesheet">
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="config.js"></script>
+
+<style>
+
+body{
+    margin:0;
+    background:#020617;
+    color:white;
+    font-family:'Inter',sans-serif;
+    min-height:100vh;
+}
+
+.header{
+    height:74px;
+    display:flex;
+    align-items:center;
+    gap:14px;
+    padding:0 18px;
+
+    background:rgba(15,23,42,.85);
+
+    backdrop-filter:blur(18px);
+
+    border-bottom:1px solid rgba(51,65,85,.7);
+
+    position:sticky;
+    top:0;
+    z-index:20;
+}
+
+.back-btn{
+    width:44px;
+    height:44px;
+
+    border-radius:16px;
+
+    border:1px solid rgba(99,102,241,.18);
+
+    background:rgba(99,102,241,.08);
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    cursor:pointer;
+
+    transition:.2s;
+}
+
+.back-btn:hover{
+    background:rgba(99,102,241,.18);
+}
+
+.page{
+    padding:24px 18px 140px;
+    max-width:720px;
+    margin:auto;
+}
+
+.title{
+    font-size:34px;
+    font-weight:700;
+    font-family:'Manrope',sans-serif;
+}
+
+.subtitle{
+    color:#94a3b8;
+    margin-top:8px;
+    line-height:1.6;
+}
+
+.card{
+    margin-top:28px;
+
+    background:rgba(15,23,42,.92);
+
+    border:1px solid rgba(51,65,85,.85);
+
+    border-radius:28px;
+
+    padding:22px;
+}
+
+.label{
+    font-size:14px;
+    font-weight:600;
+    margin-bottom:10px;
+    color:#cbd5e1;
+}
+
+.input{
+    width:100%;
+
+    background:#020617;
+
+    border:1px solid rgba(51,65,85,.85);
+
+    border-radius:18px;
+
+    padding:16px;
+
+    color:white;
+
+    outline:none;
+
+    font-size:15px;
+
+    transition:.2s;
+}
+
+.input:focus{
+    border-color:#6366f1;
+    box-shadow:0 0 0 4px rgba(99,102,241,.12);
+}
+
+.group-preview{
+    margin-top:20px;
+
+    display:flex;
+    align-items:center;
+    gap:16px;
+}
+
+.preview-avatar{
+    width:72px;
+    height:72px;
+
+    border-radius:26px;
+
+    background:linear-gradient(
+        135deg,
+        #6366f1,
+        #7c3aed
+    );
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:26px;
+    font-weight:700;
+}
+
+.preview-name{
+    font-size:22px;
+    font-weight:700;
+}
+
+.preview-members{
+    margin-top:4px;
+    color:#94a3b8;
+    font-size:14px;
+}
+
+.section-title{
+    margin-top:34px;
+    margin-bottom:14px;
+
+    font-size:18px;
+    font-weight:700;
+}
+
+.user-list{
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+}
+
+.user-card{
+    background:rgba(15,23,42,.92);
+
+    border:1px solid rgba(51,65,85,.8);
+
+    border-radius:22px;
+
+    padding:16px;
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    transition:.2s;
+}
+
+.user-card:hover{
+    border-color:rgba(99,102,241,.45);
+}
+
+.user-left{
+    display:flex;
+    align-items:center;
+    gap:14px;
+}
+
+.user-avatar{
+    width:54px;
+    height:54px;
+
+    border-radius:20px;
+
+    background:rgba(99,102,241,.15);
+
+    border:1px solid rgba(99,102,241,.22);
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-weight:700;
+    color:#c4b5fd;
+}
+
+.user-name{
+    font-size:16px;
+    font-weight:600;
+}
+
+.user-status{
+    font-size:13px;
+    color:#94a3b8;
+    margin-top:4px;
+}
+
+.check{
+    width:24px;
+    height:24px;
+}
+
+.bottom-bar{
+    position:fixed;
+    left:0;
+    right:0;
+    bottom:0;
+
+    padding:16px 18px 24px;
+
+    background:linear-gradient(
+        to top,
+        #020617,
+        rgba(2,6,23,.94)
+    );
+
+    backdrop-filter:blur(20px);
+
+    border-top:1px solid rgba(51,65,85,.7);
+}
+
+.create-btn{
+    width:100%;
+
+    height:60px;
+
+    border:none;
+
+    border-radius:22px;
+
+    background:linear-gradient(
+        135deg,
+        #6366f1,
+        #7c3aed
+    );
+
+    color:white;
+
+    font-size:16px;
+    font-weight:700;
+
+    cursor:pointer;
+
+    transition:.2s;
+}
+
+.create-btn:hover{
+    transform:translateY(-2px);
+    box-shadow:0 14px 30px rgba(99,102,241,.24);
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="header">
+
+    <button class="back-btn" onclick="history.back()">
+
+        <svg xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor">
+
+            <path stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15 19l-7-7 7-7"/>
+
+        </svg>
+
+    </button>
+
+    <div>
+
+        <div style="font-weight:700;font-size:18px;">
+            Create Group
+        </div>
+
+        <div style="font-size:13px;color:#94a3b8;margin-top:2px;">
+            Make your own community
+        </div>
+
+    </div>
+
+</div>
+
+<div class="page">
+
+    <div class="title">
+        New Group 👥
+    </div>
+
+    <div class="subtitle">
+        Choose a group name and add members to start chatting together.
+    </div>
+
+    <div class="card">
+
+        <div class="label">
+            Group Name
+        </div>
+
+        <input
+            type="text"
+            id="groupName"
+            class="input"
+            placeholder="Enter group name..."
+        >
+
+        <div class="group-preview">
+
+            <div
+                class="preview-avatar"
+                id="previewAvatar"
+            >
+                G
+            </div>
+
+            <div>
+
+                <div
+                    class="preview-name"
+                    id="previewName"
+                >
+                    Group Name
+                </div>
+
+                <div
+                    class="preview-members"
+                    id="memberCount"
+                >
+                    0 members selected
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="section-title">
+        Select Members
+    </div>
+
+    <div
+        class="user-list"
+        id="userList"
+    >
+
+    </div>
+
+</div>
+
+<div class="bottom-bar">
+
+    <button
+        class="create-btn"
+        onclick="createGroup()"
+    >
+        Create Group
+    </button>
+
+</div>
+
+<script>
+
+const currentUser =
+    JSON.parse(
+        localStorage.getItem("user")
+    );
+
+const userList =
+    document.getElementById("userList");
+
+const selectedUsers = [];
+
+const groupNameInput =
+    document.getElementById("groupName");
+
+groupNameInput.addEventListener(
+    "input",
+    () => {
+
+        const value =
+            groupNameInput.value.trim();
+
+        document.getElementById(
+            "previewName"
+        ).innerText =
+            value || "Group Name";
+
+        document.getElementById(
+            "previewAvatar"
+        ).innerText =
+            value
+            ? value.charAt(0).toUpperCase()
+            : "G";
+    }
+);
+
+async function loadUsers(){
+
+    const res = await fetch(
+        `${API_URL}/users`
+    );
+
+    const users = await res.json();
+
+    users.forEach(user => {
+
+        if(
+            user.user_id ===
+            currentUser.user_id
+        ) return;
+
+        const div =
+            document.createElement("div");
+
+        div.className =
+            "user-card";
+
+        div.innerHTML = `
+
+            <div class="user-left">
+
+                <div class="user-avatar">
+                    ${user.user_id
+                        .charAt(0)
+                        .toUpperCase()}
+                </div>
+
+                <div>
+
+                    <div class="user-name">
+                        ${user.user_id}
+                    </div>
+
+                    <div class="user-status">
+                        Tap to add member
+                    </div>
+
+                </div>
+
+            </div>
+
+            <input
+                type="checkbox"
+                class="check"
+                value="${user.user_id}"
+            >
+        `;
+
+        const checkbox =
+            div.querySelector(".check");
+
+        checkbox.addEventListener(
+            "change",
+            () => {
+
+                if(checkbox.checked){
+
+                    selectedUsers.push(
+                        user.user_id
+                    );
+
+                }else{
+
+                    const index =
+                        selectedUsers.indexOf(
+                            user.user_id
+                        );
+
+                    if(index > -1){
+
+                        selectedUsers.splice(
+                            index,
+                            1
+                        );
+                    }
+                }
+
+                document.getElementById(
+                    "memberCount"
+                ).innerText =
+                    `${selectedUsers.length} members selected`;
+            }
+        );
+
+        userList.appendChild(div);
+    });
+}
+
+loadUsers();
+
+async function createGroup(){
+
+    const groupName =
+        groupNameInput.value.trim();
+
+    if(!groupName){
+
+        alert("Enter group name");
+        return;
+    }
+
+    if(selectedUsers.length === 0){
+
+        alert("Select members");
+        return;
+    }
+
+    const res = await fetch(
+        `${API_URL}/create-group`,
+        {
+            method:"POST",
+
+            headers:{
+                "Content-Type":
+                "application/json"
+            },
+
+            body:JSON.stringify({
+
+                group_name: groupName,
+
+                members: [
+                    currentUser.user_id,
+                    ...selectedUsers
+                ]
+            })
+        }
+    );
+
+    const data = await res.json();
+
+    if(data.success){
+
+        location.href =
+            `chat.html?id=${data.conversation_id}`;
+    }
+}
+
+</script>
+
+</body>
+</html>
