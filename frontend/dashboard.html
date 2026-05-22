@@ -471,10 +471,19 @@ function getLastMessagePreview(msg){
     { method: "POST" }
   );
 
+              if(chat.is_group){
+
+        localStorage.setItem(
+            "current_group",
+            JSON.stringify(chat)
+        );
+              }
+              
   location.href =
     `chat.html?id=${chat.conversation_id}`;
 };
 
+    
           div.innerHTML = `
 
             <div class="flex items-center justify-between gap-4">
