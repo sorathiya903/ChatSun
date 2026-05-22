@@ -554,29 +554,39 @@ async function createGroup(){
         return;
     }
 
-    const res = await fetch(
-        `${API_URL}/create-group`,
-        {
-            method:"POST",
 
-            headers:{
-                "Content-Type":
-                "application/json"
-            },
+    res = await fetch(
+    `${API_URL}/create-group`,
+    {
+        method:"POST",
 
-            body:JSON.stringify({
+        headers:{
+            "Content-Type":
+            "application/json"
+        },
 
-                group_name: groupName,
+        body:JSON.stringify({
 
-                members: [
-                    currentUser.user_id,
-                    ...selectedUsers
-                ]
-            })
-        }
-    );
+            group_name: groupName,
 
-    const data = await res.json();
+            creator:
+                currentUser.user_id,
+
+            admins: [
+                currentUser.user_id
+            ],
+
+            members: [
+                currentUser.user_id,
+                ...selectedUsers
+            ],
+
+            group_avatar: null
+        })
+    }
+);
+
+const data = await res.json();
 
     if(data.success){
 
