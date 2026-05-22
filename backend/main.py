@@ -782,7 +782,9 @@ async def create_group(data: dict):
     "type": "system",
     "file_name": None,
     "status": "sent",
-    "timestamp": datetime.now(timezone.utc).isoformat()}
+    "timestamp": datetime.now(
+                    ZoneInfo("Asia/Kolkata")
+                ).isoformat()}
     
     group["messages"] = [system_message]
 
