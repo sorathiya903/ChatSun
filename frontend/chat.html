@@ -1806,10 +1806,13 @@ async function loadMessages(){
     new Date(b.timestamp)
 );
 
-window.unreadCount = data.filter(
+ window.unreadCount = data.filter(
     m =>
         m.sender !== currentUser.user_id &&
-        m.status !== "read"
+        (
+            !m.seen_by ||
+            !m.seen_by.includes(currentUser.user_id)
+        )
 ).length;
 
 data.forEach(addMessage);
@@ -1882,7 +1885,21 @@ if(data.type === "seen_update"){
     const msgEl = document.querySelector(
         `[data-id="${data.message_id}"]`
     );
+if(
+    unreadSeparatorElement &&
+    data.seen_by.includes(currentUser.user_id)
+){
 
+    window.unreadCount--;
+
+    if(window.unreadCount <= 0){
+
+        unreadSeparatorElement.remove();
+
+        unreadSeparatorElement = null;
+    }
+    }
+    
     if(msgEl){
 
         const statusEl =
