@@ -1903,12 +1903,13 @@ if (isAtBottom()) {
     );
 
     const data = await res.json();
-
+if(isGroup){return}else{
     document.getElementById("statusText")
         .innerText =
         data.online
         ? "Online"
         : "Offline";
+}
 }
 
 updateStatus();
