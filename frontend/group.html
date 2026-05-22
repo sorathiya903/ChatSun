@@ -523,11 +523,11 @@ async function loadUsers(){
                         );
                     }
                 }
-
-                document.getElementById(
-                    "memberCount"
-                ).innerText =
-                    `${selectedUsers.length} members selected`;
+document.getElementById(
+    "memberCount"
+).innerText =
+    `${selectedUsers.length + 1} members • You are admin`;
+                
             }
         );
 
