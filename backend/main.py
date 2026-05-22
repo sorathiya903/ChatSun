@@ -772,7 +772,7 @@ async def create_group(data: dict):
         "created_by": creator
     }
 
-    conversations.insert_one(group)
+    
 
     system_message = {
     "message_id": str(uuid.uuid4()),
@@ -795,6 +795,8 @@ async def create_group(data: dict):
             group["unread"][member] = 1
         else:
             group["unread"][member] = 0
+
+    conversations.insert_one(group)
 
     return {
         "success": True,
