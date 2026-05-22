@@ -1317,7 +1317,11 @@ chatBox.appendChild(unreadDiv);
     /* SYSTEM MESSAGE */
 
 if(msg.type === "system"){
-
+if(
+        msg.text.includes(currentUser.user_id)
+    ){
+        return;
+        }
     const systemWrap =
         document.createElement("div");
 
