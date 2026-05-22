@@ -774,6 +774,26 @@ async def create_group(data: dict):
 
     conversations.insert_one(group)
 
+    system_message = {
+    "message_id": str(uuid.uuid4()),
+    "conversation_id": conversation_id,
+    "sender": "system",
+    "text": f"{creator} added you",
+    "type": "system",
+    "file_name": None,
+    "status": "sent",
+    "timestamp": datetime.now(timezone.utc).isoformat()}
+    
+    group["messages"] = [system_message]
+
+    group["unread"] = {}
+    
+    for member in members:
+        if member != creator:
+            group["unread"][member] = 1
+        else:
+            group["unread"][member] = 0
+
     return {
         "success": True,
         "conversation_id":
