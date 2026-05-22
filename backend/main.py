@@ -674,7 +674,7 @@ async def get_unread_count(conversation_id: str, user_id: str):
         }
 
 
-@router.post("/create-group")
+@app.post("/create-group")
 async def create_group(data: dict):
 
     conversation_id = (
