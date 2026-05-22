@@ -480,6 +480,11 @@ body{
     backdrop-filter:blur(10px);
 
     box-shadow:0 4px 18px rgba(99,102,241,.12);
+        overflow: hidden;
+    max-height: 60px;
+    opacity: 1;
+    transform: scaleY(1);
+    transition: all 0.25s ease;
     }
 
     .file-btn{
@@ -1148,6 +1153,27 @@ let selectedFile = null;
 
     showFilePreview(selectedFile);
 });
+
+
+    function removeUnreadSeparatorSmooth() {
+    if (!unreadSeparatorElement) return;
+
+    const el = unreadSeparatorElement;
+
+    // start collapse animation
+    el.style.maxHeight = "0px";
+    el.style.opacity = "0";
+    el.style.transform = "scaleY(0.8)";
+    el.style.margin = "0px";
+
+    setTimeout(() => {
+        if (el && el.parentNode) {
+            el.remove();
+        }
+        unreadSeparatorElement = null;
+    }, 250); // match CSS transition time
+    }
+
 
     
     function observeMessage(box, msg){
@@ -1906,7 +1932,7 @@ ignoreNextScroll = true;
     const oldScroll = chatBox.scrollTop;
 
 
-    unreadSeparatorElement.remove();
+    removeUnreadSeparatorSmooth();
 
     unreadSeparatorElement = null;
 
