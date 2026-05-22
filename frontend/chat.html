@@ -2223,17 +2223,6 @@ const inputBox = document.querySelector(".input-box");
     }
 
     
-function showInput() {
-    inputBox.style.transform = "translateY(0)";
-    inputBox.style.opacity = "1";
-    inputVisible = true;
-}
-
-function hideInput() {
-    inputBox.style.transform = "translateY(120px)";
-    inputBox.style.opacity = "0";
-    inputVisible = false;
-}
 
 
 
@@ -2302,7 +2291,89 @@ ws.onerror = (e) => {
 ws.onclose = () => {
     console.log("WS Closed");
 };
-</script>
 
+    let lastScrollTop = 0;
+let inputVisible = true;
+
+const inputBox =
+    document.querySelector(".input-box");
+
+const showInputBtn =
+    document.getElementById("showInputBtn");
+
+let inactivityTimer = null;
+
+function showInput(){
+
+    inputBox.style.transform =
+        "translateY(0)";
+
+    inputBox.style.opacity = "1";
+
+    inputVisible = true;
+
+    showInputBtn.style.display =
+        "none";
+
+    // IMPORTANT
+    chatBox.style.paddingBottom =
+        "calc(var(--input-height) + 100px)";
+
+    chatBox.scrollTop += 140;
+}
+
+function hideInput(){
+
+    inputBox.style.transform =
+        "translateY(120px)";
+
+    inputBox.style.opacity = "0";
+
+    inputVisible = false;
+
+    // telegram style
+    chatBox.style.paddingBottom = "30px";
+
+    clearTimeout(inactivityTimer);
+
+    inactivityTimer = setTimeout(()=>{
+
+        if(!inputVisible){
+
+            showInputBtn.style.display =
+                "block";
+        }
+
+    },2000);
+}
+
+showInputBtn.onclick = showInput;
+
+chatBox.addEventListener("scroll",()=>{
+
+    const currentScroll =
+        chatBox.scrollTop;
+
+    const diff =
+        currentScroll - lastScrollTop;
+
+    // scrolling up
+    if(diff < -5 && inputVisible){
+
+        hideInput();
+    }
+
+    // scrolling down
+    if(diff > 5 && !inputVisible){
+
+        showInput();
+    }
+
+    lastScrollTop = currentScroll;
+});
+</script>
+<button id="showInputBtn">
+    Show input
+</button>
 </body>
     </html>
