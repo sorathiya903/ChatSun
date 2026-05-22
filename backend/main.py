@@ -672,3 +672,27 @@ async def get_unread_count(conversation_id: str, user_id: str):
         "conversation_id": conversation_id,
         "unread_count": unread_count
         }
+
+
+@router.post("/create-group")
+async def create_group(data: dict):
+
+    conversation_id = (
+        "grp_" + str(uuid.uuid4())
+    )
+
+    group = {
+        "conversation_id": conversation_id,
+        "is_group": True,
+        "group_name": data["group_name"],
+        "admins": [data["admin"]],
+        "users": data["users"],
+        "messages": []
+    }
+
+    conversations.insert_one(group)
+
+    return {
+        "success": True,
+        "conversation_id": conversation_id
+    }
