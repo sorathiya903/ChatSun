@@ -677,22 +677,43 @@ async def get_unread_count(conversation_id: str, user_id: str):
 @app.post("/create-group")
 async def create_group(data: dict):
 
+    creator = data["creator"]
+
+    members = list(
+        set(
+            [creator] + data["members"]
+        )
+    )
+
     conversation_id = (
         "grp_" + str(uuid.uuid4())
     )
 
     group = {
-        "conversation_id": conversation_id,
+
+        "conversation_id":
+            conversation_id,
+
         "is_group": True,
-        "group_name": data["group_name"],
-        "admins": [data["admin"]],
-        "users": data["users"],
-        "messages": []
+
+        "group_name":
+            data["group_name"],
+
+        "group_avatar": "",
+
+        "admins": [creator],
+
+        "users": members,
+
+        "messages": [],
+
+        "created_by": creator
     }
 
     conversations.insert_one(group)
 
     return {
         "success": True,
-        "conversation_id": conversation_id
+        "conversation_id":
+            conversation_id
     }
