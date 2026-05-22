@@ -947,7 +947,10 @@ body{
     method: "POST"
 });
 
+    
+let ignoreNextScroll = false;
 
+    
     function buildSeenPopup(msg){
 
     if(
@@ -1894,10 +1897,20 @@ if(
 
     if(window.unreadCount <= 0){
 
-        unreadSeparatorElement.remove();
+    const oldHeight = chatBox.scrollHeight;
+    const oldScroll = chatBox.scrollTop;
 
-        unreadSeparatorElement = null;
-    }
+    ignoreNextScroll = true;
+
+    unreadSeparatorElement.remove();
+
+    unreadSeparatorElement = null;
+
+    const newHeight = chatBox.scrollHeight;
+
+    chatBox.scrollTop =
+        oldScroll - (oldHeight - newHeight);
+}
     }
     
     if(msgEl){
@@ -2170,8 +2183,13 @@ const inputBox = document.querySelector(".input-box");
 
     
     chatBox.addEventListener("scroll", () => {
+if(ignoreNextScroll){
 
+        ignoreNextScroll = false;
+        return;
+}
     const currentScroll = chatBox.scrollTop;
+        
 if (isAtBottom()) {
     inputBox.style.transform = "translateY(0)";
     inputBox.style.opacity = "1";
