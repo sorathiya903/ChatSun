@@ -483,14 +483,22 @@ function getLastMessagePreview(msg){
 
                 <div class="w-14 h-14 rounded-2xl bg-indigo-500/15 border border-indigo-500/20 flex items-center justify-center text-indigo-300 font-semibold text-lg">
 
-                  ${chat.user_id.charAt(0).toUpperCase()}
+                  ${
+    chat.is_group
+    ? "👥"
+    : chat.user_id.charAt(0).toUpperCase()
+                  }
 
                 </div>
 
                 <div>
 
                   <h3 class="font-semibold text-lg text-white">
-                    ${chat.user_id}
+                    ${
+    chat.is_group
+    ? chat.group_name
+    : chat.user_id
+    }
                   </h3>
 
                   <p class="text-sm text-slate-400 mt-1 line-clamp-1">
