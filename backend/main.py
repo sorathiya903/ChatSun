@@ -134,7 +134,8 @@ async def chat(ws: WebSocket, conversation_id: str):
                 "text": text,
                 "type": data.get("type", "text"),
                 "file_name": data.get("file_name"),
-                "status": "sent",
+                #"status": "sent",
+                "seen_by": [sender],
                 "timestamp": datetime.now(
                     ZoneInfo("Asia/Kolkata")
                 ).isoformat()
@@ -620,44 +621,6 @@ async def get_chats(user_id: str):
 
     return chats
 
-@app.post("/read/{message_id}")
-async def mark_read(message_id: str):
-
-    convo = conversations.find_one({
-        "messages.message_id": message_id
-    })
-    print(message_id)
-    print(conversations.find_one({ "messages.message_id": message_id}))
-
-    if not convo:
-        return {"success": False}
-
-    conversations.update_one(
-        {
-            "messages.message_id": message_id
-        },
-        {
-            "$set": {
-                "messages.$.status": "read"
-            }
-        }
-    )
-
-    update_data = {
-        "type": "status_update",
-        "message_id": message_id,
-        "status": "read"
-    }
-
-    for conn in connections[
-        convo["conversation_id"]
-    ]:
-
-        await conn.send_text(
-            json.dumps(update_data)
-        )
-
-    return {"success": True}
 
 @app.post("/delivered/{message_id}")
 async def mark_delivered(message_id: str):
@@ -803,3 +766,61 @@ async def create_group(data: dict):
         "conversation_id":
             conversation_id
     }
+
+@app.post("/read/{message_id}/{user_id}")
+async def mark_read(message_id: str, user_id: str):
+
+    convo = conversations.find_one({
+        "messages.message_id": message_id
+    })
+
+    if not convo:
+        return {"success": False}
+
+    message = None
+
+    for msg in convo["messages"]:
+
+        if msg["message_id"] == message_id:
+            message = msg
+            break
+
+    if not message:
+        return {"success": False}
+
+    seen_by = message.get("seen_by", [])
+
+    if user_id not in seen_by:
+
+        conversations.update_one(
+            {
+                "messages.message_id": message_id
+            },
+            {
+                "$push": {
+                    "messages.$.seen_by": user_id
+                }
+            }
+        )
+
+    update_data = {
+        "type": "seen_update",
+        "message_id": message_id,
+        "seen_by": seen_by + [user_id]
+    }
+
+    for conn in connections.get(
+        convo["conversation_id"],
+        []
+    ):
+
+        try:
+
+            await conn.send_text(
+                json.dumps(update_data)
+            )
+
+        except:
+            pass
+
+    return {"success": True}
