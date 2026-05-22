@@ -2230,6 +2230,18 @@ chatBox.addEventListener("scroll", () => {
     lastScrollTop = currentScroll;
 });
 
+    const chat = chatBox;
+
+    // prevent user scroll + programmatic scroll
+    chat.style.overflow = "hidden";
+
+    setTimeout(() => {
+        chat.style.overflow = "auto"; // restore scroll
+        scrollLocked = false;
+
+        // resync scroll position
+        lastScrollTop = chat.scrollTop;
+    }, 1000);
     
     async function updateStatus() {
 
