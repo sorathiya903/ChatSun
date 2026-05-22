@@ -949,6 +949,7 @@ body{
 
     
 let ignoreNextScroll = false;
+let lockScrollHandler = false;
 
     
     function buildSeenPopup(msg){
@@ -1894,7 +1895,8 @@ if(
     unreadSeparatorElement &&
     data.seen_by.includes(currentUser.user_id)
 ){
-    ignoreNextScroll = true;
+    lockScrollHandler = true;
+ignoreNextScroll = true;
 
     window.unreadCount--;
 
@@ -1912,6 +1914,10 @@ if(
 
     chatBox.scrollTop =
         oldScroll - (oldHeight - newHeight);
+
+    setTimeout(() => {
+    lockScrollHandler = false;
+}, 200);
 }
     }
     
@@ -2186,11 +2192,11 @@ const inputBox = document.querySelector(".input-box");
     
 
 chatBox.addEventListener("scroll", () => {
-    if (ignoreNextScroll) {
+   if (ignoreNextScroll || lockScrollHandler) {
         ignoreNextScroll = false;
         lastScrollTop = chatBox.scrollTop;
         return;
-    }
+   }
 
     const currentScroll = chatBox.scrollTop;
 
