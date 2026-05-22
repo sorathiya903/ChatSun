@@ -1424,28 +1424,33 @@ let moved = false;
 
         chatBox.appendChild(sep);
     }
-if(
+
+    if(
     !unreadSeparatorAdded &&
     msg.sender !== currentUser.user_id &&
-    msg.status !== "read"
+    (
+        !msg.seen_by ||
+        !msg.seen_by.includes(currentUser.user_id)
+    )
 ){
 
     unreadSeparatorAdded = true;
-const unreadDiv =
-    document.createElement("div");
 
-unreadDiv.className =
-    "unread-separator";
+    const unreadDiv =
+        document.createElement("div");
 
-unreadDiv.innerText =
-    `${window.unreadCount} unread messages`;
+    unreadDiv.className =
+        "unread-separator";
 
-unreadSeparatorElement = unreadDiv;
+    unreadDiv.innerText =
+        `${window.unreadCount} unread messages`;
 
-chatBox.appendChild(unreadDiv);
-    
-            }
+    unreadSeparatorElement = unreadDiv;
 
+    chatBox.appendChild(unreadDiv);
+
+    window.unreadCount--;
+    }
     /* SYSTEM MESSAGE */
 
 if(msg.type === "system"){
@@ -2093,9 +2098,18 @@ function goBack(){
     let lastScrollTop = 0;
 let inputVisible = true;
 const inputBox = document.querySelector(".input-box");
-function isAtBottom() {
-    return chatBox.scrollHeight - chatBox.scrollTop === chatBox.clientHeight;
-}
+
+    
+    function isAtBottom(){
+
+    return Math.abs(
+        chatBox.scrollHeight
+        - chatBox.clientHeight
+        - chatBox.scrollTop
+    ) < 5;
+    }
+
+    
     chatBox.addEventListener("scroll", () => {
 
     const currentScroll = chatBox.scrollTop;
