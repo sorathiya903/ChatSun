@@ -1267,31 +1267,43 @@ const conversationId =
     new URLSearchParams(location.search)
     .get("id");
 
-
-let otherUser = "";
 let isGroup = false;
+let groupData = null;
 
-if(conversationId.startsWith("grp_")){
+async function loadConversationInfo(){
 
-    isGroup = true;
+    const res = await fetch(
+        `${API_URL}/conversation/${conversationId}`
+    );
 
-    const groupData =
-        JSON.parse(
-            localStorage.getItem("current_group")
-        );
+    const data = await res.json();
 
-    document.getElementById("chatUser")
-    .innerText =
-        groupData.group_name;
+    if(!data.success) return;
 
-    document.getElementById("avatarLetter")
-    .innerText = "👥";
+    if(data.is_group){
 
-    document.getElementById("statusText")
-    .innerText =
-        groupData.members.join(", ");
+        isGroup = true;
 
-}else{
+        groupData = data;
+
+        document.getElementById(
+            "chatUser"
+        ).innerText =
+            data.group_name;
+
+        document.getElementById(
+            "statusText"
+        ).innerText =
+            data.members.join(", ");
+
+        document.getElementById(
+            "avatarLetter"
+        ).innerText =
+            data.group_name
+            .charAt(0)
+            .toUpperCase();
+    }
+}
 
     otherUser =
         conversationId
@@ -1306,7 +1318,7 @@ if(conversationId.startsWith("grp_")){
     document.getElementById("avatarLetter")
     .innerText =
         otherUser.charAt(0).toUpperCase();
-}
+
     
 const ws = new WebSocket(
     `${WS_URL}/ws/${conversationId}`
@@ -1801,7 +1813,7 @@ data.forEach(addMessage);
 async function initChat(){
 
     await loadMessages();
-
+await loadConversationInfo();
     if(unreadSeparatorElement){
 
         unreadSeparatorElement.scrollIntoView({
