@@ -136,7 +136,12 @@
             Logout
 
           </button>
-
+<button
+    onclick="openGroupModal()"
+    class="group-btn"
+>
+    👥 New Group
+</button>
         </div>
 
       </div>
@@ -206,6 +211,49 @@
 
   </div>
 
+
+  <div id="groupModal" class="modal">
+
+    <div class="modal-box">
+
+        <div class="modal-title">
+            Create Group
+        </div>
+
+        <input
+            id="groupName"
+            class="modal-input"
+            placeholder="Group name"
+        >
+
+        <textarea
+            id="groupUsers"
+            class="modal-input"
+            placeholder="Enter usernames separated by commas"
+        ></textarea>
+
+        <div class="modal-actions">
+
+            <button
+                class="modal-btn cancel-btn"
+                onclick="closeGroupModal()"
+            >
+                Cancel
+            </button>
+
+            <button
+                class="modal-btn confirm-btn"
+                onclick="createGroup()"
+            >
+                Create
+            </button>
+
+        </div>
+
+    </div>
+
+  </div>
+  
   <script>
 
     let currentUser = null;
@@ -230,6 +278,72 @@
       loadUsers();
     }
 
+    function openGroupModal(){
+
+    document.getElementById(
+        "groupModal"
+    ).style.display = "flex";
+}
+
+function closeGroupModal(){
+
+    document.getElementById(
+        "groupModal"
+    ).style.display = "none";
+}
+
+
+    async function createGroup(){
+
+    const groupName =
+        document.getElementById(
+            "groupName"
+        ).value.trim();
+
+    const users =
+        document.getElementById(
+            "groupUsers"
+        ).value
+        .split(",")
+        .map(x => x.trim())
+        .filter(Boolean);
+
+    if(!groupName || users.length === 0){
+        return;
+    }
+
+    users.push(currentUser.user_id);
+
+    const res = await fetch(
+        `${API_URL}/create-group`,
+        {
+            method:"POST",
+
+            headers:{
+                "Content-Type":
+                "application/json"
+            },
+
+            body:JSON.stringify({
+
+                group_name: groupName,
+
+                users: [...new Set(users)],
+
+                admin: currentUser.user_id
+            })
+        }
+    );
+
+    const data = await res.json();
+
+    if(data.success){
+
+        location.reload();
+    }
+                             }
+
+    
     // -------------------
     // LOAD USERS
     // -------------------
