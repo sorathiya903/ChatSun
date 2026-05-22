@@ -1877,7 +1877,49 @@ ws.onmessage = (event)=>{
         return;
     }
 
+if(data.type === "seen_update"){
 
+    const msgEl = document.querySelector(
+        `[data-id="${data.message_id}"]`
+    );
+
+    if(msgEl){
+
+        const statusEl =
+            msgEl.querySelector(".status");
+
+        if(statusEl){
+
+            statusEl.innerHTML = `
+                ${buildSeenPopup({
+                    sender: currentUser.user_id,
+                    seen_by: data.seen_by
+                })}
+            `;
+        }
+
+        const seenBtn =
+            msgEl.querySelector(".group-seen-btn");
+
+        const popup =
+            msgEl.querySelector(".seen-popup");
+
+        if(seenBtn && popup){
+
+            seenBtn.addEventListener("click",(e)=>{
+
+                e.stopPropagation();
+
+                popup.style.display =
+                    popup.style.display === "flex"
+                    ? "none"
+                    : "flex";
+            });
+        }
+    }
+
+    return;
+    }
     if(data.type === "status_update"){
 
     const msgEl = document.querySelector(
