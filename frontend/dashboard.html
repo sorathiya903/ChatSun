@@ -233,7 +233,52 @@
     // -------------------
     // LOAD USERS
     // -------------------
+function getLastMessagePreview(msg){
 
+    if(!msg) return "";
+
+    if(msg.type === "file"){
+
+        const url = msg.text || "";
+
+        if(
+            url.match(
+                /\.(jpg|jpeg|png|gif|webp)$/i
+            )
+        ){
+            return "🖼️ Photo";
+        }
+
+        if(
+            url.match(
+                /\.(mp4|webm|ogg)$/i
+            )
+        ){
+            return "🎥 Video";
+        }
+
+        if(
+            url.match(
+                /\.(mp3|wav|m4a)$/i
+            )
+        ){
+            return "🎵 Audio";
+        }
+
+        if(
+            url.match(/\.pdf$/i)
+        ){
+            return "📕 PDF";
+        }
+
+        return "📄 File";
+    }
+
+    return msg.text;
+
+}
+
+          
     async function loadUsers() {
 
       const usersDiv =
@@ -336,14 +381,13 @@
 
                   <p class="text-sm text-slate-400 mt-1 line-clamp-1">
 
-                    ${
-                      chat.last_message
-                        ? chat.last_message.text
-                        : "Start chatting now 🚀"
-                    }
+    ${
+      chat.last_message
+        ? getLastMessagePreview(chat.last_message)
+        : "Start chatting now 🚀"
+    }
 
-                  </p>
-
+</p>
                 </div>
 
               </div>
