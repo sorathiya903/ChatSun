@@ -239,7 +239,36 @@ async def get_users():
         for u in all_users
     ]
 
+@app.get("/conversation/{conversation_id}")
+async def get_conversation(conversation_id: str):
 
+    convo = conversations.find_one({
+        "conversation_id": conversation_id
+    })
+
+    if not convo:
+        return {
+            "success": False
+        }
+
+    return {
+        "success": True,
+
+        "conversation_id":
+            convo["conversation_id"],
+
+        "is_group":
+            convo.get("is_group", False),
+
+        "group_name":
+            convo.get("group_name"),
+
+        "members":
+            convo.get("users", []),
+
+        "admins":
+            convo.get("admins", [])
+    }
 
 
 @app.post("/online/{user_id}")
