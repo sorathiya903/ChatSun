@@ -1817,7 +1817,7 @@ if(seenBtn && popup){
     wrap.appendChild(box);
     chatBox.appendChild(wrap);
 observeMessage(box, msg);
-    chatBox.scrollTop = chatBox.scrollHeight;
+    
         }
 
 /* ---------------- */
@@ -2292,11 +2292,7 @@ function showInput(){
     showInputBtn.style.display =
         "none";
 
-    // IMPORTANT
-    chatBox.style.paddingBottom =
-        "calc(var(--input-height) + 100px)";
 
-    chatBox.scrollTop += 140;
 }
 
 function hideInput(){
@@ -2309,8 +2305,7 @@ function hideInput(){
     inputVisible = false;
 
     // telegram style
-    chatBox.style.paddingBottom = "30px";
-
+    
     clearTimeout(inactivityTimer);
 
     inactivityTimer = setTimeout(()=>{
