@@ -458,7 +458,17 @@ body{
   box-shadow:0 0 10px rgba(0,229,255,1);
 }
 
-    .unread-separator{
+    
+
+
+.unread-separator{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    width:fit-content;
+    max-width:90%;
+
     align-self:center;
 
     background:rgba(99,102,241,.14);
@@ -468,24 +478,33 @@ body{
     color:#c4b5fd;
 
     font-size:12px;
-
     font-weight:600;
 
-    padding:8px 16px;
+    padding:10px 18px;
 
     border-radius:999px;
 
-    margin:4px 0 10px;
+    margin:10px auto;
 
     backdrop-filter:blur(10px);
 
     box-shadow:0 4px 18px rgba(99,102,241,.12);
-        overflow: hidden;
- 
-    opacity: 1;
-    transform: scaleY(1);
-    transition: all 0.25s ease;
+
+    white-space:nowrap;
+
+    opacity:1;
+
+    transform-origin:center;
+
+    transition:
+        opacity .25s ease,
+        transform .25s ease,
+        margin .25s ease;
+
+    z-index:2;
     }
+
+    
 
     .file-btn{
     width:48px;
@@ -1187,24 +1206,28 @@ let selectedFile = null;
 });
 
 
-    function removeUnreadSeparatorSmooth() {
-    if (!unreadSeparatorElement) return;
+    function removeUnreadSeparatorSmooth(){
+
+    if(!unreadSeparatorElement) return;
 
     const el = unreadSeparatorElement;
 
-    // start collapse animation
-    el.style.maxHeight = "0px";
     el.style.opacity = "0";
-    el.style.transform = "scaleY(0.8)";
-    el.style.margin = "0px";
 
-    setTimeout(() => {
-        if (el && el.parentNode) {
+    el.style.transform = "scaleY(0.7)";
+
+    el.style.margin = "0px auto";
+
+    setTimeout(()=>{
+
+        if(el.parentNode){
             el.remove();
         }
+
         unreadSeparatorElement = null;
-    }, 250); // match CSS transition time
-    }
+
+    },250);
+}
 
 
     
