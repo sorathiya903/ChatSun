@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<title>Group Info</title>
+
+<script src="config.js"></script>
+
+<!-- Google Font -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:'Inter',sans-serif;
+    background:
+        radial-gradient(circle at top left,#1e293b 0%,#020617 45%),
+        #020617;
+    color:white;
+    min-height:100vh;
+    padding:40px 20px;
+}
+
+.container{
+    max-width:850px;
+    margin:auto;
+}
+
+.page-title{
+    font-size:38px;
+    font-weight:800;
+    margin-bottom:25px;
+    letter-spacing:-1px;
+}
+
+.card{
+    background:rgba(15,23,42,0.88);
+    backdrop-filter:blur(14px);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:28px;
+    padding:30px;
+    box-shadow:
+        0 10px 40px rgba(0,0,0,0.45),
+        inset 0 1px 0 rgba(255,255,255,0.03);
+}
+
+.group-header{
+    display:flex;
+    align-items:center;
+    gap:18px;
+    margin-bottom:28px;
+}
+
+.group-avatar{
+    width:75px;
+    height:75px;
+    border-radius:22px;
+    background:linear-gradient(135deg,#3b82f6,#8b5cf6);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:30px;
+    font-weight:700;
+    box-shadow:0 10px 30px rgba(59,130,246,0.3);
+}
+
+.group-info h2{
+    font-size:30px;
+    margin-bottom:6px;
+}
+
+.group-info p{
+    color:#94a3b8;
+    font-size:14px;
+}
+
+.section-title{
+    font-size:15px;
+    color:#94a3b8;
+    margin-bottom:14px;
+    text-transform:uppercase;
+    letter-spacing:1px;
+}
+
+.members{
+    display:grid;
+    gap:12px;
+    margin-bottom:28px;
+}
+
+.member{
+    background:#111c33;
+    border:1px solid rgba(255,255,255,0.06);
+    padding:14px 18px;
+    border-radius:18px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    transition:0.25s ease;
+}
+
+.member:hover{
+    transform:translateY(-2px);
+    background:#172554;
+}
+
+.member-left{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.member-avatar{
+    width:42px;
+    height:42px;
+    border-radius:14px;
+    background:linear-gradient(135deg,#2563eb,#7c3aed);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:700;
+}
+
+.admin-badge{
+    background:rgba(139,92,246,0.15);
+    color:#c4b5fd;
+    border:1px solid rgba(139,92,246,0.3);
+    padding:6px 12px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:600;
+}
+
+.bottom-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:18px;
+}
+
+.info-box{
+    background:#0b1220;
+    border:1px solid rgba(255,255,255,0.06);
+    padding:18px;
+    border-radius:20px;
+}
+
+.info-box span{
+    display:block;
+    color:#94a3b8;
+    font-size:13px;
+    margin-bottom:8px;
+}
+
+.info-box strong{
+    font-size:16px;
+    word-break:break-word;
+}
+
+.loading{
+    text-align:center;
+    padding:50px;
+    color:#94a3b8;
+}
+
+.error{
+    color:#f87171;
+}
+
+@media(max-width:700px){
+
+    .group-header{
+        flex-direction:column;
+        align-items:flex-start;
+    }
+
+    .bottom-grid{
+        grid-template-columns:1fr;
+    }
+
+    .page-title{
+        font-size:30px;
+    }
+
+}
+
+</style>
+</head>
+<body>
+
+<div class="container">
+
+    <h1 class="page-title">Group Info</h1>
+
+    <div id="groupBox" class="card">
+        <div class="loading">Loading group...</div>
+    </div>
+
+</div>
+
+<script>
+
+const API_URL = window.API_URL;
+
+const conversationId =
+    new URLSearchParams(location.search).get("id");
+
+async function loadGroup(){
+
+    try{
+
+        const res = await fetch(
+            `${API_URL}/conversation/${conversationId}`
+        );
+
+        const data = await res.json();
+
+        if(!data.success){
+
+            document.getElementById("groupBox").innerHTML = `
+                <div class="loading error">
+                    Group not found
+                </div>
+            `;
+
+            return;
+        }
+
+        let membersHTML = "";
+
+        data.members.forEach(member => {
+
+            const firstLetter =
+                member.charAt(0).toUpperCase();
+
+            const isAdmin =
+                data.admins.includes(member);
+
+            membersHTML += `
+                <div class="member">
+
+                    <div class="member-left">
+
+                        <div class="member-avatar">
+                            ${firstLetter}
+                        </div>
+
+                        <div>
+                            <div style="font-weight:600;">
+                                ${member}
+                            </div>
+                        </div>
+
+                    </div>
+
+                    ${
+                        isAdmin
+                        ? `<div class="admin-badge">Admin</div>`
+                        : ``
+                    }
+
+                </div>
+            `;
+        });
+
+        const html = `
+
+            <div class="group-header">
+
+                <div class="group-avatar">
+                    👥
+                </div>
+
+                <div class="group-info">
+                    <h2>${data.group_name}</h2>
+                    <p>
+                        ${data.members.length} Members
+                    </p>
+                </div>
+
+            </div>
+
+            <div class="section-title">
+                Members
+            </div>
+
+            <div class="members">
+                ${membersHTML}
+            </div>
+
+            <div class="bottom-grid">
+
+                <div class="info-box">
+                    <span>Admins</span>
+                    <strong>
+                        ${data.admins.join(", ")}
+                    </strong>
+                </div>
+
+                <div class="info-box">
+                    <span>Group ID</span>
+                    <strong>
+                        ${data.conversation_id}
+                    </strong>
+                </div>
+
+            </div>
+
+        `;
+
+        document.getElementById("groupBox").innerHTML = html;
+
+    }catch(err){
+
+        document.getElementById("groupBox").innerHTML = `
+            <div class="loading error">
+                Failed to load group
+            </div>
+        `;
+
+        console.error(err);
+    }
+
+}
+
+loadGroup();
+
+</script>
+
+</body>
+</html>
