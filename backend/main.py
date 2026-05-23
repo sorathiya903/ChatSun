@@ -10,6 +10,10 @@ import json
 import re
 import time
 from fastapi.staticfiles import StaticFiles
+from argon2 import PasswordHasher
+from argon2.exceptions import VerifyMismatchError
+
+ph = PasswordHasher()
 
 app = FastAPI()
 app.mount(
@@ -417,12 +421,14 @@ async def register(data: RegisterModel):
     # CREATE USER
     # -----------------------------
 
+    hashed_password = ph.hash(password)
     users.insert_one({
         "full_name": full_name,
         "email": email,
-        "password": password,
-        "user_id": user_id
-    })
+        "password_hash": hashed_password,
+        "auth_type": "password",
+        "user_id": user_id,
+        "created_at": datetime.utcnow()})
 
     return {
         "success": True,
@@ -471,9 +477,19 @@ async def login(data: LoginModel):
     # -----------------------------
 
     user = users.find_one({
-        "email": email,
-        "password": password
-    })
+        "email": email})
+    
+    if not user:
+        return {  "success": False, "message": "Wrong email or password"}
+
+    try:
+        ph.verify(
+        user["password_hash"],
+        password )
+
+    except VerifyMismatchError:
+
+    return { "success": False,"message": "Wrong email or password"}
 
     if not user:
         return {
