@@ -193,7 +193,14 @@ body{
 
 }
 
-</style>
+.member-name {
+    max-width: 180px;      /* adjust if needed */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+}
+    </style>
 </head>
 <body>
 
@@ -253,9 +260,9 @@ async function loadGroup(){
                         </div>
 
                         <div>
-                            <div style="font-weight:600;">
-                                ${member}
-                            </div>
+                            <div class="member-name" title="${member}" style="font-weight:600;">
+    ${member}
+</div>
                         </div>
 
                     </div>
