@@ -1377,6 +1377,9 @@ async function loadConversationInfo(){
             data.group_name
             .charAt(0)
             .toUpperCase();
+        document.getElementById("chatUser").onclick = () => {
+            window.location.href = `grpinfo.html?id=${conversationId}`;
+        };
     }
 }
 
@@ -2405,11 +2408,7 @@ chatBox.addEventListener("scroll",()=>{
     lastScrollTop = currentScroll;
 });
 
-        if(isGroup){
-    document.getElementById("chatUser").addEventListener("click", () => {
-        window.location.href = `grpinfo.html?id=${conversationId}`;
-    });
-     }
+        
 </script>
 
 </body>
