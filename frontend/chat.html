@@ -844,7 +844,7 @@ body{
     </div>
 
     <div class="user-info">
-        <h2 id="chatUser">Chat</h2>
+        <h2 id="chatUser" style="cursor:pointer;"></h2>
         <p id="statusText" class="online-status">
     Connecting...
         </p>
@@ -2404,6 +2404,12 @@ chatBox.addEventListener("scroll",()=>{
 
     lastScrollTop = currentScroll;
 });
+
+        if(isGroup){
+    document.getElementById("chatUser").addEventListener("click", () => {
+        window.location.href = `grpinfo.html?id=${conversationId}`;
+    });
+     }
 </script>
 
 </body>
