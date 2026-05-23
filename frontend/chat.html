@@ -2009,15 +2009,26 @@ ignoreNextScroll = true;
         const statusEl =
             msgEl.querySelector(".status");
 
-        if(statusEl){
+if(statusEl){
 
-            statusEl.innerHTML = buildSeenPopup({
-    sender: msgEl.closest(".me")
-        ? currentUser.user_id
-        : "other",
-    seen_by: data.seen_by
-});
-        }
+    // GROUP CHAT
+    if(isGroup){
+
+        statusEl.innerHTML = buildSeenPopup({
+            sender: currentUser.user_id,
+            seen_by: data.seen_by
+        });
+
+    }
+
+    // PRIVATE CHAT
+    else{
+
+        statusEl.innerHTML = getStatusDots({
+            seen_by: data.seen_by
+        });
+    }
+}
 
         const seenBtn =
             msgEl.querySelector(".group-seen-btn");
