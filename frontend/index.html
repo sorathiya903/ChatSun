@@ -8,7 +8,7 @@
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
+<script src="https://accounts.google.com/gsi/client" async defer></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@500;600;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 
   <!-- Tailwind CDN -->
@@ -434,7 +434,16 @@
               <!-- Social Buttons -->
               
 
-                
+                <div
+    id="g_id_onload"
+    data-client_id="YOUR_CLIENT_ID"
+    data-callback="handleGoogleLogin">
+</div>
+
+<div
+    class="g_id_signin"
+    data-type="standard">
+</div>
               
               
               <!-- Inputs -->
@@ -1117,6 +1126,36 @@ document
 
 });
 
+
+      async function handleGoogleLogin(response){
+
+    const res = await fetch(
+        `${API_URL}/google-login`,
+        {
+            method:"POST",
+
+            headers:{
+                "Content-Type":"application/json"
+            },
+
+            body:JSON.stringify({
+                token: response.credential
+            })
+        }
+    );
+
+    const data = await res.json();
+
+    if(data.success){
+
+        localStorage.setItem(
+            "user",
+            JSON.stringify(data.user)
+        );
+
+        location.href = "dashboard.html";
+    }
+    }
 </script>
 </body>
   </html>
