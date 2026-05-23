@@ -95,7 +95,6 @@ async def upload_file(file: UploadFile = File(...)):
         file.filename
     }
 
-
 @app.websocket("/ws/{conversation_id}")
 async def chat(ws: WebSocket, conversation_id: str):
 
@@ -109,114 +108,242 @@ async def chat(ws: WebSocket, conversation_id: str):
     try:
 
         while True:
+
             raw = await ws.receive_text()
+
             data = json.loads(raw)
 
             # -------------------------
             # TYPING EVENT
             # -------------------------
             if data.get("type") == "typing":
-                for conn in connections[conversation_id]:
-                    await conn.send_text(json.dumps({
-                        "type": "typing",
-                        "sender": data["sender"]
-                    }))
+
+                for conn in connections.get(
+                    conversation_id,
+                    []
+                ):
+
+                    try:
+
+                        await conn.send_text(
+                            json.dumps({
+                                "type": "typing",
+                                "sender": data["sender"]
+                            })
+                        )
+
+                    except:
+                        pass
+
                 continue
 
             # -------------------------
             # NORMAL MESSAGE
             # -------------------------
             sender = data["sender"]
+
             text = data["text"]
 
-            users_list = conversation_id.split("_")
+            convo = conversations.find_one({
+                "conversation_id": conversation_id
+            })
 
-            # safer receiver detection
-            receiver = next(u for u in users_list if u != sender)
+            # -------------------------
+            # GROUP / PRIVATE RECEIVERS
+            # -------------------------
+            if convo and convo.get("is_group"):
 
+                receivers = [
+                    u for u in convo["users"]
+                    if u != sender
+                ]
+
+            else:
+
+                users_list = conversation_id.split("_")
+
+                receivers = [
+                    u for u in users_list
+                    if u != sender
+                ]
+
+            # -------------------------
+            # CREATE MESSAGE
+            # -------------------------
             message = {
+
                 "message_id": str(uuid.uuid4()),
+
                 "conversation_id": conversation_id,
+
                 "sender": sender,
+
                 "text": text,
-                "type": data.get("type", "text"),
-                "file_name": data.get("file_name"),
-                #"status": "sent",
+
+                "type": data.get(
+                    "type",
+                    "text"
+                ),
+
+                "file_name": data.get(
+                    "file_name"
+                ),
+
                 "seen_by": [sender],
+
                 "timestamp": datetime.now(
                     ZoneInfo("Asia/Kolkata")
                 ).isoformat()
             }
 
             # -------------------------
-            # FIND CONVERSATION
-            # -------------------------
-            convo = conversations.find_one({
-                "conversation_id": conversation_id
-            })
-
-            # -------------------------
-            # CREATE IF NOT EXISTS
+            # CREATE CONVERSATION
             # -------------------------
             if not convo:
 
                 users_list = conversation_id.split("_")
 
                 conversations.insert_one({
-                    "conversation_id": conversation_id,
-                    "users": users_list,
-                    "messages": [message],
-                    "unread": {u: 0 for u in users_list}
+
+                    "conversation_id":
+                        conversation_id,
+
+                    "users":
+                        users_list,
+
+                    "messages":
+                        [message],
+
+                    "unread":
+                        {
+                            u: 0
+                            for u in users_list
+                        }
                 })
 
             else:
 
                 conversations.update_one(
-                    {"conversation_id": conversation_id},
-                    {"$push": {"messages": message}}
+
+                    {
+                        "conversation_id":
+                            conversation_id
+                    },
+
+                    {
+                        "$push": {
+                            "messages": message
+                        }
+                    }
                 )
 
-                # increment unread for receiver
-                conversations.update_one(
-                    {"conversation_id": conversation_id},
-                    {"$inc": {f"unread.{receiver}": 1}}
-                )
+                # increment unread
+                for receiver in receivers:
+
+                    conversations.update_one(
+
+                        {
+                            "conversation_id":
+                                conversation_id
+                        },
+
+                        {
+                            "$inc": {
+                                f"unread.{receiver}": 1
+                            }
+                        }
+                    )
 
             # -------------------------
-            # REALTIME BROADCAST MESSAGE
+            # BROADCAST MESSAGE
             # -------------------------
             disconnected = []
 
-            for conn in connections[conversation_id]:
+            for conn in connections.get(
+                conversation_id,
+                []
+            ):
+
                 try:
-                    await conn.send_text(json.dumps(message))
+
+                    await conn.send_text(
+                        json.dumps(message)
+                    )
+
                 except:
+
                     disconnected.append(conn)
 
+            # cleanup dead sockets
             for conn in disconnected:
-                if conn in connections[conversation_id]:
-                    connections[conversation_id].remove(conn)
+
+                if conn in connections.get(
+                    conversation_id,
+                    []
+                ):
+
+                    connections[
+                        conversation_id
+                    ].remove(conn)
 
             # -------------------------
-            # REALTIME UNREAD UPDATE
+            # UNREAD UPDATE
             # -------------------------
             update = {
+
                 "type": "unread_update",
-                "conversation_id": conversation_id,
-                "receiver": receiver
+
+                "conversation_id":
+                    conversation_id,
+
+                "receivers":
+                    receivers
             }
 
-            for conn in connections[conversation_id]:
+            for conn in connections.get(
+                conversation_id,
+                []
+            ):
+
                 try:
-                    await conn.send_text(json.dumps(update))
+
+                    await conn.send_text(
+                        json.dumps(update)
+                    )
+
                 except:
                     pass
 
     except WebSocketDisconnect:
-        if ws in connections[conversation_id]:
-            connections[conversation_id].remove(ws)
 
+        print(
+            "WS disconnected:",
+            conversation_id
+        )
 
+        if ws in connections.get(
+            conversation_id,
+            []
+        ):
+
+            connections[
+                conversation_id
+            ].remove(ws)
+
+    except Exception as e:
+
+        print("WS ERROR:", e)
+
+        if ws in connections.get(
+            conversation_id,
+            []
+        ):
+
+            connections[
+                conversation_id
+            ].remove(ws)
+
+            
 @app.post("/clear-unread/{conversation_id}/{user_id}")
 async def clear_unread(conversation_id: str, user_id: str):
 
