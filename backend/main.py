@@ -10,78 +10,9 @@ import json
 import re
 import time
 from fastapi.staticfiles import StaticFiles
-from jose import jwt, JWTError
+from auth import router
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
-from google.oauth2 import id_token
-from google.auth.transport import requests
-
-#helper functions
-
-def set_auth_cookie(response, token):
-
-    response.set_cookie(
-
-        key="access_token",
-
-        value=token,
-
-        httponly=True,
-
-        secure=True,
-
-        samesite="None",
-
-        max_age=60 * 60 * 24 * 30
-    )
-
-def create_access_token(user_id):
-
-    expire = (
-        datetime.now(timezone.utc)
-        + timedelta(days=30)
-    )
-
-    payload = {
-        "sub": user_id,
-        "exp": expire
-    }
-
-    return jwt.encode(
-        payload,
-        SECRET_KEY,
-        algorithm=ALGORITHM
-    )
-
-
-def verify_token(token):
-
-    try:
-
-        payload = jwt.decode(
-            token,
-            SECRET_KEY,
-            algorithms=[ALGORITHM]
-        )
-
-        return payload.get("sub")
-
-    except JWTError:
-        return None
-
-def hash_password(password):
-
-    return ph.hash(password)
-
-
-def verify_password(password, hashed):
-
-    try:
-        return ph.verify(hashed, password)
-
-    except VerifyMismatchError:
-        return False
-
 
 
 
@@ -94,7 +25,7 @@ app.mount(
     name="uploads"
 )
 last_seen = {}
-
+app.include_router(router)
 
 app.add_middleware(
     CORSMiddleware,
