@@ -1243,13 +1243,14 @@ observer.observe(box);
 
   console.log("request sent")  }
 
-    function getStatusDots(status){
+     function getStatusDots(msg){
 
-    console.log("STATUS UPDATE:", status);
+    const isRead =
+        msg.seen_by &&
+        msg.seen_by.length > 1;
 
-    if(status === "read"){
-
-        console.log("Message was READ");
+    // READ
+    if(isRead){
 
         return `
             <span class="dots">
@@ -1260,34 +1261,19 @@ observer.observe(box);
         `;
     }
 
-    if(status === "delivered"){
-
-        console.log("Message was DELIVERED");
-
-        return `
-            <span class="dots">
-                <span class="dot active"></span>
-                <span class="dot deliver"></span>
-                <span class="dot"></span>
-            </span>
-        `;
+    // SENT / DELIVERED fallback
+    return `
+        <span class="dots">
+            <span class="dot active"></span>
+            <span class="dot deliver"></span>
+            <span class="dot"></span>
+        </span>
+    `;
     }
 
-    if(status === "sent"){
 
-        console.log("Message was SENT");
 
-        return `
-            <span class="dots">
-                <span class="dot active"></span>
-                <span class="dot"></span>
-                <span class="dot"></span>
-            </span>
-        `;
-    }
-
-    return "";
-    }
+         
 
     function buildDropdown(msg) {
     let html = `
@@ -1735,7 +1721,7 @@ if(
                     ${
                         isGroup
                         ? buildSeenPopup(msg)
-                        : getStatusDots(msg.status)
+                        : getStatusDots(msg)
                     }
 
                 </span>
