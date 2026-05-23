@@ -819,24 +819,46 @@ async def mark_read(message_id: str, user_id: str):
 
     seen_by = message.get("seen_by", [])
 
-    if user_id not in seen_by:
+    # already seen
+    if user_id in seen_by:
 
-        conversations.update_one(
-            {
-                "messages.message_id": message_id
-            },
-            {
-                "$push": {
-                    "messages.$.seen_by": user_id
-                }
+        return {
+            "success": True,
+            "already_seen": True
+        }
+
+    # add user only once
+    conversations.update_one(
+        {
+            "messages.message_id": message_id
+        },
+        {
+            "$push": {
+                "messages.$.seen_by": user_id
             }
-        )
+        }
+    )
+
+    # fetch updated message
+    updated_convo = conversations.find_one({
+        "messages.message_id": message_id
+    })
+
+    updated_message = None
+
+    for msg in updated_convo["messages"]:
+
+        if msg["message_id"] == message_id:
+            updated_message = msg
+            break
 
     update_data = {
         "type": "seen_update",
         "message_id": message_id,
-        "seen_by": seen_by + [user_id]
+        "seen_by": updated_message.get("seen_by", [])
     }
+
+    disconnected = []
 
     for conn in connections.get(
         convo["conversation_id"],
@@ -850,6 +872,17 @@ async def mark_read(message_id: str, user_id: str):
             )
 
         except:
-            pass
+            disconnected.append(conn)
+
+    # cleanup dead sockets
+    for conn in disconnected:
+
+        if conn in connections[
+            convo["conversation_id"]
+        ]:
+
+            connections[
+                convo["conversation_id"]
+            ].remove(conn)
 
     return {"success": True}
