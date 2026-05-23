@@ -1911,19 +1911,17 @@ if (isAtBottom()) {
 } else {
     hideInput();
     }
+
+
     if(unreadSeparatorElement){
 
-        unreadSeparatorElement.scrollIntoView({
-            behavior:"smooth",
-            block:"center"
-        });
+    chatBox.scrollTop =
+        unreadSeparatorElement.offsetTop - 120;
 
-    }else{
+}else{
 
-        chatBox.scrollTo({
-            top: chatBox.scrollHeight,
-            behavior:"smooth"
-        });
+    chatBox.scrollTop =
+        chatBox.scrollHeight;
     }
 }
 
