@@ -1,5 +1,4 @@
 fastapi
-uvicorn
 pymongo
 pydantic
 python-multipart
@@ -7,3 +6,5 @@ argon2-cffi
 python-jose[cryptography]
 google-auth
 google-auth-oauthlib
+uvicorn[standard]
+websockets
