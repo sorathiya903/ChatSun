@@ -1858,12 +1858,13 @@ async function loadMessages(){
 );
 
   const unreadMessages = data.filter(
-    m =>
-        m.sender !== currentUser.user_id &&
-        (
-            !m.seen_by ||
-            !m.seen_by.includes(currentUser.user_id)
-        )
+  m =>
+    m.type !== "system" &&
+    m.sender !== currentUser.user_id &&
+    (
+      !m.seen_by ||
+      !m.seen_by.includes(currentUser.user_id)
+    )
 );
 
 window.unreadCount = unreadMessages.length;
@@ -1873,11 +1874,12 @@ let firstUnreadFound = false;
 data.forEach(msg => {
 
     const isUnread =
-        msg.sender !== currentUser.user_id &&
-        (
-            !msg.seen_by ||
-            !msg.seen_by.includes(currentUser.user_id)
-        );
+    msg.type !== "system" &&
+    msg.sender !== currentUser.user_id &&
+    (
+        !msg.seen_by ||
+        !msg.seen_by.includes(currentUser.user_id)
+    );
 
     // INSERT SEPARATOR
     if(isUnread && !firstUnreadFound){
