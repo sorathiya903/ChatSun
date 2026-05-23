@@ -1830,16 +1830,49 @@ async function loadMessages(){
     new Date(b.timestamp)
 );
 
- window.unreadCount = data.filter(
+  const unreadMessages = data.filter(
     m =>
         m.sender !== currentUser.user_id &&
         (
             !m.seen_by ||
             !m.seen_by.includes(currentUser.user_id)
         )
-).length;
+);
 
-data.forEach(addMessage);
+window.unreadCount = unreadMessages.length;
+
+let firstUnreadFound = false;
+
+data.forEach(msg => {
+
+    const isUnread =
+        msg.sender !== currentUser.user_id &&
+        (
+            !msg.seen_by ||
+            !msg.seen_by.includes(currentUser.user_id)
+        );
+
+    // INSERT SEPARATOR
+    if(isUnread && !firstUnreadFound){
+
+        firstUnreadFound = true;
+
+        unreadSeparatorElement =
+            document.createElement("div");
+
+        unreadSeparatorElement.className =
+            "unread-separator";
+
+        unreadSeparatorElement.innerText =
+            `${window.unreadCount} unread messages`;
+
+        chatBox.appendChild(
+            unreadSeparatorElement
+        );
+    }
+
+    addMessage(msg);
+});
 }
 
 async function initChat(){
