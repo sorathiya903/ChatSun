@@ -3,3 +3,4 @@ uvicorn[standard]
 pymongo
 pydantic
 python-multipart
+argon2-cffi
