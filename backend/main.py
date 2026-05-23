@@ -488,8 +488,7 @@ async def login(data: LoginModel):
         password )
 
     except VerifyMismatchError:
-
-    return { "success": False,"message": "Wrong email or password"}
+        return { "success": False,"message": "Wrong email or password"}
 
     if not user:
         return {
