@@ -995,10 +995,13 @@ body{
         return "";
     }
 
-    const viewers =
+    const viewers = [
+    ...new Set(
         msg.seen_by.filter(
             user => user !== msg.sender
-        );
+        )
+    )
+];
 
     if(viewers.length === 0){
         return "";
