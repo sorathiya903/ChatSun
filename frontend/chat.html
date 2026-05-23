@@ -1521,7 +1521,8 @@ if(
     box.className = "msg";
     box.setAttribute("data-id", msg.message_id);
 
-
+box.setAttribute("data-sender", msg.sender);
+    
     let messageContent = "";
 
 if(
@@ -1968,12 +1969,12 @@ ignoreNextScroll = true;
 
         if(statusEl){
 
-            statusEl.innerHTML = `
-                ${buildSeenPopup({
-                    sender: msg.sender,
-                    seen_by: data.seen_by
-                })}
-            `;
+            statusEl.innerHTML = buildSeenPopup({
+    sender: msgEl.closest(".me")
+        ? currentUser.user_id
+        : "other",
+    seen_by: data.seen_by
+});
         }
 
         const seenBtn =
