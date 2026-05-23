@@ -984,8 +984,6 @@ body{
 });
 
     
-let ignoreNextScroll = false;
-let lockScrollHandler = false;
 
     
     function buildSeenPopup(msg){
@@ -1486,32 +1484,7 @@ let moved = false;
         chatBox.appendChild(sep);
     }
 
-    if(
-    !unreadSeparatorAdded &&
-    msg.sender !== currentUser.user_id &&
-    (
-        !msg.seen_by ||
-        !msg.seen_by.includes(currentUser.user_id)
-    )
-){
-
-    unreadSeparatorAdded = true;
-
-    const unreadDiv =
-        document.createElement("div");
-
-    unreadDiv.className =
-        "unread-separator";
-
-    unreadDiv.innerText =
-        `${window.unreadCount} unread messages`;
-
-    unreadSeparatorElement = unreadDiv;
-
-    chatBox.appendChild(unreadDiv);
-
-    window.unreadCount--;
-    }
+    
     /* SYSTEM MESSAGE */
 
 if(msg.type === "system"){
@@ -2239,7 +2212,6 @@ function goBack(){
         "dashboard.html";
 }
 
-    let lastScrollTop = 0;
 let inputVisible = true;
 const inputBox = document.querySelector(".input-box");
 
@@ -2258,32 +2230,8 @@ const inputBox = document.querySelector(".input-box");
 
 
 
-chatBox.addEventListener("scroll", () => {
 
-    if (scrollLocked) return;
-
-    const atBottom = isAtBottom();
-
-    if (atBottom) {
-        showInput();
-    } else {
-        hideInput();
-    }
-});
     
-
-    const chat = chatBox;
-
-    // prevent user scroll + programmatic scroll
-    chat.style.overflow = "hidden";
-
-    setTimeout(() => {
-        chat.style.overflow = "auto"; // restore scroll
-        scrollLocked = false;
-
-        // resync scroll position
-        lastScrollTop = chat.scrollTop;
-    }, 1000);
     
     async function updateStatus() {
 
