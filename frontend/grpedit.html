@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+<title>Edit Group</title>
+
+<script src="config.js"></script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:'Inter',sans-serif;
+
+    background:
+        radial-gradient(circle at top left,#1e293b 0%,#020617 45%),
+        #020617;
+
+    color:white;
+
+    min-height:100vh;
+
+    padding:30px 18px;
+}
+
+.container{
+    max-width:900px;
+    margin:auto;
+}
+
+.title{
+    font-size:38px;
+    font-weight:800;
+
+    margin-bottom:24px;
+}
+
+.card{
+    background:rgba(15,23,42,.88);
+
+    border:1px solid rgba(255,255,255,.08);
+
+    border-radius:28px;
+
+    padding:28px;
+
+    backdrop-filter:blur(18px);
+
+    box-shadow:
+        0 10px 40px rgba(0,0,0,.45),
+        inset 0 1px 0 rgba(255,255,255,.03);
+}
+
+.section{
+    margin-top:28px;
+}
+
+.section-title{
+    font-size:15px;
+
+    color:#94a3b8;
+
+    margin-bottom:14px;
+
+    text-transform:uppercase;
+
+    letter-spacing:1px;
+}
+
+.input{
+    width:100%;
+
+    background:#0b1220;
+
+    border:1px solid rgba(255,255,255,.08);
+
+    border-radius:18px;
+
+    padding:16px;
+
+    color:white;
+
+    outline:none;
+
+    font-size:15px;
+}
+
+.save-btn{
+    margin-top:16px;
+
+    border:none;
+
+    background:linear-gradient(135deg,#3b82f6,#8b5cf6);
+
+    color:white;
+
+    padding:14px 22px;
+
+    border-radius:18px;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+    transition:.25s;
+}
+
+.save-btn:hover{
+    transform:translateY(-2px);
+}
+
+.members{
+    display:grid;
+    gap:14px;
+}
+
+.member{
+    background:#111c33;
+
+    border:1px solid rgba(255,255,255,.06);
+
+    border-radius:22px;
+
+    padding:16px;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    gap:14px;
+}
+
+.member-left{
+    display:flex;
+    align-items:center;
+    gap:12px;
+
+    min-width:0;
+}
+
+.avatar{
+    width:48px;
+    height:48px;
+
+    border-radius:16px;
+
+    background:linear-gradient(135deg,#2563eb,#7c3aed);
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-weight:700;
+}
+
+.member-name{
+    font-size:15px;
+    font-weight:600;
+
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+
+    max-width:220px;
+}
+
+.badges{
+    display:flex;
+    gap:8px;
+    margin-top:5px;
+}
+
+.badge{
+    font-size:11px;
+
+    padding:5px 10px;
+
+    border-radius:999px;
+
+    font-weight:600;
+}
+
+.admin{
+    background:rgba(139,92,246,.15);
+    color:#c4b5fd;
+
+    border:1px solid rgba(139,92,246,.28);
+}
+
+.creator{
+    background:rgba(34,197,94,.12);
+    color:#86efac;
+
+    border:1px solid rgba(34,197,94,.28);
+}
+
+.actions{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+.action-btn{
+    border:none;
+
+    border-radius:14px;
+
+    padding:10px 14px;
+
+    cursor:pointer;
+
+    font-size:13px;
+    font-weight:600;
+
+    transition:.2s;
+}
+
+.make-admin{
+    background:#312e81;
+    color:#c4b5fd;
+}
+
+.remove-admin{
+    background:#451a03;
+    color:#fdba74;
+}
+
+.remove-user{
+    background:#7f1d1d;
+    color:#fca5a5;
+}
+
+.loading{
+    text-align:center;
+    color:#94a3b8;
+    padding:50px;
+}
+
+.error{
+    color:#f87171;
+}
+
+.top-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:16px;
+    flex-wrap:wrap;
+}
+
+.back-btn{
+    border:none;
+
+    background:#1e293b;
+
+    color:white;
+
+    padding:12px 18px;
+
+    border-radius:16px;
+
+    cursor:pointer;
+}
+
+@media(max-width:700px){
+
+    .member{
+        flex-direction:column;
+        align-items:flex-start;
+    }
+
+    .actions{
+        width:100%;
+    }
+
+    .action-btn{
+        flex:1;
+    }
+
+    .member-name{
+        max-width:160px;
+    }
+
+    .title{
+        font-size:30px;
+    }
+
+}
+
+</style>
+</head>
+<body>
+
+<div class="container">
+
+    <div class="top-row">
+
+        <h1 class="title">
+            Edit Group
+        </h1>
+
+        <button
+            class="back-btn"
+            onclick="history.back()"
+        >
+            ← Back
+        </button>
+
+    </div>
+
+    <div id="app" class="card">
+
+        <div class="loading">
+            Loading group...
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+const info = await fetch(
+    `${API_URL}/me`,
+    {
+        credentials:"include"
+    }
+);
+
+const data = await info.json();
+
+const currentUser = data.user;
+
+const conversationId =
+    new URLSearchParams(
+        location.search
+    ).get("id");
+
+let groupData = null;
+
+/* LOAD */
+
+async function loadGroup(){
+
+    try{
+
+        const res = await fetch(
+            `${API_URL}/conversation/${conversationId}`
+        );
+
+        const data = await res.json();
+
+        if(!data.success){
+
+            document.getElementById("app").innerHTML = `
+                <div class="loading error">
+                    Group not found
+                </div>
+            `;
+
+            return;
+        }
+
+        groupData = data;
+
+        /* CHECK ADMIN */
+
+        if(
+            !data.admins.includes(
+                currentUser.user_id
+            )
+        ){
+
+            document.getElementById("app").innerHTML = `
+                <div class="loading error">
+                    Only admins can edit this group
+                </div>
+            `;
+
+            return;
+        }
+
+        renderGroup();
+
+    }catch(err){
+
+        console.log(err);
+
+        document.getElementById("app").innerHTML = `
+            <div class="loading error">
+                Failed to load group
+            </div>
+        `;
+    }
+}
+
+/* RENDER */
+
+function renderGroup(){
+
+    let membersHTML = "";
+
+    groupData.members.forEach(member => {
+
+        const isAdmin =
+            groupData.admins.includes(member);
+
+        const isCreator =
+            groupData.created_by === member;
+
+        membersHTML += `
+            <div class="member">
+
+                <div class="member-left">
+
+                    <div class="avatar">
+                        ${member.charAt(0).toUpperCase()}
+                    </div>
+
+                    <div>
+
+                        <div
+                            class="member-name"
+                            title="${member}"
+                        >
+                            ${member}
+                        </div>
+
+                        <div class="badges">
+
+                            ${
+                                isAdmin
+                                ? `
+                                    <div class="badge admin">
+                                        Admin
+                                    </div>
+                                `
+                                : ``
+                            }
+
+                            ${
+                                isCreator
+                                ? `
+                                    <div class="badge creator">
+                                        Creator
+                                    </div>
+                                `
+                                : ``
+                            }
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                ${
+                    member !== currentUser.user_id
+                    ? `
+                        <div class="actions">
+
+                            ${
+                                !isAdmin
+                                ? `
+                                    <button
+                                        class="action-btn make-admin"
+                                        onclick="makeAdmin('${member}')"
+                                    >
+                                        Make Admin
+                                    </button>
+                                `
+                                : `
+                                    <button
+                                        class="action-btn remove-admin"
+                                        onclick="removeAdmin('${member}')"
+                                    >
+                                        Remove Admin
+                                    </button>
+                                `
+                            }
+
+                            <button
+                                class="action-btn remove-user"
+                                onclick="removeMember('${member}')"
+                            >
+                                Remove
+                            </button>
+
+                        </div>
+                    `
+                    : ``
+                }
+
+            </div>
+        `;
+    });
+
+    document.getElementById("app").innerHTML = `
+
+        <div class="section">
+
+            <div class="section-title">
+                Group Name
+            </div>
+
+            <input
+                id="groupName"
+                class="input"
+                value="${groupData.group_name}"
+            >
+
+            <button
+                class="save-btn"
+                onclick="saveGroupName()"
+            >
+                Save Name
+            </button>
+
+        </div>
+
+        <div class="section">
+
+            <div class="section-title">
+                Members
+            </div>
+
+            <div class="members">
+                ${membersHTML}
+            </div>
+
+        </div>
+    `;
+}
+
+/* CHANGE GROUP NAME */
+
+async function saveGroupName(){
+
+    const newName =
+        document.getElementById("groupName")
+        .value
+        .trim();
+
+    if(!newName) return;
+
+    const res = await fetch(
+        `${API_URL}/group/name/${conversationId}`,
+        {
+            method:"POST",
+
+            headers:{
+                "Content-Type":"application/json"
+            },
+
+            body:JSON.stringify({
+                user_id: currentUser.user_id,
+                group_name: newName
+            })
+        }
+    );
+
+    const data = await res.json();
+
+    if(data.success){
+
+        alert("Group name updated");
+
+        groupData.group_name = newName;
+    }
+}
+
+/* MAKE ADMIN */
+
+async function makeAdmin(member){
+
+    const res = await fetch(
+        `${API_URL}/group/make-admin/${conversationId}`,
+        {
+            method:"POST",
+
+            headers:{
+                "Content-Type":"application/json"
+            },
+
+            body:JSON.stringify({
+                user_id: currentUser.user_id,
+                member
+            })
+        }
+    );
+
+    const data = await res.json();
+
+    if(data.success){
+
+        groupData.admins.push(member);
+
+        renderGroup();
+    }
+}
+
+/* REMOVE ADMIN */
+
+async function removeAdmin(member){
+
+    const res = await fetch(
+        `${API_URL}/group/remove-admin/${conversationId}`,
+        {
+            method:"POST",
+
+            headers:{
+                "Content-Type":"application/json"
+            },
+
+            body:JSON.stringify({
+                user_id: currentUser.user_id,
+                member
+            })
+        }
+    );
+
+    const data = await res.json();
+
+    if(data.success){
+
+        groupData.admins =
+            groupData.admins.filter(
+                x => x !== member
+            );
+
+        renderGroup();
+    }
+}
+
+/* REMOVE MEMBER */
+
+async function removeMember(member){
+
+    const confirmRemove =
+        confirm(
+            `Remove ${member} from group?`
+        );
+
+    if(!confirmRemove) return;
+
+    const res = await fetch(
+        `${API_URL}/group/remove-member/${conversationId}`,
+        {
+            method:"POST",
+
+            headers:{
+                "Content-Type":"application/json"
+            },
+
+            body:JSON.stringify({
+                user_id: currentUser.user_id,
+                member
+            })
+        }
+    );
+
+    const data = await res.json();
+
+    if(data.success){
+
+        groupData.members =
+            groupData.members.filter(
+                x => x !== member
+            );
+
+        groupData.admins =
+            groupData.admins.filter(
+                x => x !== member
+            );
+
+        renderGroup();
+    }
+}
+
+loadGroup();
+
+</script>
+
+</body>
+  </html>
