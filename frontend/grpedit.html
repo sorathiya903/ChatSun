@@ -417,7 +417,7 @@ async function loadGroup(){
 
         if(
             !data.admins.includes(
-                currentUser.user_id
+                currentUser
             )
         ){
 
@@ -505,7 +505,7 @@ function renderGroup(){
                 </div>
 
                 ${
-                    member !== currentUser.user_id
+                    member !== currentUser
                     ? `
                         <div class="actions">
 
@@ -603,7 +603,7 @@ async function saveGroupName(){
             },
 
             body:JSON.stringify({
-                user_id: currentUser.user_id,
+                user_id: currentUser,
                 group_name: newName
             })
         }
@@ -633,7 +633,7 @@ async function makeAdmin(member){
             },
 
             body:JSON.stringify({
-                user_id: currentUser.user_id,
+                user_id: currentUser,
                 member
             })
         }
@@ -663,7 +663,7 @@ async function removeAdmin(member){
             },
 
             body:JSON.stringify({
-                user_id: currentUser.user_id,
+                user_id: currentUser,
                 member
             })
         }
@@ -703,7 +703,7 @@ async function removeMember(member){
             },
 
             body:JSON.stringify({
-                user_id: currentUser.user_id,
+                user_id: currentUser,
                 member
             })
         }
