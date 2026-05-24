@@ -819,3 +819,121 @@ async def mark_read(message_id: str, user_id: str):
             ].remove(conn)
 
     return {"success": True}
+
+
+
+@app.post("/group/name/{conversation_id}")
+async def change_group_name(
+    conversation_id: str,
+    data: dict
+):
+
+    convo = conversations.find_one({
+        "conversation_id": conversation_id
+    })
+
+    if not convo:
+        return {"success": False}
+
+    if data["user_id"] not in convo["admins"]:
+        return {"success": False}
+
+    conversations.update_one(
+        {"conversation_id": conversation_id},
+        {
+            "$set": {
+                "group_name": data["group_name"]
+            }
+        }
+    )
+
+    return {"success": True}
+
+
+@app.post("/group/make-admin/{conversation_id}")
+async def make_admin(
+    conversation_id: str,
+    data: dict
+):
+
+    convo = conversations.find_one({
+        "conversation_id": conversation_id
+    })
+
+    if not convo:
+        return {"success": False}
+
+    if data["user_id"] not in convo["admins"]:
+        return {"success": False}
+
+    conversations.update_one(
+        {"conversation_id": conversation_id},
+        {
+            "$addToSet": {
+                "admins": data["member"]
+            }
+        }
+    )
+
+    return {"success": True}
+
+
+@app.post("/group/remove-admin/{conversation_id}")
+async def remove_admin(
+    conversation_id: str,
+    data: dict
+):
+
+    convo = conversations.find_one({
+        "conversation_id": conversation_id
+    })
+
+    if not convo:
+        return {"success": False}
+
+    if data["user_id"] not in convo["admins"]:
+        return {"success": False}
+
+    conversations.update_one(
+        {"conversation_id": conversation_id},
+        {
+            "$pull": {
+                "admins": data["member"]
+            }
+        }
+    )
+
+    return {"success": True}
+
+
+@app.post("/group/remove-member/{conversation_id}")
+async def remove_member(
+    conversation_id: str,
+    data: dict
+):
+
+    convo = conversations.find_one({
+        "conversation_id": conversation_id
+    })
+
+    if not convo:
+        return {"success": False}
+
+    if data["user_id"] not in convo["admins"]:
+        return {"success": False}
+
+    conversations.update_one(
+        {"conversation_id": conversation_id},
+        {
+            "$pull": {
+                "users": data["member"],
+                "admins": data["member"]
+            },
+
+            "$unset": {
+                f"unread.{data['member']}": ""
+            }
+        }
+    )
+
+    return {"success": True}
