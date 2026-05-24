@@ -1,46 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Modern Profile</title>
+<title>Profile</title>
 
 <script src="config.js"></script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
 
 :root{
 
-    --bg:#050816;
+    --bg:#020617;
     --card:#0f172a;
-    --card2:#111c33;
 
-    --border:rgba(255,255,255,.08);
+    --border:rgba(255,255,255,.07);
 
     --text:#ffffff;
     --muted:#94a3b8;
 
     --blue:#3b82f6;
     --purple:#8b5cf6;
-    --cyan:#06b6d4;
-
-    --success:#22c55e;
-
-    --shadow:
-        0 20px 80px rgba(0,0,0,.45);
 
     --gradient:
         linear-gradient(
             135deg,
-            #3b82f6 0%,
-            #8b5cf6 50%,
-            #06b6d4 100%
+            #3b82f6,
+            #8b5cf6
         );
 }
 
@@ -50,177 +42,84 @@
     box-sizing:border-box;
 }
 
-html{
-    scroll-behavior:smooth;
-}
-
 body{
 
     font-family:'Inter',sans-serif;
 
-    color:var(--text);
-
     background:
-        radial-gradient(circle at top left,#172554 0%,transparent 35%),
-        radial-gradient(circle at bottom right,#4c1d95 0%,transparent 35%),
-        linear-gradient(180deg,#020617 0%,#050816 100%);
+        radial-gradient(circle at top left,#172554 0%,transparent 30%),
+        radial-gradient(circle at bottom right,#4c1d95 0%,transparent 30%),
+        var(--bg);
+
+    color:var(--text);
 
     min-height:100vh;
 
-    overflow-x:hidden;
+    padding:24px;
 
-    padding:40px 18px;
+    overflow-x:hidden;
 }
 
-/* animated background glow */
+/* smooth background glow */
 
-.bg-blur{
+.bg{
     position:fixed;
-    width:350px;
-    height:350px;
+
+    width:300px;
+    height:300px;
 
     border-radius:50%;
 
-    background:rgba(59,130,246,.18);
+    background:rgba(59,130,246,.12);
 
     filter:blur(120px);
 
     z-index:-1;
 
-    animation:float 12s ease-in-out infinite;
+    top:-120px;
+    left:-120px;
 }
 
-.bg-blur.two{
+.bg.two{
+
+    background:rgba(139,92,246,.12);
+
+    top:auto;
+    left:auto;
+
     right:-120px;
-    bottom:-100px;
-
-    background:rgba(139,92,246,.18);
-
-    animation-delay:3s;
-}
-
-@keyframes float{
-    0%{
-        transform:translateY(0px);
-    }
-    50%{
-        transform:translateY(-30px);
-    }
-    100%{
-        transform:translateY(0px);
-    }
+    bottom:-120px;
 }
 
 .container{
-    max-width:760px;
+    max-width:650px;
     margin:auto;
 }
 
-/* card */
+/* loading */
 
-.card{
+.loading{
 
-    position:relative;
-
-    overflow:hidden;
-
-    background:
-        linear-gradient(
-            180deg,
-            rgba(255,255,255,.03),
-            rgba(255,255,255,.01)
-        );
-
-    border:1px solid var(--border);
-
-    border-radius:36px;
-
-    padding:34px;
-
-    backdrop-filter:blur(30px);
-
-    box-shadow:var(--shadow);
-}
-
-/* top accent */
-
-.card::before{
-
-    content:"";
-
-    position:absolute;
-
-    top:0;
-    left:0;
-
-    width:100%;
-    height:5px;
-
-    background:var(--gradient);
-}
-
-/* loading skeleton */
-
-.skeleton{
-
-    position:relative;
-
-    overflow:hidden;
-
-    background:rgba(255,255,255,.05);
-
-    border-radius:14px;
-}
-
-.skeleton::after{
-
-    content:"";
-
-    position:absolute;
-
-    inset:0;
-
-    transform:translateX(-100%);
-
-    background:
-        linear-gradient(
-            90deg,
-            transparent,
-            rgba(255,255,255,.08),
-            transparent
-        );
-
-    animation:shimmer 1.4s infinite;
-}
-
-@keyframes shimmer{
-    100%{
-        transform:translateX(100%);
-    }
-}
-
-/* loading screen */
-
-.loading-screen{
+    min-height:100vh;
 
     display:flex;
-    flex-direction:column;
+
     align-items:center;
     justify-content:center;
 
-    gap:22px;
+    flex-direction:column;
 
-    min-height:70vh;
+    gap:22px;
 }
 
-.loader-ring{
+.loader{
 
-    width:90px;
-    height:90px;
+    width:58px;
+    height:58px;
 
     border-radius:50%;
 
-    border:5px solid rgba(255,255,255,.08);
+    border:4px solid rgba(255,255,255,.08);
 
     border-top-color:#3b82f6;
 
@@ -233,67 +132,39 @@ body{
     }
 }
 
-.loading-title{
-
-    font-size:28px;
-    font-weight:800;
-
-    background:var(--gradient);
-
-    -webkit-background-clip:text;
-    -webkit-text-fill-color:transparent;
-}
-
-.loading-sub{
-
-    color:var(--muted);
+.loading-text{
 
     font-size:15px;
 
-    text-align:center;
+    color:var(--muted);
 
-    max-width:300px;
-
-    line-height:1.6;
+    font-weight:500;
 }
 
-.loading-dots{
-    display:flex;
-    gap:8px;
+/* card */
+
+.card{
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(255,255,255,.03),
+            rgba(255,255,255,.015)
+        );
+
+    border:1px solid var(--border);
+
+    border-radius:32px;
+
+    padding:32px;
+
+    backdrop-filter:blur(24px);
+
+    box-shadow:
+        0 20px 60px rgba(0,0,0,.4);
 }
 
-.loading-dots span{
-
-    width:10px;
-    height:10px;
-
-    border-radius:50%;
-
-    background:#3b82f6;
-
-    animation:bounce .8s infinite alternate;
-}
-
-.loading-dots span:nth-child(2){
-    animation-delay:.2s;
-}
-
-.loading-dots span:nth-child(3){
-    animation-delay:.4s;
-}
-
-@keyframes bounce{
-    from{
-        opacity:.3;
-        transform:translateY(0);
-    }
-    to{
-        opacity:1;
-        transform:translateY(-8px);
-    }
-}
-
-/* profile */
+/* top */
 
 .profile-top{
 
@@ -303,68 +174,44 @@ body{
 
     justify-content:space-between;
 
-    gap:24px;
+    gap:20px;
 
     flex-wrap:wrap;
 }
 
 .profile-left{
-    display:flex;
-    gap:22px;
-    align-items:center;
-}
 
-.avatar-wrap{
-    position:relative;
+    display:flex;
+
+    align-items:center;
+
+    gap:20px;
 }
 
 .avatar{
 
-    width:130px;
-    height:130px;
+    width:110px;
+    height:110px;
 
-    border-radius:32px;
+    border-radius:28px;
 
     object-fit:cover;
 
-    border:3px solid rgba(255,255,255,.08);
-
-    box-shadow:
-        0 0 0 6px rgba(255,255,255,.02),
-        0 10px 40px rgba(59,130,246,.25);
-}
-
-.online{
-
-    position:absolute;
-
-    right:8px;
-    bottom:8px;
-
-    width:20px;
-    height:20px;
-
-    border-radius:50%;
-
-    background:var(--success);
-
-    border:3px solid #0f172a;
+    border:2px solid rgba(255,255,255,.08);
 }
 
 .name{
 
-    font-size:36px;
+    font-size:34px;
 
-    font-weight:900;
+    font-weight:800;
 
     letter-spacing:-1px;
-
-    line-height:1.1;
 }
 
 .userid{
 
-    margin-top:10px;
+    margin-top:8px;
 
     color:var(--muted);
 
@@ -373,179 +220,50 @@ body{
     font-weight:500;
 }
 
-.badges{
-
-    display:flex;
-    gap:10px;
-
-    margin-top:18px;
-
-    flex-wrap:wrap;
-}
-
-.badge{
-
-    background:rgba(255,255,255,.05);
-
-    border:1px solid rgba(255,255,255,.06);
-
-    padding:10px 14px;
-
-    border-radius:999px;
-
-    font-size:13px;
-
-    color:#dbeafe;
-
-    font-weight:600;
-
-    backdrop-filter:blur(10px);
-}
-
-/* buttons */
-
-.action-buttons{
-    display:flex;
-    gap:14px;
-    flex-wrap:wrap;
-}
-
-.btn{
-
-    border:none;
-
-    cursor:pointer;
-
-    transition:.25s ease;
-
-    font-family:'Inter',sans-serif;
-}
+/* button */
 
 .edit-btn{
+
+    border:none;
 
     background:var(--gradient);
 
     color:white;
 
-    padding:15px 22px;
+    padding:14px 20px;
 
     border-radius:18px;
 
-    font-size:15px;
-
-    font-weight:800;
-
-    box-shadow:
-        0 10px 30px rgba(59,130,246,.25);
-}
-
-.edit-btn:hover{
-    transform:translateY(-2px) scale(1.02);
-}
-
-.logout-btn{
-
-    background:rgba(255,255,255,.05);
-
-    color:white;
-
-    border:1px solid rgba(255,255,255,.08);
-
-    padding:15px 18px;
-
-    border-radius:18px;
+    cursor:pointer;
 
     font-size:14px;
 
     font-weight:700;
+
+    transition:.2s ease;
 }
 
-.logout-btn:hover{
-    background:rgba(255,255,255,.08);
+.edit-btn:hover{
+    transform:translateY(-2px);
 }
 
-/* stats */
-
-.stats{
-
-    display:grid;
-
-    grid-template-columns:repeat(3,1fr);
-
-    gap:18px;
-
-    margin-top:30px;
-}
-
-.stat{
-
-    background:rgba(255,255,255,.03);
-
-    border:1px solid rgba(255,255,255,.06);
-
-    padding:22px;
-
-    border-radius:24px;
-}
-
-.stat-value{
-
-    font-size:28px;
-
-    font-weight:800;
-}
-
-.stat-label{
-
-    color:var(--muted);
-
-    margin-top:6px;
-
-    font-size:14px;
-}
-
-/* section */
+/* form */
 
 .section{
     margin-top:34px;
 }
 
-.section-title{
-
-    font-size:20px;
-
-    font-weight:800;
-
-    margin-bottom:22px;
-}
-
-/* form */
-
-.form-grid{
-
-    display:grid;
-
-    grid-template-columns:1fr 1fr;
-
-    gap:18px;
-}
-
 .form-group{
-    display:flex;
-    flex-direction:column;
-}
-
-.form-group.full{
-    grid-column:1/-1;
+    margin-bottom:18px;
 }
 
 .label{
 
-    color:#cbd5e1;
-
     margin-bottom:10px;
 
     font-size:14px;
+
+    color:#cbd5e1;
 
     font-weight:600;
 }
@@ -555,17 +273,13 @@ body{
     width:100%;
 
     background:
-        linear-gradient(
-            180deg,
-            rgba(255,255,255,.04),
-            rgba(255,255,255,.02)
-        );
+        rgba(255,255,255,.03);
 
-    border:1px solid rgba(255,255,255,.08);
+    border:1px solid rgba(255,255,255,.06);
 
     border-radius:18px;
 
-    padding:17px 18px;
+    padding:16px;
 
     color:white;
 
@@ -573,7 +287,7 @@ body{
 
     font-size:15px;
 
-    transition:.25s ease;
+    transition:.2s ease;
 }
 
 .input:focus{
@@ -588,25 +302,29 @@ body{
     color:#64748b;
 }
 
-/* save button */
-
 .save-btn{
-
-    margin-top:22px;
 
     width:100%;
 
-    padding:17px;
+    margin-top:8px;
 
-    border-radius:18px;
+    border:none;
 
     background:var(--gradient);
 
     color:white;
 
-    font-size:16px;
+    padding:16px;
 
-    font-weight:800;
+    border-radius:18px;
+
+    cursor:pointer;
+
+    font-size:15px;
+
+    font-weight:700;
+
+    transition:.2s ease;
 }
 
 .save-btn:hover{
@@ -619,26 +337,13 @@ body{
     display:none;
 }
 
-/* fade animation */
+/* mobile */
 
-.fade-in{
-    animation:fade .5s ease;
-}
+@media(max-width:640px){
 
-@keyframes fade{
-    from{
-        opacity:0;
-        transform:translateY(10px);
+    body{
+        padding:18px;
     }
-    to{
-        opacity:1;
-        transform:translateY(0);
-    }
-}
-
-/* responsive */
-
-@media(max-width:700px){
 
     .card{
         padding:24px;
@@ -654,21 +359,13 @@ body{
         align-items:flex-start;
     }
 
-    .stats{
-        grid-template-columns:1fr;
-    }
-
-    .form-grid{
-        grid-template-columns:1fr;
+    .avatar{
+        width:95px;
+        height:95px;
     }
 
     .name{
-        font-size:30px;
-    }
-
-    .avatar{
-        width:110px;
-        height:110px;
+        font-size:28px;
     }
 }
 
@@ -676,51 +373,41 @@ body{
 </head>
 <body>
 
-<div class="bg-blur"></div>
-<div class="bg-blur two"></div>
+<div class="bg"></div>
+<div class="bg two"></div>
 
 <div class="container">
 
-    <!-- Loading Screen -->
+    <!-- Loading -->
 
-    <div id="loadingScreen" class="loading-screen">
+    <div
+        id="loading"
+        class="loading"
+    >
 
-        <div class="loader-ring"></div>
+        <div class="loader"></div>
 
-        <div class="loading-title">
-            Loading Your Profile
-        </div>
-
-        <div class="loading-sub">
-            Preparing your personalized dashboard and syncing your account details...
-        </div>
-
-        <div class="loading-dots">
-            <span></span>
-            <span></span>
-            <span></span>
+        <div class="loading-text">
+            Loading your profile...
         </div>
 
     </div>
 
-    <!-- Profile Card -->
+    <!-- Profile -->
 
-    <div id="profileCard" class="card hidden fade-in">
+    <div
+        id="profileCard"
+        class="card hidden"
+    >
 
         <div class="profile-top">
 
             <div class="profile-left">
 
-                <div class="avatar-wrap">
-
-                    <img
-                        id="avatar"
-                        class="avatar"
-                    >
-
-                    <div class="online"></div>
-
-                </div>
+                <img
+                    id="avatar"
+                    class="avatar"
+                >
 
                 <div>
 
@@ -736,157 +423,85 @@ body{
                         class="userid"
                     ></div>
 
-                    <div class="badges">
-
-                        <div class="badge">
-                            Premium User
-                        </div>
-
-                        <div class="badge">
-                            Verified
-                        </div>
-
-                    </div>
-
                 </div>
 
             </div>
 
-            <div class="action-buttons">
-
-                <button
-                    class="btn edit-btn"
-                    onclick="toggleEdit()"
-                >
-                    Edit Profile
-                </button>
-
-                <button
-                    class="btn logout-btn"
-                >
-                    Settings
-                </button>
-
-            </div>
+            <button
+                class="edit-btn"
+                onclick="toggleEdit()"
+            >
+                Edit Profile
+            </button>
 
         </div>
 
-        <!-- stats -->
-
-        <div class="stats">
-
-            <div class="stat">
-
-                <div class="stat-value">
-                    98%
-                </div>
-
-                <div class="stat-label">
-                    Profile Completion
-                </div>
-
-            </div>
-
-            <div class="stat">
-
-                <div class="stat-value">
-                    24
-                </div>
-
-                <div class="stat-label">
-                    Active Sessions
-                </div>
-
-            </div>
-
-            <div class="stat">
-
-                <div class="stat-value">
-                    4.9
-                </div>
-
-                <div class="stat-label">
-                    Trust Score
-                </div>
-
-            </div>
-
-        </div>
-
-        <!-- edit section -->
+        <!-- Edit Section -->
 
         <div
             id="editSection"
             class="section hidden"
         >
 
-            <div class="section-title">
-                Edit Profile
+            <div class="form-group">
+
+                <div class="label">
+                    Full Name
+                </div>
+
+                <input
+                    id="fullName"
+                    class="input"
+                    placeholder="Enter full name"
+                >
+
             </div>
 
-            <div class="form-grid">
+            <div class="form-group">
 
-                <div class="form-group full">
-
-                    <div class="label">
-                        Full Name
-                    </div>
-
-                    <input
-                        id="fullName"
-                        class="input"
-                        placeholder="Enter your full name"
-                    >
-
+                <div class="label">
+                    Profile Picture URL
                 </div>
 
-                <div class="form-group full">
+                <input
+                    id="profilePicture"
+                    class="input"
+                    placeholder="https://..."
+                >
 
-                    <div class="label">
-                        Profile Picture URL
-                    </div>
+            </div>
 
-                    <input
-                        id="profilePicture"
-                        class="input"
-                        placeholder="https://..."
-                    >
+            <div class="form-group">
 
+                <div class="label">
+                    User ID
                 </div>
 
-                <div class="form-group">
+                <input
+                    id="userId"
+                    class="input"
+                    placeholder="username"
+                >
 
-                    <div class="label">
-                        User ID
-                    </div>
+            </div>
 
-                    <input
-                        id="userId"
-                        class="input"
-                        placeholder="username"
-                    >
+            <div class="form-group">
 
+                <div class="label">
+                    Phone Number
                 </div>
 
-                <div class="form-group">
-
-                    <div class="label">
-                        Phone Number
-                    </div>
-
-                    <input
-                        type="tel"
-                        id="phoneNumber"
-                        class="input"
-                        placeholder="+91..."
-                    >
-
-                </div>
+                <input
+                    type="tel"
+                    id="phoneNumber"
+                    class="input"
+                    placeholder="+91..."
+                >
 
             </div>
 
             <button
-                class="btn save-btn"
+                class="save-btn"
                 onclick="saveProfile()"
             >
                 Save Changes
@@ -905,12 +520,6 @@ let currentUser = null;
 async function loadProfile(){
 
     try{
-
-        // fake minimum loading for better UX
-
-        await new Promise(resolve =>
-            setTimeout(resolve,1400)
-        );
 
         const res = await fetch(
             `${API_URL}/me`,
@@ -965,21 +574,16 @@ async function loadProfile(){
         ).value =
             currentUser.phone_number || "";
 
-        // show profile
-
         document.getElementById(
-            "loadingScreen"
+            "loading"
         ).classList.add("hidden");
 
         document.getElementById(
             "profileCard"
         ).classList.remove("hidden");
-
     }
 
     catch(err){
-
-        console.log(err);
 
         alert("Failed to load profile");
     }
@@ -994,12 +598,12 @@ function toggleEdit(){
 
 async function saveProfile(){
 
-    const button = document.querySelector(
-        ".save-btn"
-    );
+    const button =
+        document.querySelector(
+            ".save-btn"
+        );
 
     button.innerText = "Saving...";
-    button.disabled = true;
 
     const full_name =
         document.getElementById(
@@ -1021,59 +625,48 @@ async function saveProfile(){
             "phoneNumber"
         ).value.trim();
 
-    try{
+    const res = await fetch(
+        `${API_URL}/edit-profile`,
+        {
+            method:"POST",
 
-        const res = await fetch(
-            `${API_URL}/edit-profile`,
-            {
-                method:"POST",
+            credentials:"include",
 
-                credentials:"include",
+            headers:{
+                "Content-Type":"application/json"
+            },
 
-                headers:{
-                    "Content-Type":"application/json"
-                },
-
-                body:JSON.stringify({
-                    full_name,
-                    profile_picture,
-                    user_id,
-                    phone_number
-                })
-            }
-        );
-
-        const data = await res.json();
-
-        if(data.success){
-
-            button.innerText = "Saved Successfully ✓";
-
-            setTimeout(()=>{
-
-                button.innerText = "Save Changes";
-                button.disabled = false;
-
-            },1500);
-
-            loadProfile();
+            body:JSON.stringify({
+                full_name,
+                profile_picture,
+                user_id,
+                phone_number
+            })
         }
+    );
 
-        else{
+    const data = await res.json();
 
-            button.innerText = "Save Changes";
-            button.disabled = false;
+    if(data.success){
 
-            alert("Failed to update");
-        }
+        button.innerText = "Saved ✓";
+
+        loadProfile();
+
+        setTimeout(()=>{
+
+            button.innerText =
+                "Save Changes";
+
+        },1500);
     }
 
-    catch(err){
+    else{
 
-        button.innerText = "Save Changes";
-        button.disabled = false;
+        button.innerText =
+            "Save Changes";
 
-        alert("Something went wrong");
+        alert("Update failed");
     }
 }
 
@@ -1082,4 +675,4 @@ loadProfile();
 </script>
 
 </body>
-                    </html>
+    </html>
