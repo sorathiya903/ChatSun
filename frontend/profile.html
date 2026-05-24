@@ -234,10 +234,15 @@ body{
     Phone Number
 </div>
 
-<input
+<input type="tel"
     id="phoneNumber"
     class="input"
     placeholder="+91..."
+    
+    oninput="
+        this.value =this.value.toLowerCase()
+    "
+
 >
             <button
                 class="save-btn"
