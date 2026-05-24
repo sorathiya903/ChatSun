@@ -81,350 +81,153 @@
   </style>
 </head>
 
-<body class="bg-[#020617] text-white overflow-hidden">
+<body class="bg-slate-950 text-white min-h-screen">
 
-<!-- Animated Background -->
-<div class="fixed inset-0 overflow-hidden -z-10">
+  <!-- Background -->
+  <div class="bubble w-72 h-72 top-10 left-10 animate-float fixed"></div>
+  <div class="bubble w-52 h-52 bottom-10 right-10 animate-float fixed"></div>
 
-  <div class="absolute w-[500px] h-[500px] bg-indigo-500/20 blur-3xl rounded-full top-[-150px] left-[-100px] animate-pulse"></div>
+  <!-- Dashboard -->
+  <div id="dashboard" class="relative z-10 min-h-screen p-6 lg:p-10">
 
-  <div class="absolute w-[400px] h-[400px] bg-fuchsia-500/10 blur-3xl rounded-full bottom-[-100px] right-[-100px] animate-pulse"></div>
+    <!-- Top Navbar -->
+    <div class="glass border border-slate-800 rounded-3xl px-6 py-5 mb-8">
 
-  <div class="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.03)_1px,transparent_1px)] bg-[size:40px_40px]"></div>
+      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
 
-</div>
+        <!-- Left -->
+        <div class="flex items-center gap-4">
 
-<!-- APP -->
-<div class="flex h-screen">
+          <div class="w-14 h-14 rounded-2xl bg-indigo-500/15 border border-indigo-500/20 flex items-center justify-center">
 
-  <!-- SIDEBAR -->
-  <aside class="w-[90px] lg:w-[280px] border-r border-white/5 bg-slate-950/70 backdrop-blur-2xl flex flex-col justify-between p-4 lg:p-6">
+            <svg xmlns="http://www.w3.org/2000/svg"
+              class="w-7 h-7 text-indigo-400"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor">
 
-    <!-- TOP -->
-    <div>
+              <path stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-4l-4 4-4-4z" />
 
-      <!-- LOGO -->
-      <div class="flex items-center gap-4 mb-10">
+            </svg>
 
-        <div class="w-14 h-14 rounded-3xl bg-gradient-to-br from-indigo-500 to-fuchsia-500 flex items-center justify-center shadow-2xl shadow-indigo-500/30">
+          </div>
 
-          <svg xmlns="http://www.w3.org/2000/svg"
-            class="w-7 h-7"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor">
+          <div>
+            <h1 class="font-manrope text-3xl font-bold tracking-tight">
+              ChatSun Dashboard
+            </h1>
 
-            <path stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-4l-4 4-4-4z"/>
-
-          </svg>
-
-        </div>
-
-        <div class="hidden lg:block">
-
-          <h1 class="text-2xl font-bold font-manrope">
-            ChatSun
-          </h1>
-
-          <p class="text-slate-400 text-sm">
-            Next Gen Messaging
-          </p>
+            <p class="text-slate-400 text-sm">
+              Realtime conversations with modern UI.
+            </p>
+          </div>
 
         </div>
 
-      </div>
+        <!-- Right -->
+        <div class="flex items-center gap-4">
 
-      <!-- PROFILE -->
-      <div class="bg-slate-900/60 border border-white/5 rounded-3xl p-4 flex items-center gap-4 mb-8">
+          <button onclick="logout()"
+            class="bg-rose-500/10 hover:bg-rose-500 hover:text-white border border-rose-500/20 transition-all px-5 py-3 rounded-2xl text-rose-400 font-medium">
 
-        <div class="relative">
+            Logout
 
+          </button>
+<button
+    onclick="window.location.href='group.html'"
+    class="group-btn"
+>
+    👥 New Group
+</button>
           <img
-            id="profilePic"
-            src="https://ui-avatars.com/api/?name=U"
-            class="w-14 h-14 rounded-2xl object-cover cursor-pointer border border-white/10"
-            onclick="location.href='profile.html'"
-          >
-
-          <div class="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-400 rounded-full border-2 border-slate-900"></div>
-
+    id="profilePic"
+    src="https://ui-avatars.com/api/?name=U"
+    onclick="location.href='profile.html'"
+    style="
+        width:46px;
+        height:46px;
+        border-radius:16px;
+        cursor:pointer;
+        object-fit:cover;
+        border:2px solid rgba(255,255,255,.08);
+    "
+>
         </div>
-
-        <div class="hidden lg:block">
-
-          <h3 id="sidebarName"
-            class="font-semibold">
-            Loading...
-          </h3>
-
-          <p class="text-xs text-slate-400">
-            Online
-          </p>
-
-        </div>
-
-      </div>
-
-      <!-- NAV -->
-      <div class="space-y-3">
-
-        <button class="w-full flex items-center gap-4 bg-indigo-500/15 border border-indigo-500/20 hover:bg-indigo-500/25 transition-all rounded-2xl px-5 py-4">
-
-          <span class="text-xl">💬</span>
-
-          <span class="hidden lg:block font-medium">
-            Chats
-          </span>
-
-        </button>
-
-        <button onclick="location.href='group.html'"
-          class="w-full flex items-center gap-4 bg-slate-900/60 hover:bg-slate-800/80 transition-all rounded-2xl px-5 py-4">
-
-          <span class="text-xl">👥</span>
-
-          <span class="hidden lg:block font-medium">
-            Groups
-          </span>
-
-        </button>
-
-        <button class="w-full flex items-center gap-4 bg-slate-900/60 hover:bg-slate-800/80 transition-all rounded-2xl px-5 py-4">
-
-          <span class="text-xl">⭐</span>
-
-          <span class="hidden lg:block font-medium">
-            Favorites
-          </span>
-
-        </button>
-
-        <button class="w-full flex items-center gap-4 bg-slate-900/60 hover:bg-slate-800/80 transition-all rounded-2xl px-5 py-4">
-
-          <span class="text-xl">⚙️</span>
-
-          <span class="hidden lg:block font-medium">
-            Settings
-          </span>
-
-        </button>
 
       </div>
 
     </div>
 
-    <!-- BOTTOM -->
-    <button onclick="logout()"
-      class="bg-rose-500/10 hover:bg-rose-500 border border-rose-500/20 transition-all rounded-2xl py-4 text-rose-300 hover:text-white font-semibold">
+    <!-- Search -->
+    <div class="glass border border-slate-800 rounded-3xl p-6 mb-8">
 
-      Logout
+      <div class="flex flex-col lg:flex-row gap-4">
 
-    </button>
-
-  </aside>
-
-  <!-- MAIN -->
-  <main class="flex-1 flex flex-col overflow-hidden">
-
-    <!-- TOP BAR -->
-    <div class="sticky top-0 z-50 backdrop-blur-2xl bg-slate-950/70 border-b border-white/5 px-6 py-5">
-
-      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
-
-        <!-- SEARCH -->
         <div class="flex-1 relative">
 
           <input
             id="searchInput"
             type="text"
-            placeholder="Search by user id or phone..."
-            class="w-full bg-slate-900/80 border border-slate-800 rounded-2xl py-4 pl-14 pr-5 outline-none focus:border-indigo-500 transition-all"
-          >
-
-          <div class="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500">
-
-            🔍
-
-          </div>
+            placeholder="Search by user id..."
+            class="input-focus w-full bg-slate-900 border border-slate-700 rounded-2xl px-5 py-4 text-white outline-none transition-all focus:border-indigo-500"
+          />
 
         </div>
 
-        <!-- ACTIONS -->
-        <div class="flex items-center gap-3">
+        <button onclick="searchUser()"
+          class="bg-indigo-500 hover:bg-indigo-400 active:scale-[0.98] transition-all rounded-2xl px-8 py-4 font-semibold shadow-lg shadow-indigo-500/10">
 
-          <button onclick="searchUser()"
-            class="bg-indigo-500 hover:bg-indigo-400 transition-all rounded-2xl px-6 py-4 font-semibold shadow-lg shadow-indigo-500/20">
+          Search User
 
-            Search
-
-          </button>
-
-          <button onclick="location.href='group.html'"
-            class="bg-fuchsia-500/15 border border-fuchsia-500/20 hover:bg-fuchsia-500/25 transition-all rounded-2xl px-6 py-4 font-semibold text-fuchsia-300">
-
-            + Group
-
-          </button>
-
-        </div>
+        </button>
 
       </div>
+
+      <!-- Search Result -->
+      <div id="searchResult" class="mt-6 space-y-4"></div>
 
     </div>
 
-    <!-- CONTENT -->
-    <div class="flex-1 overflow-y-auto p-6">
+    <!-- Users -->
+    <div class="glass border border-slate-800 rounded-3xl p-6">
 
-      <!-- STATS -->
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div class="flex items-center justify-between mb-6">
 
-        <div class="bg-slate-900/60 border border-white/5 rounded-3xl p-5">
-
-          <p class="text-slate-400 text-sm mb-2">
-            Chats
-          </p>
-
-          <h2 id="totalChats"
-            class="text-3xl font-bold">
-            0
+        <div>
+          <h2 class="text-2xl font-bold font-manrope">
+            Recent Chats
           </h2>
 
-        </div>
-
-        <div class="bg-slate-900/60 border border-white/5 rounded-3xl p-5">
-
-          <p class="text-slate-400 text-sm mb-2">
-            Unread
+          <p class="text-slate-400 text-sm mt-1">
+            Continue your conversations instantly.
           </p>
-
-          <h2 id="unreadChats"
-            class="text-3xl font-bold text-indigo-400">
-            0
-          </h2>
-
         </div>
 
-        <div class="bg-slate-900/60 border border-white/5 rounded-3xl p-5">
+        <div class="flex items-center gap-2">
 
-          <p class="text-slate-400 text-sm mb-2">
-            Groups
-          </p>
+          <div class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
 
-          <h2 id="groupCount"
-            class="text-3xl font-bold text-fuchsia-400">
-            0
-          </h2>
-
-        </div>
-
-        <div class="bg-slate-900/60 border border-white/5 rounded-3xl p-5">
-
-          <p class="text-slate-400 text-sm mb-2">
-            Online
-          </p>
-
-          <h2 class="text-3xl font-bold text-emerald-400">
-            Live
-          </h2>
+          <span class="text-sm text-slate-400">
+            Live Sync Active
+          </span>
 
         </div>
 
       </div>
 
-      <!-- ACTIVE CHAT PREVIEW -->
-      <div id="activePreview"
-        class="bg-gradient-to-r from-indigo-500/10 to-fuchsia-500/10 border border-indigo-500/10 rounded-[30px] p-6 mb-8">
-
-        <p class="text-indigo-300 text-sm mb-2">
-          Continue chatting
-        </p>
-
-        <h2 class="text-2xl font-bold">
-          Your conversations are synced live ⚡
-        </h2>
-
-      </div>
-
-      <!-- FILTERS -->
-      <div class="flex gap-3 overflow-x-auto mb-8 pb-2">
-
-        <button class="px-5 py-3 rounded-2xl bg-indigo-500 text-white font-medium whitespace-nowrap">
-          All
-        </button>
-
-        <button class="px-5 py-3 rounded-2xl bg-slate-900/60 border border-white/5 whitespace-nowrap">
-          Groups
-        </button>
-
-        <button class="px-5 py-3 rounded-2xl bg-slate-900/60 border border-white/5 whitespace-nowrap">
-          Unread
-        </button>
-
-        <button class="px-5 py-3 rounded-2xl bg-slate-900/60 border border-white/5 whitespace-nowrap">
-          Online
-        </button>
-
-      </div>
-
-      <!-- SEARCH RESULT -->
-      <div id="searchResult"
-        class="space-y-4 mb-8">
-      </div>
-
-      <!-- CHATS -->
-      <div>
-
-        <div class="flex items-center justify-between mb-6">
-
-          <div>
-
-            <h2 class="text-3xl font-bold font-manrope">
-              Recent Chats
-            </h2>
-
-            <p class="text-slate-400 mt-1">
-              Realtime conversations and groups
-            </p>
-
-          </div>
-
-          <div class="flex items-center gap-2 text-emerald-400 text-sm">
-
-            <div class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
-
-            Live Sync
-
-          </div>
-
-        </div>
-
-        <div id="users"
-          class="space-y-4">
-        </div>
-
-      </div>
+      <div id="users" class="space-y-4"></div>
 
     </div>
 
-  </main>
-
-</div>
-
-<!-- FLOATING ACTION -->
-<button
-  onclick="location.href='group.html'"
-  class="fixed bottom-6 right-6 w-16 h-16 rounded-3xl bg-gradient-to-br from-indigo-500 to-fuchsia-500 shadow-2xl shadow-indigo-500/30 text-3xl flex items-center justify-center hover:scale-105 transition-all z-50">
-
-  +
-
-</button>
+  </div>
 
 
-            
-                
+
+
+        
   
   <script>
 
@@ -891,4 +694,4 @@ loadProfilePic();
   </script>
 
 </body>
-  </html>
+</html>
