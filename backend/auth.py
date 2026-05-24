@@ -278,6 +278,8 @@ async def register(
 
         secure=True,
 
+        path="/",
+
         samesite="none",
 
         max_age=60 * 60 * 24 * 30
@@ -354,6 +356,8 @@ async def login(
         httponly=True,
 
         secure=True,
+
+        path="/",
 
         samesite="none",
 
@@ -487,6 +491,8 @@ async def google_login(
             httponly=True,
 
             secure=True,
+
+            path="/",
 
             samesite="none",
 
