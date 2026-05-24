@@ -121,6 +121,222 @@
     .input-focus:focus {
       box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12);
     }
+
+      /* GOOGLE LOGIN WRAPPER */
+
+.g_id_signin{
+    position:relative !important;
+
+    display:inline-flex !important;
+
+    align-items:center !important;
+    justify-content:center !important;
+
+    overflow:hidden !important;
+
+    border-radius:999px !important;
+
+    padding:0 !important;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(59,130,246,.18),
+            rgba(139,92,246,.18)
+        ) !important;
+
+    backdrop-filter:blur(18px) !important;
+
+    border:1px solid rgba(255,255,255,.12) !important;
+
+    box-shadow:
+        0 10px 35px rgba(0,0,0,.35),
+        0 0 30px rgba(99,102,241,.18),
+        inset 0 1px 0 rgba(255,255,255,.06) !important;
+
+    transition:
+        transform .35s cubic-bezier(.22,1,.36,1),
+        box-shadow .35s ease,
+        border-color .35s ease !important;
+
+    animation:
+        morphFloat 5s ease-in-out infinite;
+}
+
+/* HOVER */
+
+.g_id_signin:hover{
+
+    transform:
+        translateY(-3px)
+        scale(1.015) !important;
+
+    border-color:
+        rgba(255,255,255,.22) !important;
+
+    box-shadow:
+        0 16px 45px rgba(0,0,0,.45),
+        0 0 50px rgba(99,102,241,.30),
+        0 0 80px rgba(59,130,246,.12),
+        inset 0 1px 0 rgba(255,255,255,.08) !important;
+}
+
+/* CLICK */
+
+.g_id_signin:active{
+
+    transform:
+        scale(.97) !important;
+}
+
+/* LIQUID GLOW */
+
+.g_id_signin::before{
+
+    content:"";
+
+    position:absolute;
+
+    inset:-40%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(59,130,246,.35) 0%,
+            rgba(139,92,246,.25) 35%,
+            transparent 70%
+        );
+
+    filter:blur(40px);
+
+    animation:
+        liquidMove 7s linear infinite;
+
+    pointer-events:none;
+}
+
+/* SHIMMER */
+
+.g_id_signin::after{
+
+    content:"";
+
+    position:absolute;
+
+    top:0;
+    left:-120%;
+
+    width:60%;
+    height:100%;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(255,255,255,.18),
+            transparent
+        );
+
+    transform:skewX(-20deg);
+
+    animation:
+        shimmer 4s infinite;
+
+    pointer-events:none;
+}
+
+/* INNER GOOGLE BUTTON */
+
+.g_id_signin iframe{
+
+    position:relative !important;
+
+    z-index:2 !important;
+
+    border-radius:999px !important;
+
+    overflow:hidden !important;
+
+    mix-blend-mode:screen;
+}
+
+/* FLOATING MORPH */
+
+@keyframes morphFloat{
+
+    0%{
+        transform:
+            translateY(0px)
+            scale(1);
+
+        border-radius:
+            55% 45% 60% 40% / 45% 60% 40% 55%;
+    }
+
+    25%{
+        border-radius:
+            48% 52% 40% 60% / 60% 40% 58% 42%;
+    }
+
+    50%{
+        transform:
+            translateY(-4px)
+            scale(1.01);
+
+        border-radius:
+            60% 40% 52% 48% / 42% 58% 38% 62%;
+    }
+
+    75%{
+        border-radius:
+            42% 58% 48% 52% / 52% 48% 60% 40%;
+    }
+
+    100%{
+        transform:
+            translateY(0px)
+            scale(1);
+
+        border-radius:
+            55% 45% 60% 40% / 45% 60% 40% 55%;
+    }
+}
+
+/* LIQUID MOTION */
+
+@keyframes liquidMove{
+
+    0%{
+        transform:
+            translate(-10%,-10%)
+            rotate(0deg);
+    }
+
+    50%{
+        transform:
+            translate(10%,10%)
+            rotate(180deg);
+    }
+
+    100%{
+        transform:
+            translate(-10%,-10%)
+            rotate(360deg);
+    }
+}
+
+/* LIGHT SHIMMER */
+
+@keyframes shimmer{
+
+    0%{
+        left:-120%;
+    }
+
+    100%{
+        left:140%;
+    }
+    }
   </style>
 </head>
 
