@@ -766,6 +766,7 @@ document
         `${API_URL}/login`,
         {
           method:"POST",
+          credentials:"include",
 
           headers:{
             "Content-Type":
@@ -1002,7 +1003,7 @@ document
         `${API_URL}/register`,
         {
           method:"POST",
-
+        credentials:"include",
           headers:{
             "Content-Type":
             "application/json"
