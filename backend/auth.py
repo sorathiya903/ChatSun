@@ -561,7 +561,9 @@ async def get_me(
                 user["email"],
 
             "user_id":
-                user["user_id"]
+                user["user_id"],
+            "profile_picture":
+    user.get("profile_picture", "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQjoowYAeUbwx01s1wuzsFwoaoONtdK2qCu5Yb50rRzxQ&s=10")
         }
     }
 
