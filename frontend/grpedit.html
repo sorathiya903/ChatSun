@@ -333,18 +333,32 @@ body{
 </div>
 
 <script>
+    async function getCurrentUser(){
 
-const info = await fetch(
-    `${API_URL}/me`,
-    {
-        credentials:"include"
+    const res = await fetch(
+        `${API_URL}/me`,
+        {
+            credentials:"include"
+        }
+    );
+
+    const data = await res.json();
+
+    return data.user;
     }
-);
+let currentUser;
 
-const data = await info.json();
+async function init(){
 
-const currentUser = data.user;
+    currentUser =
+        await getCurrentUser();
 
+    console.log(currentUser);
+
+    
+}
+
+init();
 const conversationId =
     new URLSearchParams(
         location.search
