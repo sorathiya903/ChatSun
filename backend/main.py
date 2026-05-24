@@ -438,28 +438,64 @@ async def set_offline(user_id: str):
     }
 
 
+@app.get("/search/{query}")
+async def search_user(query: str):
 
-
-
-@app.get("/search/{user_id}")
-async def search_user(user_id: str):
+    query = query.strip()
 
     user = users.find_one({
-        "user_id": user_id.lower()
+
+        "$or": [
+
+            {
+                "user_id":
+                    query.lower()
+            },
+
+            {
+                "phone_number":
+                    query
+            }
+        ]
     })
 
     if not user:
+
         return {
             "success": False
         }
 
     return {
+
         "success": True,
+
         "user": {
-            "email": user["email"],
-            "user_id": user["user_id"]
+
+            "full_name":
+                user["full_name"],
+
+            "email":
+                user["email"],
+
+            "user_id":
+                user["user_id"],
+
+            "profile_picture":
+                user.get(
+                    "profile_picture",
+                    ""
+                ),
+
+            "phone_number":
+                user.get(
+                    "phone_number",
+                    ""
+                )
         }
     }
+}
+
+
 
 @app.get("/messages/{conversation_id}")
 async def get_messages(conversation_id: str):
