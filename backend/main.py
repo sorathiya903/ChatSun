@@ -1063,6 +1063,9 @@ async def edit_profile(
                 "User ID already taken"
         }
 
+    if "user_id" in data:
+        raise HTTPException(status_code=400, detail="user_id cannot be changed")
+
     users.update_one(
         {
             "email":
@@ -1079,8 +1082,6 @@ async def edit_profile(
                         "profile_picture"
                     ],
 
-                "user_id":
-                    data["user_id"],
 
                 "phone_number":
                     data["phone_number"]
