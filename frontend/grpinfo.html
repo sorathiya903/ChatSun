@@ -200,13 +200,66 @@ body{
     text-overflow: ellipsis;
     display: block;
 }
+
+  .top-actions{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:14px;
+
+    margin-bottom:24px;
+}
+
+.edit-btn{
+    border:none;
+
+    background:
+        linear-gradient(
+            135deg,
+            #3b82f6,
+            #8b5cf6
+        );
+
+    color:white;
+
+    padding:12px 18px;
+
+    border-radius:16px;
+
+    font-size:14px;
+    font-weight:700;
+
+    cursor:pointer;
+
+    transition:.25s ease;
+
+    box-shadow:
+        0 10px 24px rgba(59,130,246,.22);
+}
+
+.edit-btn:hover{
+    transform:translateY(-2px);
+    }
     </style>
 </head>
 <body>
 
 <div class="container">
 
-    <h1 class="page-title">Group Info</h1>
+    <div class="top-actions">
+
+    <h1 class="page-title">
+        Group Info
+    </h1>
+
+    <button
+        class="edit-btn"
+        onclick="openEditPage()"
+    >
+        Edit Group
+    </button>
+
+    </div>
 
     <div id="groupBox" class="card">
         <div class="loading">Loading group...</div>
@@ -339,6 +392,12 @@ async function loadGroup(){
 
 loadGroup();
 
+
+    function openEditPage(){
+
+    window.location.href =
+        `grpedit.html?id=${conversationId}`;
+    }
 </script>
 
 </body>
