@@ -480,7 +480,7 @@ body{
                 <input
                     id="userId"
                     class="input"
-                    placeholder="username"
+                    readonly
                     oninput="this.value=this.value.toLowerCase()"
                 >
 
@@ -616,10 +616,7 @@ async function saveProfile(){
             "profilePicture"
         ).value.trim();
 
-    const user_id =
-        document.getElementById(
-            "userId"
-        ).value.trim();
+    
 
     const phone_number =
         document.getElementById(
@@ -640,7 +637,7 @@ async function saveProfile(){
             body:JSON.stringify({
                 full_name,
                 profile_picture,
-                user_id,
+                
                 phone_number
             })
         }
