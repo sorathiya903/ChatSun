@@ -142,6 +142,19 @@
 >
     👥 New Group
 </button>
+          <img
+    id="profilePic"
+    src="https://ui-avatars.com/api/?name=U"
+    onclick="location.href='profile.html'"
+    style="
+        width:46px;
+        height:46px;
+        border-radius:16px;
+        cursor:pointer;
+        object-fit:cover;
+        border:2px solid rgba(255,255,255,.08);
+    "
+>
         </div>
 
       </div>
@@ -653,6 +666,31 @@ function connectChatSocket(conversationId) {
       location.href = "index.html";
     }
 setInterval(loadUsers, 10000);
+
+
+    async function loadProfilePic(){
+
+    const res = await fetch(
+        `${API_URL}/me`,
+        {
+            credentials:"include"
+        }
+    );
+
+    const data = await res.json();
+
+    if(!data.success) return;
+
+    const user = data.user;
+
+    document.getElementById(
+        "profilePic"
+    ).src =
+        user.profile_picture ||
+        `https://ui-avatars.com/api/?name=${encodeURIComponent(user.full_name)}`;
+}
+
+loadProfilePic();
   </script>
 
 </body>
