@@ -240,70 +240,7 @@
       loadUsers();
     }
 
-    function openGroupModal(){
-
-    document.getElementById(
-        "groupModal"
-    ).style.display = "flex";
-}
-
-function closeGroupModal(){
-
-    document.getElementById(
-        "groupModal"
-    ).style.display = "none";
-}
-
-
-    async function createGroup(){
-
-    const groupName =
-        document.getElementById(
-            "groupName"
-        ).value.trim();
-
-    const users =
-        document.getElementById(
-            "groupUsers"
-        ).value
-        .split(",")
-        .map(x => x.trim())
-        .filter(Boolean);
-
-    if(!groupName || users.length === 0){
-        return;
-    }
-
-    users.push(currentUser.user_id);
-
-    const res = await fetch(
-        `${API_URL}/create-group`,
-        {
-            method:"POST",
-
-            headers:{
-                "Content-Type":
-                "application/json"
-            },
-
-            body:JSON.stringify({
-
-                group_name: groupName,
-
-                users: [...new Set(users)],
-
-                admin: currentUser.user_id
-            })
-        }
-    );
-
-    const data = await res.json();
-
-    if(data.success){
-
-        location.reload();
-    }
-                             }
+     
 
     
     // -------------------
@@ -359,12 +296,36 @@ function getLastMessagePreview(msg){
 
       const usersDiv =
         document.getElementById("users");
+      
+    if(!usersDiv.innerHTML.trim()){
 
-      usersDiv.innerHTML = `
-        <div class="text-slate-400 text-center py-10">
-          Loading chats...
-        </div>
-      `;
+        usersDiv.innerHTML = `
+            <div class="space-y-4">
+
+                ${Array(5).fill(`
+                    <div class="animate-pulse bg-slate-900/40 border border-slate-800 rounded-3xl p-4">
+
+                        <div class="flex items-center gap-4">
+
+                            <div class="w-14 h-14 rounded-2xl bg-slate-800"></div>
+
+                            <div class="flex-1">
+
+                                <div class="h-4 w-40 bg-slate-800 rounded mb-3"></div>
+
+                                <div class="h-3 w-24 bg-slate-800 rounded"></div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                `).join("")}
+
+            </div>
+        `;
+    }
+
 
       try {
 
@@ -553,7 +514,7 @@ function connectChatSocket(conversationId) {
 
     const data = JSON.parse(event.data);
 
-    // 🔥 UNREAD UPDATE
+    // UNREAD UPDATE
     if (data.type === "unread_update") {
       loadUsers(); // refresh chat list instantly
     }
