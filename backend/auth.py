@@ -329,6 +329,10 @@ async def login(
             "message": "Wrong email or password"
         }
 
+    if user.get("auth_type") == "google":
+        return {  "success": False, "message": "This account uses Google Sign-In"}
+
+
     try:
 
         ph.verify(
