@@ -539,6 +539,12 @@
                   />
                   <label class="floating-label">Email Address</label>
                 </div>
+                <input
+    type="tel"
+    id="phoneNumber"
+    placeholder="Phone Number (optional)"
+    class="input"
+/>
 
                 <!-- Password -->
                 <div class="relative">
@@ -917,6 +923,11 @@ document
     .trim()
     .toLowerCase();
 
+  const phone_number =
+    document.getElementById(
+        "phoneNumber"
+    ).value.trim();
+
   const password =
     document
     .getElementById("signupPassword")
@@ -1017,8 +1028,9 @@ document
 
             password: password,
 
-            user_id: userId
-
+            user_id: userId, 
+            
+            phone_number:phone_number 
           })
         }
       );
