@@ -1398,33 +1398,8 @@ document
 
 });
 
-google.accounts.id.initialize({
-    client_id:
-        "169600349371-9c2q2h3q5rrr6obh45oili7ulef2vnhv.apps.googleusercontent.com",
 
-    callback: handleGoogleLogin
-});
 
-document
-.getElementById("googleBtn")
-.onclick = () => {
-
-    const btn =
-        document.getElementById("googleBtn");
-
-    btn.classList.add("loading");
-
-    document.getElementById(
-        "googleText"
-    ).innerText =
-        "Connecting...";
-
-    setTimeout(() => {
-
-        google.accounts.id.prompt();
-
-    }, 900);
-};
       async function handleGoogleLogin(response){
 
     const res = await fetch(
