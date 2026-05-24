@@ -65,6 +65,7 @@ class RegisterModel(BaseModel):
     email: str
     password: str
     user_id: str
+    phone_number: str = ""
 
 class LoginModel(BaseModel):
     email: str
@@ -251,7 +252,9 @@ async def register(
         "auth_type": "password",
 
         "created_at":
-            datetime.now(timezone.utc)
+            datetime.now(timezone.utc),
+        "phone_number":data.phone_number,
+        
     }
 
     users.insert_one(user_data)
@@ -462,6 +465,8 @@ async def google_login(
 
                 "profile_picture":
                     picture,
+                "phone_number": "",
+
 
                 "auth_type":
                     "google",
