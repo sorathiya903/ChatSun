@@ -943,3 +943,57 @@ async def remove_member(
 async def debug_cookies(request: Request):
 
     return request.cookies
+
+
+
+@app.post("/group/add-member/{conversation_id}")
+async def add_member(
+    conversation_id: str,
+    data: dict
+):
+
+    convo = conversations.find_one({
+        "conversation_id": conversation_id
+    })
+
+    if not convo:
+        return {
+            "success": False
+        }
+
+    if data["user_id"] not in convo["admins"]:
+        return {
+            "success": False,
+            "message": "Only admins can add"
+        }
+
+    # check user exists
+    user_exists = users.find_one({
+        "user_id": data["member"]
+    })
+
+    if not user_exists:
+        return {
+            "success": False,
+            "message": "User not found"
+        }
+
+    conversations.update_one(
+        {
+            "conversation_id": conversation_id
+        },
+        {
+            "$addToSet": {
+                "users": data["member"]
+            },
+
+            "$set": {
+                f"unread.{data['member']}": 0
+            }
+        }
+    )
+
+    return {
+        "success": True
+    }
+    }
