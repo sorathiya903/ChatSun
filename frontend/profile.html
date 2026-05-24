@@ -1,19 +1,48 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-<title>Profile</title>
+<title>Modern Profile</title>
 
 <script src="config.js"></script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
 <style>
+
+:root{
+
+    --bg:#050816;
+    --card:#0f172a;
+    --card2:#111c33;
+
+    --border:rgba(255,255,255,.08);
+
+    --text:#ffffff;
+    --muted:#94a3b8;
+
+    --blue:#3b82f6;
+    --purple:#8b5cf6;
+    --cyan:#06b6d4;
+
+    --success:#22c55e;
+
+    --shadow:
+        0 20px 80px rgba(0,0,0,.45);
+
+    --gradient:
+        linear-gradient(
+            135deg,
+            #3b82f6 0%,
+            #8b5cf6 50%,
+            #06b6d4 100%
+        );
+}
 
 *{
     margin:0;
@@ -21,231 +50,843 @@
     box-sizing:border-box;
 }
 
+html{
+    scroll-behavior:smooth;
+}
+
 body{
+
     font-family:'Inter',sans-serif;
 
-    background:
-        radial-gradient(circle at top left,#1e293b 0%,#020617 45%),
-        #020617;
+    color:var(--text);
 
-    color:white;
+    background:
+        radial-gradient(circle at top left,#172554 0%,transparent 35%),
+        radial-gradient(circle at bottom right,#4c1d95 0%,transparent 35%),
+        linear-gradient(180deg,#020617 0%,#050816 100%);
 
     min-height:100vh;
 
-    padding:30px 18px;
+    overflow-x:hidden;
+
+    padding:40px 18px;
+}
+
+/* animated background glow */
+
+.bg-blur{
+    position:fixed;
+    width:350px;
+    height:350px;
+
+    border-radius:50%;
+
+    background:rgba(59,130,246,.18);
+
+    filter:blur(120px);
+
+    z-index:-1;
+
+    animation:float 12s ease-in-out infinite;
+}
+
+.bg-blur.two{
+    right:-120px;
+    bottom:-100px;
+
+    background:rgba(139,92,246,.18);
+
+    animation-delay:3s;
+}
+
+@keyframes float{
+    0%{
+        transform:translateY(0px);
+    }
+    50%{
+        transform:translateY(-30px);
+    }
+    100%{
+        transform:translateY(0px);
+    }
 }
 
 .container{
-    max-width:700px;
+    max-width:760px;
     margin:auto;
 }
 
+/* card */
+
 .card{
-    background:rgba(15,23,42,.88);
 
-    border:1px solid rgba(255,255,255,.08);
+    position:relative;
 
-    border-radius:30px;
+    overflow:hidden;
 
-    padding:30px;
+    background:
+        linear-gradient(
+            180deg,
+            rgba(255,255,255,.03),
+            rgba(255,255,255,.01)
+        );
 
-    backdrop-filter:blur(18px);
+    border:1px solid var(--border);
+
+    border-radius:36px;
+
+    padding:34px;
+
+    backdrop-filter:blur(30px);
+
+    box-shadow:var(--shadow);
 }
 
-.profile-top{
+/* top accent */
+
+.card::before{
+
+    content:"";
+
+    position:absolute;
+
+    top:0;
+    left:0;
+
+    width:100%;
+    height:5px;
+
+    background:var(--gradient);
+}
+
+/* loading skeleton */
+
+.skeleton{
+
+    position:relative;
+
+    overflow:hidden;
+
+    background:rgba(255,255,255,.05);
+
+    border-radius:14px;
+}
+
+.skeleton::after{
+
+    content:"";
+
+    position:absolute;
+
+    inset:0;
+
+    transform:translateX(-100%);
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(255,255,255,.08),
+            transparent
+        );
+
+    animation:shimmer 1.4s infinite;
+}
+
+@keyframes shimmer{
+    100%{
+        transform:translateX(100%);
+    }
+}
+
+/* loading screen */
+
+.loading-screen{
+
     display:flex;
+    flex-direction:column;
     align-items:center;
-    gap:20px;
+    justify-content:center;
+
+    gap:22px;
+
+    min-height:70vh;
+}
+
+.loader-ring{
+
+    width:90px;
+    height:90px;
+
+    border-radius:50%;
+
+    border:5px solid rgba(255,255,255,.08);
+
+    border-top-color:#3b82f6;
+
+    animation:spin 1s linear infinite;
+}
+
+@keyframes spin{
+    to{
+        transform:rotate(360deg);
+    }
+}
+
+.loading-title{
+
+    font-size:28px;
+    font-weight:800;
+
+    background:var(--gradient);
+
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+}
+
+.loading-sub{
+
+    color:var(--muted);
+
+    font-size:15px;
+
+    text-align:center;
+
+    max-width:300px;
+
+    line-height:1.6;
+}
+
+.loading-dots{
+    display:flex;
+    gap:8px;
+}
+
+.loading-dots span{
+
+    width:10px;
+    height:10px;
+
+    border-radius:50%;
+
+    background:#3b82f6;
+
+    animation:bounce .8s infinite alternate;
+}
+
+.loading-dots span:nth-child(2){
+    animation-delay:.2s;
+}
+
+.loading-dots span:nth-child(3){
+    animation-delay:.4s;
+}
+
+@keyframes bounce{
+    from{
+        opacity:.3;
+        transform:translateY(0);
+    }
+    to{
+        opacity:1;
+        transform:translateY(-8px);
+    }
+}
+
+/* profile */
+
+.profile-top{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    gap:24px;
 
     flex-wrap:wrap;
 }
 
-.avatar{
-    width:120px;
-    height:120px;
+.profile-left{
+    display:flex;
+    gap:22px;
+    align-items:center;
+}
 
-    border-radius:30px;
+.avatar-wrap{
+    position:relative;
+}
+
+.avatar{
+
+    width:130px;
+    height:130px;
+
+    border-radius:32px;
 
     object-fit:cover;
 
     border:3px solid rgba(255,255,255,.08);
+
+    box-shadow:
+        0 0 0 6px rgba(255,255,255,.02),
+        0 10px 40px rgba(59,130,246,.25);
+}
+
+.online{
+
+    position:absolute;
+
+    right:8px;
+    bottom:8px;
+
+    width:20px;
+    height:20px;
+
+    border-radius:50%;
+
+    background:var(--success);
+
+    border:3px solid #0f172a;
 }
 
 .name{
-    font-size:32px;
-    font-weight:800;
+
+    font-size:36px;
+
+    font-weight:900;
+
+    letter-spacing:-1px;
+
+    line-height:1.1;
 }
 
 .userid{
-    color:#94a3b8;
-    margin-top:8px;
+
+    margin-top:10px;
+
+    color:var(--muted);
+
+    font-size:15px;
+
+    font-weight:500;
 }
 
-.edit-btn{
+.badges{
+
+    display:flex;
+    gap:10px;
+
     margin-top:18px;
+
+    flex-wrap:wrap;
+}
+
+.badge{
+
+    background:rgba(255,255,255,.05);
+
+    border:1px solid rgba(255,255,255,.06);
+
+    padding:10px 14px;
+
+    border-radius:999px;
+
+    font-size:13px;
+
+    color:#dbeafe;
+
+    font-weight:600;
+
+    backdrop-filter:blur(10px);
+}
+
+/* buttons */
+
+.action-buttons{
+    display:flex;
+    gap:14px;
+    flex-wrap:wrap;
+}
+
+.btn{
 
     border:none;
 
-    background:linear-gradient(
-        135deg,
-        #3b82f6,
-        #8b5cf6
-    );
+    cursor:pointer;
+
+    transition:.25s ease;
+
+    font-family:'Inter',sans-serif;
+}
+
+.edit-btn{
+
+    background:var(--gradient);
 
     color:white;
 
-    padding:14px 20px;
+    padding:15px 22px;
 
     border-radius:18px;
 
-    cursor:pointer;
+    font-size:15px;
+
+    font-weight:800;
+
+    box-shadow:
+        0 10px 30px rgba(59,130,246,.25);
+}
+
+.edit-btn:hover{
+    transform:translateY(-2px) scale(1.02);
+}
+
+.logout-btn{
+
+    background:rgba(255,255,255,.05);
+
+    color:white;
+
+    border:1px solid rgba(255,255,255,.08);
+
+    padding:15px 18px;
+
+    border-radius:18px;
+
+    font-size:14px;
 
     font-weight:700;
 }
 
-.section{
+.logout-btn:hover{
+    background:rgba(255,255,255,.08);
+}
+
+/* stats */
+
+.stats{
+
+    display:grid;
+
+    grid-template-columns:repeat(3,1fr);
+
+    gap:18px;
+
     margin-top:30px;
 }
 
-.label{
-    color:#94a3b8;
+.stat{
 
-    margin-bottom:10px;
+    background:rgba(255,255,255,.03);
+
+    border:1px solid rgba(255,255,255,.06);
+
+    padding:22px;
+
+    border-radius:24px;
+}
+
+.stat-value{
+
+    font-size:28px;
+
+    font-weight:800;
+}
+
+.stat-label{
+
+    color:var(--muted);
+
+    margin-top:6px;
 
     font-size:14px;
 }
 
+/* section */
+
+.section{
+    margin-top:34px;
+}
+
+.section-title{
+
+    font-size:20px;
+
+    font-weight:800;
+
+    margin-bottom:22px;
+}
+
+/* form */
+
+.form-grid{
+
+    display:grid;
+
+    grid-template-columns:1fr 1fr;
+
+    gap:18px;
+}
+
+.form-group{
+    display:flex;
+    flex-direction:column;
+}
+
+.form-group.full{
+    grid-column:1/-1;
+}
+
+.label{
+
+    color:#cbd5e1;
+
+    margin-bottom:10px;
+
+    font-size:14px;
+
+    font-weight:600;
+}
+
 .input{
+
     width:100%;
 
-    background:#0b1220;
+    background:
+        linear-gradient(
+            180deg,
+            rgba(255,255,255,.04),
+            rgba(255,255,255,.02)
+        );
 
     border:1px solid rgba(255,255,255,.08);
 
     border-radius:18px;
 
-    padding:16px;
+    padding:17px 18px;
 
     color:white;
 
     outline:none;
 
     font-size:15px;
+
+    transition:.25s ease;
 }
 
+.input:focus{
+
+    border-color:rgba(59,130,246,.7);
+
+    box-shadow:
+        0 0 0 4px rgba(59,130,246,.12);
+}
+
+.input::placeholder{
+    color:#64748b;
+}
+
+/* save button */
+
 .save-btn{
-    margin-top:18px;
 
-    border:none;
+    margin-top:22px;
 
-    background:#2563eb;
+    width:100%;
 
-    color:white;
-
-    padding:14px 20px;
+    padding:17px;
 
     border-radius:18px;
 
-    cursor:pointer;
+    background:var(--gradient);
 
-    font-weight:700;
+    color:white;
+
+    font-size:16px;
+
+    font-weight:800;
 }
+
+.save-btn:hover{
+    transform:translateY(-2px);
+}
+
+/* hidden */
 
 .hidden{
     display:none;
+}
+
+/* fade animation */
+
+.fade-in{
+    animation:fade .5s ease;
+}
+
+@keyframes fade{
+    from{
+        opacity:0;
+        transform:translateY(10px);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+/* responsive */
+
+@media(max-width:700px){
+
+    .card{
+        padding:24px;
+    }
+
+    .profile-top{
+        flex-direction:column;
+        align-items:flex-start;
+    }
+
+    .profile-left{
+        flex-direction:column;
+        align-items:flex-start;
+    }
+
+    .stats{
+        grid-template-columns:1fr;
+    }
+
+    .form-grid{
+        grid-template-columns:1fr;
+    }
+
+    .name{
+        font-size:30px;
+    }
+
+    .avatar{
+        width:110px;
+        height:110px;
+    }
 }
 
 </style>
 </head>
 <body>
 
+<div class="bg-blur"></div>
+<div class="bg-blur two"></div>
+
 <div class="container">
 
-    <div class="card">
+    <!-- Loading Screen -->
+
+    <div id="loadingScreen" class="loading-screen">
+
+        <div class="loader-ring"></div>
+
+        <div class="loading-title">
+            Loading Your Profile
+        </div>
+
+        <div class="loading-sub">
+            Preparing your personalized dashboard and syncing your account details...
+        </div>
+
+        <div class="loading-dots">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+
+    </div>
+
+    <!-- Profile Card -->
+
+    <div id="profileCard" class="card hidden fade-in">
 
         <div class="profile-top">
 
-            <img
-                id="avatar"
-                class="avatar"
-            >
+            <div class="profile-left">
 
-            <div>
+                <div class="avatar-wrap">
 
-                <div
-                    id="name"
-                    class="name"
-                >
-                    Loading...
+                    <img
+                        id="avatar"
+                        class="avatar"
+                    >
+
+                    <div class="online"></div>
+
                 </div>
 
-                <div
-                    id="userid"
-                    class="userid"
-                ></div>
+                <div>
+
+                    <div
+                        id="name"
+                        class="name"
+                    >
+                        Loading...
+                    </div>
+
+                    <div
+                        id="userid"
+                        class="userid"
+                    ></div>
+
+                    <div class="badges">
+
+                        <div class="badge">
+                            Premium User
+                        </div>
+
+                        <div class="badge">
+                            Verified
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="action-buttons">
 
                 <button
-                    class="edit-btn"
+                    class="btn edit-btn"
                     onclick="toggleEdit()"
                 >
                     Edit Profile
+                </button>
+
+                <button
+                    class="btn logout-btn"
+                >
+                    Settings
                 </button>
 
             </div>
 
         </div>
 
+        <!-- stats -->
+
+        <div class="stats">
+
+            <div class="stat">
+
+                <div class="stat-value">
+                    98%
+                </div>
+
+                <div class="stat-label">
+                    Profile Completion
+                </div>
+
+            </div>
+
+            <div class="stat">
+
+                <div class="stat-value">
+                    24
+                </div>
+
+                <div class="stat-label">
+                    Active Sessions
+                </div>
+
+            </div>
+
+            <div class="stat">
+
+                <div class="stat-value">
+                    4.9
+                </div>
+
+                <div class="stat-label">
+                    Trust Score
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- edit section -->
+
         <div
             id="editSection"
             class="section hidden"
         >
 
-            <div class="label">
-                Full Name
+            <div class="section-title">
+                Edit Profile
             </div>
 
-            <input
-                id="fullName"
-                class="input"
-            >
+            <div class="form-grid">
 
-            <div class="label"
-                style="margin-top:18px;"
-            >
-                Profile Picture URL
+                <div class="form-group full">
+
+                    <div class="label">
+                        Full Name
+                    </div>
+
+                    <input
+                        id="fullName"
+                        class="input"
+                        placeholder="Enter your full name"
+                    >
+
+                </div>
+
+                <div class="form-group full">
+
+                    <div class="label">
+                        Profile Picture URL
+                    </div>
+
+                    <input
+                        id="profilePicture"
+                        class="input"
+                        placeholder="https://..."
+                    >
+
+                </div>
+
+                <div class="form-group">
+
+                    <div class="label">
+                        User ID
+                    </div>
+
+                    <input
+                        id="userId"
+                        class="input"
+                        placeholder="username"
+                    >
+
+                </div>
+
+                <div class="form-group">
+
+                    <div class="label">
+                        Phone Number
+                    </div>
+
+                    <input
+                        type="tel"
+                        id="phoneNumber"
+                        class="input"
+                        placeholder="+91..."
+                    >
+
+                </div>
+
             </div>
 
-            <input
-                id="profilePicture"
-                class="input"
-            >
-<div class="label">
-    User ID
-</div>
-
-<input
-    id="userId"
-    class="input"
->
-
-<div class="label"
-    style="margin-top:18px;"
->
-    Phone Number
-</div>
-
-<input type="tel"
-    id="phoneNumber"
-    class="input"
-    placeholder="+91..."
-    
-    oninput="
-        this.value =this.value.toLowerCase()
-    "
-
->
             <button
-                class="save-btn"
+                class="btn save-btn"
                 onclick="saveProfile()"
             >
                 Save Changes
@@ -263,59 +904,85 @@ let currentUser = null;
 
 async function loadProfile(){
 
-    const res = await fetch(
-        `${API_URL}/me`,
-        {
-            credentials:"include"
+    try{
+
+        // fake minimum loading for better UX
+
+        await new Promise(resolve =>
+            setTimeout(resolve,1400)
+        );
+
+        const res = await fetch(
+            `${API_URL}/me`,
+            {
+                credentials:"include"
+            }
+        );
+
+        const data = await res.json();
+
+        if(!data.success){
+
+            location.href="/";
+            return;
         }
-    );
 
-    const data = await res.json();
-
-    if(!data.success){
-
-        location.href = "/";
-
-        return;
-    }
-
-    currentUser = data.user;
-
-    document.getElementById(
-        "avatar"
-    ).src =
-        currentUser.profile_picture ||
-        `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.full_name)}`;
-
-    document.getElementById(
-        "name"
-    ).innerText =
-        currentUser.full_name;
-
-    document.getElementById(
-        "userid"
-    ).innerText =
-        "@" + currentUser.user_id;
-
-    document.getElementById(
-        "fullName"
-    ).value =
-        currentUser.full_name;
-
-    document.getElementById(
-        "profilePicture"
-    ).value =
-        currentUser.profile_picture || "";
+        currentUser = data.user;
 
         document.getElementById(
-    "userId"
-).value =
-    currentUser.user_id;
+            "avatar"
+        ).src =
+            currentUser.profile_picture ||
+            `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.full_name)}&background=3b82f6&color=fff`;
 
-document.getElementById(
-    "phoneNumber"
-).value =
-    currentUser.phone_number || "";
+        document.getElementById(
+            "name"
+        ).innerText =
+            currentUser.full_name;
+
+        document.getElementById(
+            "userid"
+        ).innerText =
+            "@" + currentUser.user_id;
+
+        document.getElementById(
+            "fullName"
+        ).value =
+            currentUser.full_name;
+
+        document.getElementById(
+            "profilePicture"
+        ).value =
+            currentUser.profile_picture || "";
+
+        document.getElementById(
+            "userId"
+        ).value =
+            currentUser.user_id;
+
+        document.getElementById(
+            "phoneNumber"
+        ).value =
+            currentUser.phone_number || "";
+
+        // show profile
+
+        document.getElementById(
+            "loadingScreen"
+        ).classList.add("hidden");
+
+        document.getElementById(
+            "profileCard"
+        ).classList.remove("hidden");
+
+    }
+
+    catch(err){
+
+        console.log(err);
+
+        alert("Failed to load profile");
+    }
 }
 
 function toggleEdit(){
@@ -326,6 +993,13 @@ function toggleEdit(){
 }
 
 async function saveProfile(){
+
+    const button = document.querySelector(
+        ".save-btn"
+    );
+
+    button.innerText = "Saving...";
+    button.disabled = true;
 
     const full_name =
         document.getElementById(
@@ -338,42 +1012,68 @@ async function saveProfile(){
         ).value.trim();
 
     const user_id =
-    document.getElementById(
-        "userId"
-    ).value.trim();
+        document.getElementById(
+            "userId"
+        ).value.trim();
 
-const phone_number =
-    document.getElementById(
-        "phoneNumber"
-    ).value.trim();
+    const phone_number =
+        document.getElementById(
+            "phoneNumber"
+        ).value.trim();
 
-    const res = await fetch(
-        `${API_URL}/edit-profile`,
-        {
-            method:"POST",
+    try{
 
-            credentials:"include",
+        const res = await fetch(
+            `${API_URL}/edit-profile`,
+            {
+                method:"POST",
 
-            headers:{
-                "Content-Type":"application/json"
-            },
+                credentials:"include",
 
-            body:JSON.stringify({
-                full_name,
-                profile_picture,
-                user_id,
-                phone_number
-            })
+                headers:{
+                    "Content-Type":"application/json"
+                },
+
+                body:JSON.stringify({
+                    full_name,
+                    profile_picture,
+                    user_id,
+                    phone_number
+                })
+            }
+        );
+
+        const data = await res.json();
+
+        if(data.success){
+
+            button.innerText = "Saved Successfully ✓";
+
+            setTimeout(()=>{
+
+                button.innerText = "Save Changes";
+                button.disabled = false;
+
+            },1500);
+
+            loadProfile();
         }
-    );
 
-    const data = await res.json();
+        else{
 
-    if(data.success){
+            button.innerText = "Save Changes";
+            button.disabled = false;
 
-        alert("Profile updated");
+            alert("Failed to update");
+        }
+    }
 
-        loadProfile();
+    catch(err){
+
+        button.innerText = "Save Changes";
+        button.disabled = false;
+
+        alert("Something went wrong");
     }
 }
 
@@ -382,4 +1082,4 @@ loadProfile();
 </script>
 
 </body>
-  </html>
+                    </html>
