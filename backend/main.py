@@ -937,3 +937,9 @@ async def remove_member(
     )
 
     return {"success": True}
+
+
+@app.get("/debug-cookies")
+async def debug_cookies(request: Request):
+
+    return request.cookies
