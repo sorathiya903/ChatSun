@@ -1047,17 +1047,43 @@ async def edit_profile(
             "success": False
         }
 
+    # user id already taken
+    existing = users.find_one({
+        "user_id": data["user_id"]
+    })
+
+    if (
+        existing and
+        existing["email"] != user["email"]
+    ):
+
+        return {
+            "success": False,
+            "message":
+                "User ID already taken"
+        }
+
     users.update_one(
         {
-            "email": user["email"]
+            "email":
+                user["email"]
         },
         {
             "$set": {
+
                 "full_name":
                     data["full_name"],
 
                 "profile_picture":
-                    data["profile_picture"]
+                    data[
+                        "profile_picture"
+                    ],
+
+                "user_id":
+                    data["user_id"],
+
+                "phone_number":
+                    data["phone_number"]
             }
         }
     )
