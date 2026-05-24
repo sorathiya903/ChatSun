@@ -219,7 +219,26 @@ body{
                 id="profilePicture"
                 class="input"
             >
+<div class="label">
+    User ID
+</div>
 
+<input
+    id="userId"
+    class="input"
+>
+
+<div class="label"
+    style="margin-top:18px;"
+>
+    Phone Number
+</div>
+
+<input
+    id="phoneNumber"
+    class="input"
+    placeholder="+91..."
+>
             <button
                 class="save-btn"
                 onclick="saveProfile()"
@@ -282,6 +301,16 @@ async function loadProfile(){
         "profilePicture"
     ).value =
         currentUser.profile_picture || "";
+
+        document.getElementById(
+    "userId"
+).value =
+    currentUser.user_id;
+
+document.getElementById(
+    "phoneNumber"
+).value =
+    currentUser.phone_number || "";
 }
 
 function toggleEdit(){
@@ -303,6 +332,16 @@ async function saveProfile(){
             "profilePicture"
         ).value.trim();
 
+    const user_id =
+    document.getElementById(
+        "userId"
+    ).value.trim();
+
+const phone_number =
+    document.getElementById(
+        "phoneNumber"
+    ).value.trim();
+
     const res = await fetch(
         `${API_URL}/edit-profile`,
         {
@@ -316,7 +355,9 @@ async function saveProfile(){
 
             body:JSON.stringify({
                 full_name,
-                profile_picture
+                profile_picture,
+                user_id,
+                phone_number
             })
         }
     );
