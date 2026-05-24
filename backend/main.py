@@ -10,7 +10,7 @@ import json
 import re
 import time
 from fastapi.staticfiles import StaticFiles
-from auth import router
+from auth import router, get_current_user 
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
 
