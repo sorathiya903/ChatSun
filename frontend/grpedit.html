@@ -344,8 +344,16 @@ body{
 
     const data = await res.json();
 
+    console.log("ME:", data);
+
+    if(!data.success){
+        return null;
+    }
+
     return data.user;
     }
+
+    
 let currentUser;
 
 async function init(){
@@ -371,6 +379,20 @@ let groupData = null;
 async function loadGroup(){
 
     try{
+              const currentUser = await getCurrentUser();
+
+        console.log(currentUser);
+
+        if(!currentUser){
+
+            document.getElementById("groupBox").innerHTML = `
+                <div class="loading error">
+                    Login required
+                </div>
+            `;
+
+            return;
+        }
 
         const res = await fetch(
             `${API_URL}/conversation/${conversationId}`
