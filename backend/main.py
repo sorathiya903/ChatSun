@@ -996,4 +996,37 @@ async def add_member(
     return {
         "success": True
     }
+
+
+@app.post("/edit-profile")
+async def edit_profile(
+    request: Request,
+    data: dict
+):
+
+    user = get_current_user(request)
+
+    if not user:
+        return {
+            "success": False
+        }
+
+    users.update_one(
+        {
+            "email": user["email"]
+        },
+        {
+            "$set": {
+                "full_name":
+                    data["full_name"],
+
+                "profile_picture":
+                    data["profile_picture"]
+            }
+        }
+    )
+
+    return {
+        "success": True
+    }
     
