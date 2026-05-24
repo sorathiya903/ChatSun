@@ -124,76 +124,67 @@
 
       /* GOOGLE LOGIN WRAPPER */
 
-.g_id_signin{
-    position:relative !important;
 
-    display:inline-flex !important;
+.google-btn{
 
-    align-items:center !important;
-    justify-content:center !important;
+    position:relative;
 
-    overflow:hidden !important;
+    width:100%;
 
-    border-radius:999px !important;
+    max-width:360px;
 
-    padding:0 !important;
+    height:72px;
+
+    border:none;
+
+    overflow:hidden;
+
+    border-radius:999px;
+
+    cursor:pointer;
 
     background:
         linear-gradient(
             135deg,
             rgba(59,130,246,.18),
             rgba(139,92,246,.18)
-        ) !important;
+        );
 
-    backdrop-filter:blur(18px) !important;
+    border:1px solid rgba(255,255,255,.12);
 
-    border:1px solid rgba(255,255,255,.12) !important;
+    backdrop-filter:blur(18px);
 
     box-shadow:
         0 10px 35px rgba(0,0,0,.35),
-        0 0 30px rgba(99,102,241,.18),
-        inset 0 1px 0 rgba(255,255,255,.06) !important;
+        0 0 35px rgba(99,102,241,.12);
 
     transition:
         transform .35s cubic-bezier(.22,1,.36,1),
-        box-shadow .35s ease,
-        border-color .35s ease !important;
+        box-shadow .35s ease;
 
     animation:
-        morphFloat 5s ease-in-out infinite;
+        idleMorph 6s ease-in-out infinite;
 }
 
-/* HOVER */
-
-.g_id_signin:hover{
+.google-btn:hover{
 
     transform:
         translateY(-3px)
-        scale(1.015) !important;
-
-    border-color:
-        rgba(255,255,255,.22) !important;
+        scale(1.02);
 
     box-shadow:
-        0 16px 45px rgba(0,0,0,.45),
-        0 0 50px rgba(99,102,241,.30),
-        0 0 80px rgba(59,130,246,.12),
-        inset 0 1px 0 rgba(255,255,255,.08) !important;
+        0 18px 50px rgba(0,0,0,.45),
+        0 0 60px rgba(99,102,241,.28);
 }
 
-/* CLICK */
+.google-btn:active{
 
-.g_id_signin:active{
-
-    transform:
-        scale(.97) !important;
+    transform:scale(.97);
 }
 
-/* LIQUID GLOW */
+/* LIQUID */
 
-.g_id_signin::before{
-
-    content:"";
+.liquid{
 
     position:absolute;
 
@@ -202,103 +193,130 @@
     background:
         radial-gradient(
             circle,
-            rgba(59,130,246,.35) 0%,
-            rgba(139,92,246,.25) 35%,
+            rgba(59,130,246,.45),
+            rgba(139,92,246,.22),
             transparent 70%
         );
 
-    filter:blur(40px);
+    filter:blur(45px);
 
     animation:
         liquidMove 7s linear infinite;
-
-    pointer-events:none;
 }
 
-/* SHIMMER */
+/* CONTENT */
 
-.g_id_signin::after{
+.google-content{
 
-    content:"";
+    position:relative;
 
-    position:absolute;
+    z-index:2;
 
-    top:0;
-    left:-120%;
-
-    width:60%;
     height:100%;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    gap:14px;
+
+    color:white;
+
+    font-size:16px;
+
+    font-weight:700;
+}
+
+/* AVATAR */
+
+.avatar-blob{
+
+    width:42px;
+    height:42px;
+
+    border-radius:
+        60% 40% 52% 48% /
+        42% 58% 38% 62%;
 
     background:
         linear-gradient(
-            90deg,
-            transparent,
-            rgba(255,255,255,.18),
-            transparent
+            135deg,
+            #3b82f6,
+            #8b5cf6
         );
 
-    transform:skewX(-20deg);
+    display:flex;
+
+    align-items:center;
+    justify-content:center;
+
+    font-weight:800;
 
     animation:
-        shimmer 4s infinite;
+        blobMorph 4s ease-in-out infinite;
+
+    box-shadow:
+        0 0 25px rgba(99,102,241,.35);
+}
+
+/* LOADING STATE */
+
+.google-btn.loading .avatar-blob{
+
+    animation:
+        blobSpin 1.2s linear infinite;
+}
+
+.google-btn.loading{
 
     pointer-events:none;
 }
 
-/* INNER GOOGLE BUTTON */
+/* MORPH */
 
-.g_id_signin iframe{
-
-    position:relative !important;
-
-    z-index:2 !important;
-
-    border-radius:999px !important;
-
-    overflow:hidden !important;
-
-    mix-blend-mode:screen;
-}
-
-/* FLOATING MORPH */
-
-@keyframes morphFloat{
+@keyframes idleMorph{
 
     0%{
-        transform:
-            translateY(0px)
-            scale(1);
-
         border-radius:
-            55% 45% 60% 40% / 45% 60% 40% 55%;
-    }
-
-    25%{
-        border-radius:
-            48% 52% 40% 60% / 60% 40% 58% 42%;
+        55% 45% 60% 40% /
+        45% 60% 40% 55%;
     }
 
     50%{
-        transform:
-            translateY(-4px)
-            scale(1.01);
-
         border-radius:
-            60% 40% 52% 48% / 42% 58% 38% 62%;
-    }
-
-    75%{
-        border-radius:
-            42% 58% 48% 52% / 52% 48% 60% 40%;
+        42% 58% 48% 52% /
+        58% 42% 60% 40%;
     }
 
     100%{
-        transform:
-            translateY(0px)
-            scale(1);
-
         border-radius:
-            55% 45% 60% 40% / 45% 60% 40% 55%;
+        55% 45% 60% 40% /
+        45% 60% 40% 55%;
+    }
+}
+
+/* BLOB */
+
+@keyframes blobMorph{
+
+    0%{
+        border-radius:
+        60% 40% 52% 48% /
+        42% 58% 38% 62%;
+    }
+
+    50%{
+        border-radius:
+        40% 60% 45% 55% /
+        55% 45% 60% 40%;
+    }
+
+    100%{
+        border-radius:
+        60% 40% 52% 48% /
+        42% 58% 38% 62%;
     }
 }
 
@@ -325,18 +343,20 @@
     }
 }
 
-/* LIGHT SHIMMER */
+/* LOADING SPIN */
 
-@keyframes shimmer{
+@keyframes blobSpin{
 
-    0%{
-        left:-120%;
+    from{
+        transform:rotate(0deg);
     }
 
-    100%{
-        left:140%;
+    to{
+        transform:rotate(360deg);
     }
-    }
+      }
+
+
   </style>
 </head>
 
@@ -648,19 +668,32 @@
               </div>
 
               <!-- Social Buttons -->
-              
 
-                <div
+              <div
     id="g_id_onload"
     data-client_id="169600349371-9c2q2h3q5rrr6obh45oili7ulef2vnhv.apps.googleusercontent.com"
-    data-callback="handleGoogleLogin">
+    data-callback="handleGoogleLogin"
+    data-auto_prompt="false">
 </div>
 
-<div
-    class="g_id_signin"
-    data-type="standard">
-</div>
-              
+<button
+    id="googleBtn"
+    class="google-btn"
+>
+    <div class="liquid"></div>
+
+    <div class="google-content">
+
+        <div class="avatar-blob">
+            G
+        </div>
+
+        <span id="googleText">
+            Continue with Google
+        </span>
+
+    </div>
+</button>
               
               <!-- Inputs -->
               <form id="loginFormElement" class="space-y-5">
@@ -1365,7 +1398,33 @@ document
 
 });
 
+google.accounts.id.initialize({
+    client_id:
+        "169600349371-9c2q2h3q5rrr6obh45oili7ulef2vnhv.apps.googleusercontent.com",
 
+    callback: handleGoogleLogin
+});
+
+document
+.getElementById("googleBtn")
+.onclick = () => {
+
+    const btn =
+        document.getElementById("googleBtn");
+
+    btn.classList.add("loading");
+
+    document.getElementById(
+        "googleText"
+    ).innerText =
+        "Connecting...";
+
+    setTimeout(() => {
+
+        google.accounts.id.prompt();
+
+    }, 900);
+};
       async function handleGoogleLogin(response){
 
     const res = await fetch(
