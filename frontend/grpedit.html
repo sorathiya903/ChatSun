@@ -570,15 +570,48 @@ function renderGroup(){
 
         <div class="section">
 
-            <div class="section-title">
-                Members
-            </div>
+    <div class="section-title">
+        Add Member
+    </div>
 
-            <div class="members">
-                ${membersHTML}
-            </div>
+    <div
+        style="
+            display:flex;
+            gap:12px;
+            flex-wrap:wrap;
+        "
+    >
 
-        </div>
+        <input
+            id="newMember"
+            class="input"
+            placeholder="Enter user id"
+            style="flex:1;"
+        >
+
+        <button
+            class="save-btn"
+            style="margin-top:0;"
+            onclick="addMember()"
+        >
+            Add
+        </button>
+
+    </div>
+
+</div>
+
+<div class="section">
+
+    <div class="section-title">
+        Members
+    </div>
+
+    <div class="members">
+        ${membersHTML}
+    </div>
+
+</div>
     `;
 }
 
@@ -729,6 +762,59 @@ async function removeMember(member){
 
 loadGroup();
 
+
+    async function addMember(){
+
+    const member = document
+        .getElementById("newMember")
+        .value
+        .trim();
+
+    if(!member){
+        return;
+    }
+
+    if(groupData.members.includes(member)){
+
+        alert("Already in group");
+
+        return;
+    }
+
+    const res = await fetch(
+        `${API_URL}/group/add-member/${conversationId}`,
+        {
+            method:"POST",
+
+            headers:{
+                "Content-Type":"application/json"
+            },
+
+            body:JSON.stringify({
+                user_id: currentUser,
+                member
+            })
+        }
+    );
+
+    const data = await res.json();
+
+    if(data.success){
+
+        groupData.members.push(member);
+
+        renderGroup();
+
+        alert("Member added");
+
+    }else{
+
+        alert(
+            data.message ||
+            "Failed to add member"
+        );
+    }
+    }
 </script>
 
 </body>
