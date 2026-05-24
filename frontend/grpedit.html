@@ -350,7 +350,7 @@ body{
         return null;
     }
 
-    return data.user_id;
+    return data.user.user_id;
     }
 
     
@@ -434,7 +434,7 @@ async function loadGroup(){
 
     }catch(err){
 
-        console.log(err);
+        alert(err);
 
         document.getElementById("app").innerHTML = `
             <div class="loading error">
