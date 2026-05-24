@@ -565,7 +565,7 @@ async def get_me(
             "email":
                 user["email"],
             "phone_number":
-            user.get( "phone_number",  ""  )
+            user.get( "phone_number",  ""  ),
 
             "user_id":
                 user["user_id"],
