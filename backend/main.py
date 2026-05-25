@@ -1,4 +1,4 @@
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Body, UploadFile, File, Response, Request, Depends
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Body, UploadFile, File, Response, Request, Depends, HTTPException
 from pymongo import MongoClient
 from pydantic import BaseModel
 import os
