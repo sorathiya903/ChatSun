@@ -1551,42 +1551,59 @@ let selectedFile = null;
     },250);
 }
 
+function observeMessage(box, msg){
 
-    
-    function observeMessage(box, msg){
-console.log("observe function called")
-if(
-    msg.sender === currentUser.user_id
-) return;
+    if(
+        msg.sender === currentUser.user_id
+    ) return;
 
+    const observer =
+        new IntersectionObserver(
 
-        
-        
-const observer =
-    new IntersectionObserver((entries)=>{
+        async(entries)=>{
 
-        entries.forEach(async(entry)=>{
+            for(const entry of entries){
 
-            if(entry.isIntersecting){
+                // visible enough
+                if(
+                    entry.isIntersecting &&
+                    entry.intersectionRatio > 0.15
+                ){
 
-                await fetch(
-                    `${API_URL}/read/${msg.message_id}/${currentUser.user_id}`,
-                    {
-                        method:"POST"
+                    try{
+                        console.log("Sending observe request...")
+                        await fetch(
+
+                            `${API_URL}/read/${msg.message_id}/${currentUser.user_id}`,
+
+                            {
+                                method:"POST"
+                            }
+                        );
+console.log("Successfully sent request")
+                    }catch(e){
+
+                        console.log(
+                            "Read error",
+                            e
+                        );
                     }
-                );
 
-                observer.unobserve(box);
+                    observer.unobserve(box);
+                }
             }
-        });
 
-    },{
-        threshold:0.8
-    });
+        },
 
-observer.observe(box);
+        {
+            threshold:[0.15]
+        }
+    );
 
-  console.log("request sent")  }
+    observer.observe(box);
+}
+    
+    
 
      function getStatusDots(msg){
 
