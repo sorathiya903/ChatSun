@@ -849,7 +849,20 @@ body{
     Connecting...
         </p>
     </div>
-
+<button onclick="startVideoCall()"
+style="
+margin-left:auto;
+width:48px;
+height:48px;
+border:none;
+border-radius:16px;
+background:#6366f1;
+color:white;
+font-size:20px;
+cursor:pointer;
+">
+📹
+</button>
 </div>
 
 <!-- CHAT -->
@@ -997,6 +1010,194 @@ body{
 <button id="showInputBtn">
     Show input
 </button>
+
+    <!-- VIDEO CALL UI -->
+
+<div id="callModal" style="
+position:fixed;
+inset:0;
+background:#000;
+z-index:999999999;
+display:none;
+flex-direction:column;
+">
+
+    <!-- TOP BAR -->
+
+    <div style="
+    height:72px;
+    background:rgba(15,23,42,.95);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 18px;
+    border-bottom:1px solid rgba(255,255,255,.08);
+    ">
+
+        <div>
+
+            <div id="callName"
+            style="
+            font-size:18px;
+            font-weight:700;
+            ">
+                Calling
+            </div>
+
+            <div id="callStatus"
+            style="
+            font-size:13px;
+            color:#94a3b8;
+            margin-top:3px;
+            ">
+                Connecting...
+            </div>
+
+        </div>
+
+        <button onclick="endCall()"
+        style="
+        width:54px;
+        height:54px;
+        border:none;
+        border-radius:18px;
+        background:#ef4444;
+        color:white;
+        font-size:22px;
+        cursor:pointer;
+        ">
+            ✕
+        </button>
+
+    </div>
+
+    <!-- VIDEOS -->
+
+    <div style="
+    flex:1;
+    position:relative;
+    background:black;
+    overflow:hidden;
+    ">
+
+        <!-- REMOTE -->
+
+        <video id="remoteVideo"
+        autoplay
+        playsinline
+        style="
+        width:100%;
+        height:100%;
+        object-fit:cover;
+        background:black;
+        ">
+        </video>
+
+        <!-- LOCAL -->
+
+        <div style="
+        position:absolute;
+        right:16px;
+        top:16px;
+        width:120px;
+        ">
+
+            <div style="
+            background:rgba(0,0,0,.5);
+            padding:6px 10px;
+            border-radius:12px 12px 0 0;
+            font-size:12px;
+            ">
+                You
+            </div>
+
+            <video id="localVideo"
+            autoplay
+            muted
+            playsinline
+            style="
+            width:100%;
+            height:180px;
+            object-fit:cover;
+            border-radius:0 0 18px 18px;
+            background:#111;
+            border:2px solid rgba(255,255,255,.08);
+            ">
+            </video>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- INCOMING CALL -->
+
+<div id="incomingCall"
+style="
+position:fixed;
+top:24px;
+left:50%;
+transform:translateX(-50%);
+background:#0f172a;
+border:1px solid rgba(255,255,255,.08);
+padding:18px;
+border-radius:24px;
+display:none;
+z-index:999999999;
+width:90%;
+max-width:360px;
+">
+
+    <div style="
+    font-size:18px;
+    font-weight:700;
+    margin-bottom:8px;
+    ">
+        Incoming Video Call
+    </div>
+
+    <div id="incomingText"
+    style="
+    color:#cbd5e1;
+    margin-bottom:18px;
+    ">
+    </div>
+
+    <div style="
+    display:flex;
+    gap:12px;
+    ">
+
+        <button onclick="rejectCall()"
+        style="
+        flex:1;
+        height:50px;
+        border:none;
+        border-radius:16px;
+        background:#ef4444;
+        color:white;
+        font-weight:700;
+        ">
+            Reject
+        </button>
+
+        <button onclick="acceptCall()"
+        style="
+        flex:1;
+        height:50px;
+        border:none;
+        border-radius:16px;
+        background:#22c55e;
+        color:white;
+        font-weight:700;
+        ">
+            Accept
+        </button>
+
+    </div>
+
+</div>
 <script>
     const currentUser =
     JSON.parse(localStorage.getItem("user"));
@@ -2409,7 +2610,388 @@ chatBox.addEventListener("scroll",()=>{
 });
 
         
+let callWs;
+
+let localStream;
+
+let peer;
+
+let incomingOffer = null;
+
+let incomingCaller = null;
+
+let currentCallUser = null;
+
+/* ------------------ */
+/* CALL WS */
+/* ------------------ */
+
+callWs = new WebSocket(
+    `${WS_URL.replace("http","ws")}/ws-call/${currentUser.user_id}`
+);
+
+callWs.onmessage = async (event)=>{
+
+    const data = JSON.parse(event.data);
+
+    console.log("CALL DATA:", data);
+
+    // INCOMING CALL
+
+    if(data.type === "incoming_call"){
+
+        incomingCaller = data.from;
+
+        document.getElementById(
+            "incomingCall"
+        ).style.display = "block";
+
+        document.getElementById(
+            "incomingText"
+        ).innerText =
+            `${data.from} is calling you`;
+
+        return;
+    }
+
+    // REJECTED
+
+    if(data.type === "call_rejected"){
+
+        alert(`${data.from} rejected the call`);
+
+        endCall();
+
+        return;
+    }
+
+    // ACCEPTED
+
+    if(data.type === "call_accepted"){
+
+        currentCallUser = data.from;
+
+        document.getElementById(
+            "callStatus"
+        ).innerText =
+            "Connected";
+
+        await createOffer();
+
+        return;
+    }
+
+    // OFFER
+
+    if(data.type === "offer"){
+
+        incomingOffer = data.offer;
+
+        currentCallUser = data.from;
+
+        await createPeer();
+
+        await peer.setRemoteDescription(
+            new RTCSessionDescription(
+                incomingOffer
+            )
+        );
+
+        const answer =
+            await peer.createAnswer();
+
+        await peer.setLocalDescription(
+            answer
+        );
+
+        callWs.send(JSON.stringify({
+
+            type:"answer",
+
+            answer:answer,
+
+            target:data.from,
+
+            from:currentUser.user_id
+        }));
+
+        return;
+    }
+
+    // ANSWER
+
+    if(data.type === "answer"){
+
+        await peer.setRemoteDescription(
+            new RTCSessionDescription(
+                data.answer
+            )
+        );
+
+        return;
+    }
+
+    // ICE
+
+    if(data.type === "ice"){
+
+        if(peer){
+
+            try{
+
+                await peer.addIceCandidate(
+                    new RTCIceCandidate(
+                        data.candidate
+                    )
+                );
+
+            }catch(e){
+
+                console.log(e);
+            }
+        }
+    }
+
+    // END
+
+    if(data.type === "call_ended"){
+
+        alert("Call ended");
+
+        endCall(false);
+    }
+};
+
+/* ------------------ */
+/* START CALL */
+/* ------------------ */
+
+async function startVideoCall(){
+
+    currentCallUser = otherUser;
+
+    document.getElementById(
+        "callModal"
+    ).style.display = "flex";
+
+    document.getElementById(
+        "callName"
+    ).innerText = otherUser;
+
+    document.getElementById(
+        "callStatus"
+    ).innerText = "Calling...";
+
+    await startMedia();
+
+    callWs.send(JSON.stringify({
+
+        type:"incoming_call",
+
+        from:currentUser.user_id,
+
+        target:otherUser
+    }));
+}
+
+/* ------------------ */
+/* ACCEPT */
+/* ------------------ */
+
+async function acceptCall(){
+
+    document.getElementById(
+        "incomingCall"
+    ).style.display = "none";
+
+    document.getElementById(
+        "callModal"
+    ).style.display = "flex";
+
+    document.getElementById(
+        "callName"
+    ).innerText = incomingCaller;
+
+    document.getElementById(
+        "callStatus"
+    ).innerText = "Connecting...";
+
+    currentCallUser = incomingCaller;
+
+    await startMedia();
+
+    callWs.send(JSON.stringify({
+
+        type:"call_accepted",
+
+        from:currentUser.user_id,
+
+        target:incomingCaller
+    }));
+}
+
+/* ------------------ */
+/* REJECT */
+/* ------------------ */
+
+function rejectCall(){
+
+    document.getElementById(
+        "incomingCall"
+    ).style.display = "none";
+
+    callWs.send(JSON.stringify({
+
+        type:"call_rejected",
+
+        from:currentUser.user_id,
+
+        target:incomingCaller
+    }));
+}
+
+/* ------------------ */
+/* MEDIA */
+/* ------------------ */
+
+async function startMedia(){
+
+    localStream =
+        await navigator.mediaDevices
+        .getUserMedia({
+
+            video:true,
+            audio:true
+        });
+
+    document.getElementById(
+        "localVideo"
+    ).srcObject = localStream;
+}
+
+/* ------------------ */
+/* PEER */
+/* ------------------ */
+
+async function createPeer(){
+
+    peer = new RTCPeerConnection({
+
+        iceServers:[
+
+            {
+                urls:"stun:stun.l.google.com:19302"
+            }
+        ]
+    });
+
+    localStream.getTracks().forEach(track=>{
+
+        peer.addTrack(
+            track,
+            localStream
+        );
+    });
+
+    peer.ontrack = (event)=>{
+
+        document.getElementById(
+            "remoteVideo"
+        ).srcObject =
+            event.streams[0];
+    };
+
+    peer.onicecandidate = (event)=>{
+
+        if(event.candidate){
+
+            callWs.send(JSON.stringify({
+
+                type:"ice",
+
+                candidate:event.candidate,
+
+                target:currentCallUser,
+
+                from:currentUser.user_id
+            }));
+        }
+    };
+}
+
+/* ------------------ */
+/* OFFER */
+/* ------------------ */
+
+async function createOffer(){
+
+    await createPeer();
+
+    const offer =
+        await peer.createOffer();
+
+    await peer.setLocalDescription(
+        offer
+    );
+
+    callWs.send(JSON.stringify({
+
+        type:"offer",
+
+        offer:offer,
+
+        target:currentCallUser,
+
+        from:currentUser.user_id
+    }));
+}
+
+/* ------------------ */
+/* END */
+/* ------------------ */
+
+function endCall(send=true){
+
+    document.getElementById(
+        "callModal"
+    ).style.display = "none";
+
+    if(peer){
+
+        peer.close();
+
+        peer = null;
+    }
+
+    if(localStream){
+
+        localStream.getTracks()
+        .forEach(track=>track.stop());
+    }
+
+    document.getElementById(
+        "remoteVideo"
+    ).srcObject = null;
+
+    document.getElementById(
+        "localVideo"
+    ).srcObject = null;
+
+    if(send && currentCallUser){
+
+        callWs.send(JSON.stringify({
+
+            type:"call_ended",
+
+            from:currentUser.user_id,
+
+            target:currentCallUser
+        }));
+    }
+}
+
 </script>
+    
 
 </body>
     </html>
