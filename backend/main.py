@@ -57,6 +57,12 @@ users = db["users"]
 
 # Active WebSocket connections
 connections = {}
+# -------------------------
+# VIDEO CALL SOCKETS
+# -------------------------
+
+call_connections = {}
+
 
 online_users = set()
 
@@ -1093,3 +1099,48 @@ async def edit_profile(
         "success": True
     }
     
+
+
+# -------------------------
+# VIDEO CALL WEBSOCKET
+# -------------------------
+
+@app.websocket("/ws-call/{user_id}")
+async def call_ws(websocket: WebSocket, user_id: str):
+
+    await websocket.accept()
+
+    call_connections[user_id] = websocket
+
+    print(f"CALL WS CONNECTED: {user_id}")
+
+    try:
+
+        while True:
+
+            raw = await websocket.receive_text()
+
+            data = json.loads(raw)
+
+            target = data.get("target")
+
+            # send to target user
+            if target in call_connections:
+
+                await call_connections[target].send_text(
+                    json.dumps(data)
+                )
+
+    except WebSocketDisconnect:
+
+        print(f"CALL WS DISCONNECTED: {user_id}")
+
+        if user_id in call_connections:
+            del call_connections[user_id]
+
+    except Exception as e:
+
+        print("CALL ERROR:", e)
+
+        if user_id in call_connections:
+            del call_connections[user_id]
