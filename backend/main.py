@@ -227,7 +227,7 @@ async def chat(ws: WebSocket, conversation_id: str):
                             for u in users_list
                         }, 
                     "settings":{  u:{    "theme":"default"   }
-                                for u in users_list
+                                for u in users_list}
                 })
 
             else:
