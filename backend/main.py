@@ -1045,6 +1045,7 @@ async def add_member(
                 f"unread.{data['member']}": 0,
                 f"settings.{data['member']}":{
                  "theme":"default"
+                }
             }
         }
     )
