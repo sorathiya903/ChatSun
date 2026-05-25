@@ -1012,7 +1012,17 @@ body{
 </head>
 
 <body>
+<button onclick="changeTheme('default')">
+    Default
+</button>
 
+<button onclick="changeTheme('night')">
+    Night
+</button>
+
+<button onclick="changeTheme('blue')">
+    Blue
+</button>
 <!-- HEADER -->
 
 <div class="header">
@@ -1080,7 +1090,7 @@ body{
 
         <button
             class="menu-item"
-            onclick="changeTheme()"
+            
         >
 
             <i class="fa-solid fa-palette"></i>
@@ -1513,6 +1523,60 @@ max-width:360px;
     method: "POST"
 });
 
+let localConversationTheme;
+        
+function applyTheme(theme){
+
+    document.body.dataset.theme = theme;
+
+    /*
+        optional:
+        save locally for instant load
+    */
+
+    localStorage.setItem(
+        `theme_${conversationId}`,
+        theme
+    );
+}
+
+        
+async function changeTheme(theme){
+
+    const res = await fetch(
+        `${API_URL}/conversation/theme/${conversationId}`,
+        {
+            method:"POST",
+
+            credentials:"include",
+
+            headers:{
+                "Content-Type":"application/json"
+            },
+
+            body:JSON.stringify({
+                theme
+            })
+        }
+    );
+
+    const data = await res.json();
+
+    if(data.success){
+
+        applyTheme(theme);
+
+        localConversationTheme = theme;
+    }
+}
+
+    
+
+
+
+
+
+    
 const menuBtn =
     document.getElementById(
         "menuBtn"
@@ -1956,7 +2020,11 @@ async function loadConversationInfo(){
     const data = await res.json();
 
     if(!data.success) return;
+const theme =
+        data.settings?.[currentUser]?.theme
+        || "default";
 
+    applyTheme(theme);
     if(data.is_group){
 
         isGroup = true;
