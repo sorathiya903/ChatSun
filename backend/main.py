@@ -225,7 +225,9 @@ async def chat(ws: WebSocket, conversation_id: str):
                         {
                             u: 0
                             for u in users_list
-                        }
+                        }, 
+                    "settings":{  u:{    "theme":"default"   }
+                                for u in users_list
                 })
 
             else:
@@ -381,16 +383,19 @@ async def get_users():
     ]
 
 @app.get("/conversation/{conversation_id}")
-async def get_conversation(conversation_id: str):
+async def get_conversation(conversation_id: str, request:Request):
 
     convo = conversations.find_one({
         "conversation_id": conversation_id
     })
+    user = get_current_user(request)
 
     if not convo:
         return {
             "success": False
         }
+    theme = convo.get( "settings",  {}).get( user["user_id"], {}).get( "theme",  "default")   
+
 
     return {
         "success": True,
@@ -408,9 +413,10 @@ async def get_conversation(conversation_id: str):
             convo.get("users", []),
 
         "admins":
-            convo.get("admins", [])
+            convo.get("admins", []),
+        "theme":theme
     }
-
+        
 
 @app.post("/online/{user_id}")
 async def set_online(user_id: str):
@@ -774,6 +780,11 @@ async def create_group(data: dict):
     group["messages"] = [system_message]
 
     group["unread"] = {}
+    group["settings"] = {member:{
+                        "theme":"default"
+                          }
+                         for member in members
+                        }
     
     for member in members:
         if member != creator:
@@ -1031,7 +1042,9 @@ async def add_member(
             },
 
             "$set": {
-                f"unread.{data['member']}": 0
+                f"unread.{data['member']}": 0,
+                f"settings.{data['member']}":{
+                 "theme":"default"
             }
         }
     )
@@ -1122,3 +1135,34 @@ async def call_ws(websocket: WebSocket, user_id: str):
 
         if user_id in call_connections:
             del call_connections[user_id]
+
+@app.post("/conversation-theme/{conversation_id}")
+async def set_theme(
+    conversation_id: str,
+    request: Request,
+    data: dict
+):
+
+    user = get_current_user(request)
+
+    if not user:
+        return {
+            "success": False
+        }
+
+    conversations.update_one(
+        {
+            "conversation_id":
+                conversation_id
+        },
+        {
+            "$set":{
+                f"settings.{user['user_id']}.theme":
+                    data["theme"]
+            }
+        }
+    )
+
+    return {
+        "success": True
+              }
