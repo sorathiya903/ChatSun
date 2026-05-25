@@ -1041,6 +1041,8 @@ async def add_member(
     }
 
 
+
+
 @app.post("/edit-profile")
 async def edit_profile(
     request: Request,
@@ -1054,53 +1056,28 @@ async def edit_profile(
             "success": False
         }
 
-    # user id already taken
-    existing = users.find_one({
-        "user_id": data["user_id"]
-    })
-
-    if (
-        existing and
-        existing["email"] != user["email"]
-    ):
-
-        return {
-            "success": False,
-            "message":
-                "User ID already taken"
-        }
-
-    if "user_id" in data:
-        raise HTTPException(status_code=400, detail="user_id cannot be changed")
-
     users.update_one(
         {
-            "email":
-                user["email"]
+            "email": user["email"]
         },
         {
             "$set": {
 
                 "full_name":
-                    data["full_name"],
+                    data.get("full_name", ""),
 
                 "profile_picture":
-                    data[
-                        "profile_picture"
-                    ],
-
+                    data.get("profile_picture", ""),
 
                 "phone_number":
-                    data["phone_number"]
+                    data.get("phone_number", "")
             }
         }
     )
 
     return {
         "success": True
-    }
-    
-
+    } 
 
 # -------------------------
 # VIDEO CALL WEBSOCKET
