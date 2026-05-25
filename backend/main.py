@@ -1164,5 +1164,6 @@ async def set_theme(
     )
 
     return {
-        "success": True
+        "success": True,
+        "theme":data["theme"]
               }
