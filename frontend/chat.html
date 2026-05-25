@@ -911,7 +911,65 @@ cursor:pointer;display:flex;justify-content:center;align-items:center;
 <!-- INPUT -->
 
 <div class="input-box">
+<div
+    id="replyPreview"
+    style="
+        display:none;
+        margin-bottom:10px;
+        background:rgba(99,102,241,.12);
+        border:1px solid rgba(99,102,241,.25);
+        padding:12px;
+        border-radius:18px;
+    "
+>
 
+    <div
+        style="
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            gap:12px;
+        "
+    >
+
+        <div>
+
+            <div
+                id="replyUser"
+                style="
+                    font-size:12px;
+                    color:#a5b4fc;
+                    font-weight:600;
+                    margin-bottom:4px;
+                "
+            ></div>
+
+            <div
+                id="replyText"
+                style="
+                    font-size:13px;
+                    color:#e2e8f0;
+                "
+            ></div>
+
+        </div>
+
+        <button
+            onclick="cancelReply()"
+            style="
+                border:none;
+                background:none;
+                color:#94a3b8;
+                cursor:pointer;
+                font-size:18px;
+            "
+        >
+            ✕
+        </button>
+
+    </div>
+
+</div>
     <div class="input-inner">
 <label class="file-btn">
 
@@ -1239,8 +1297,36 @@ max-width:360px;
 });
 
     
+let replyMessage = null;
+function startReply(msg){
 
-    
+    replyMessage = msg;
+
+    document.getElementById(
+        "replyPreview"
+    ).style.display = "block";
+
+    document.getElementById(
+        "replyUser"
+    ).innerText = msg.sender;
+
+    document.getElementById(
+        "replyText"
+    ).innerText =
+        msg.text?.slice(0, 80)
+        || "File";
+
+    input.focus();
+}
+
+function cancelReply(){
+
+    replyMessage = null;
+
+    document.getElementById(
+        "replyPreview"
+    ).style.display = "none";
+    }
     function buildSeenPopup(msg){
 
     if(
@@ -1717,6 +1803,7 @@ let holdTimer;
 let startX = 0;
 let startY = 0;
 let moved = false;
+let currentX = 0;
     
     if(renderedMessages.has(msg.message_id)) return;
 
@@ -1967,9 +2054,47 @@ if(
     box.innerHTML = `
     <div class="sender">${msg.sender}</div>
 
-    <div class="text">
-        ${messageContent}
-    </div>
+    ${
+    msg.reply_to
+    ? `
+        <div
+            style="
+                margin-bottom:10px;
+                padding:10px;
+                border-left:3px solid #a5b4fc;
+                background:rgba(255,255,255,.06);
+                border-radius:12px;
+            "
+        >
+
+            <div
+                style="
+                    font-size:12px;
+                    color:#a5b4fc;
+                    font-weight:600;
+                    margin-bottom:4px;
+                "
+            >
+                ${msg.reply_to.sender}
+            </div>
+
+            <div
+                style="
+                    font-size:12px;
+                    color:#cbd5e1;
+                "
+            >
+                ${msg.reply_to.text || "File"}
+            </div>
+
+        </div>
+    `
+    : ""
+}
+
+<div class="text">
+    ${messageContent}
+</div>
 
     <div class="time">
 
@@ -2053,19 +2178,54 @@ if(seenBtn && popup){
     box.addEventListener("touchend", () => {
     clearTimeout(holdTimer);
 });
+
     box.addEventListener("touchmove", (e) => {
+
     const touch = e.touches[0];
 
-    const dx = Math.abs(touch.clientX - startX);
-    const dy = Math.abs(touch.clientY - startY);
+    const dx =
+        touch.clientX - startX;
 
-    // if finger moved, it's scrolling → cancel long press
-    if (dx > 10 || dy > 10) {
+    const absX =
+        Math.abs(dx);
+
+    const dy =
+        Math.abs(
+            touch.clientY - startY
+        );
+
+    // scrolling
+    if(absX > 10 || dy > 10){
+
         moved = true;
+
         clearTimeout(holdTimer);
     }
-});
 
+    // swipe reply
+    if(dx > 70){
+
+        box.style.transform =
+            "translateX(18px)";
+
+        box.style.transition =
+            "transform .15s ease";
+
+        navigator.vibrate?.(30);
+
+        setTimeout(()=>{
+
+            box.style.transform =
+                "translateX(0)";
+        },150);
+
+        startReply(msg);
+
+        // prevent multiple triggers
+        startX = 999999;
+    }
+});
+    
     wrap.appendChild(box);
     chatBox.appendChild(wrap);
 observeMessage(box, msg);
@@ -2372,12 +2532,26 @@ async function sendMsg(){
     if(!input.value.trim()) return;
 
     ws.send(JSON.stringify({
-        sender: currentUser.user_id,
-        text: input.value
-    }));
 
+    sender: currentUser.user_id,
+
+    text: input.value,
+
+    reply_to: replyMessage
+        ? {
+            message_id:
+                replyMessage.message_id,
+
+            sender:
+                replyMessage.sender,
+
+            text:
+                replyMessage.text
+          }
+        : null
+}));
     input.value = "";
-
+cancelReply();
     chatBox.scrollTo({
         top: chatBox.scrollHeight,
         behavior: "smooth"
