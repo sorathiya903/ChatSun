@@ -812,6 +812,33 @@ body{
 #showInputBtn:hover{
     transform:scale(1.03);
     }
+    #localVideoWrap{
+    position:absolute;
+
+    top:16px;
+    right:16px;
+
+    width:120px;
+
+    z-index:999;
+
+    touch-action:none;
+
+    user-select:none;
+
+    cursor:grab;
+
+    transition:
+        top .22s ease,
+        left .22s ease,
+        right .22s ease,
+        bottom .22s ease;
+}
+
+#localVideoWrap.dragging{
+    transition:none;
+    cursor:grabbing;
+}
 </style>
 </head>
 
@@ -1095,12 +1122,7 @@ flex-direction:column;
 
         <!-- LOCAL -->
 
-        <div style="
-        position:absolute;
-        right:16px;
-        top:16px;
-        width:120px;
-        ">
+        <div id="localVideoWrap">
 
             <div style="
             background:rgba(0,0,0,.5);
@@ -2990,8 +3012,202 @@ function endCall(send=true){
     }
 }
 
-</script>
-    
+
+/* DRAGGABLE LOCAL VIDEO */
+
+const localWrap =
+    document.getElementById(
+        "localVideoWrap"
+    );
+
+let dragging = false;
+
+let offsetX = 0;
+let offsetY = 0;
+
+/* -------- */
+/* POINTER DOWN */
+/* -------- */
+
+localWrap.addEventListener(
+    "pointerdown",
+    (e)=>{
+
+        dragging = true;
+
+        localWrap.classList.add(
+            "dragging"
+        );
+
+        const rect =
+            localWrap.getBoundingClientRect();
+
+        offsetX =
+            e.clientX - rect.left;
+
+        offsetY =
+            e.clientY - rect.top;
+
+        localWrap.setPointerCapture(
+            e.pointerId
+        );
+    }
+);
+
+/* -------- */
+/* MOVE */
+/* -------- */
+
+window.addEventListener(
+    "pointermove",
+    (e)=>{
+
+        if(!dragging) return;
+
+        const callArea =
+            document.getElementById(
+                "callModal"
+            );
+
+        const bounds =
+            callArea.getBoundingClientRect();
+
+        const width =
+            localWrap.offsetWidth;
+
+        const height =
+            localWrap.offsetHeight;
+
+        let x =
+            e.clientX
+            - bounds.left
+            - offsetX;
+
+        let y =
+            e.clientY
+            - bounds.top
+            - offsetY;
+
+        // LIMITS
+
+        x = Math.max(
+            8,
+            Math.min(
+                x,
+                bounds.width - width - 8
+            )
+        );
+
+        y = Math.max(
+            80,
+            Math.min(
+                y,
+                bounds.height - height - 8
+            )
+        );
+
+        localWrap.style.left =
+            x + "px";
+
+        localWrap.style.top =
+            y + "px";
+
+        localWrap.style.right =
+            "auto";
+
+        localWrap.style.bottom =
+            "auto";
+    }
+);
+
+/* -------- */
+/* RELEASE */
+/* -------- */
+
+window.addEventListener(
+    "pointerup",
+    ()=>{
+
+        if(!dragging) return;
+
+        dragging = false;
+
+        localWrap.classList.remove(
+            "dragging"
+        );
+
+        snapToNearestCorner();
+    }
+);
+
+/* -------- */
+/* SNAP */
+/* -------- */
+
+function snapToNearestCorner(){
+
+    const callArea =
+        document.getElementById(
+            "callModal"
+        );
+
+    const bounds =
+        callArea.getBoundingClientRect();
+
+    const rect =
+        localWrap.getBoundingClientRect();
+
+    const centerX =
+        rect.left + rect.width / 2;
+
+    const centerY =
+        rect.top + rect.height / 2;
+
+    const left =
+        centerX < bounds.width / 2;
+
+    const top =
+        centerY < bounds.height / 2;
+
+    localWrap.style.left = "auto";
+    localWrap.style.right = "auto";
+    localWrap.style.top = "auto";
+    localWrap.style.bottom = "auto";
+
+    // TOP LEFT
+
+    if(left && top){
+
+        localWrap.style.left = "16px";
+        localWrap.style.top = "90px";
+    }
+
+    // TOP RIGHT
+
+    else if(!left && top){
+
+        localWrap.style.right = "16px";
+        localWrap.style.top = "90px";
+    }
+
+    // BOTTOM LEFT
+
+    else if(left && !top){
+
+        localWrap.style.left = "16px";
+        localWrap.style.bottom = "16px";
+    }
+
+    // BOTTOM RIGHT
+
+    else{
+
+        localWrap.style.right = "16px";
+        localWrap.style.bottom = "16px";
+    }
+}
+
+    </script>
 
 </body>
     </html>
