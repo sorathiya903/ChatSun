@@ -199,7 +199,8 @@ async def chat(ws: WebSocket, conversation_id: str):
 
                 "timestamp": datetime.now(
                     ZoneInfo("Asia/Kolkata")
-                ).isoformat()
+                ).isoformat(),
+                "reply_to": data.get("reply_to"),
             }
 
             # -------------------------
