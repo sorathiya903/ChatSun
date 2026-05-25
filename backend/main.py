@@ -394,7 +394,7 @@ async def get_conversation(conversation_id: str, request:Request):
         return {
             "success": False
         }
-    theme = convo.get( "settings",  {}).get( user["user_id"], {}).get( "theme",  "default")   
+
 
 
     return {
@@ -414,7 +414,7 @@ async def get_conversation(conversation_id: str, request:Request):
 
         "admins":
             convo.get("admins", []),
-        "theme":theme
+        "settings":convo.get("settings", {})
     }
         
 
