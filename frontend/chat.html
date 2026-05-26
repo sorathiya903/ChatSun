@@ -28,14 +28,51 @@ rel="stylesheet"
 <style>
 :root{
     --input-height: 110px;
+    --bg:#0f172a;
+    --card:#1e293b;
+
+    --text:#ffffff;
+    --muted:#94a3b8;
+
+    --primary:#3b82f6;
+
+    --message-me:#2563eb;
+    --message-other:#1e293b;
+
 }
 
+body[data-theme="night"]{
 
+    --bg:#000000;
+    --card:#111111;
+
+    --text:#ffffff;
+    --muted:#888888;
+
+    --primary:#ffffff;
+
+    --message-me:#222222;
+    --message-other:#111111;
+}
+
+body[data-theme="blue"]{
+
+    --bg:#071326;
+    --card:#0f2747;
+
+    --text:#ffffff;
+    --muted:#9fb6d1;
+
+    --primary:#60a5fa;
+
+    --message-me:#2563eb;
+    --message-other:#17365d;
+}
     
 body{
     margin:0;
     font-family:'Inter',sans-serif;
-    background:#020617;
+    background:var(--bg);
     color:white;
     display:flex;
     flex-direction:column;
@@ -1011,7 +1048,7 @@ body{
 </style>
 </head>
 
-<body>
+<body data-theme="default">
 <button onclick="changeTheme('default')">
     Default
 </button>
