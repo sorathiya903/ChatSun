@@ -70,6 +70,8 @@ rel="stylesheet"
     /* SHADOW */
 
     --shadow:0 20px 60px rgba(0,0,0,.45);
+    
+    --hover:rgba(255,255,255,.08);
 
 }
 
@@ -81,7 +83,7 @@ body[data-theme="night"]{
 
     --text:#ffffff;
     --muted:#888888;
-filter:hue-rotate(20deg);
+
     --primary:#ffffff;
     --primary-hover:#dddddd;
 
@@ -102,7 +104,7 @@ filter:hue-rotate(20deg);
 }
 
 body[data-theme="blue"]{
-filter:hue-rotate(90deg)
+--filter:hue-rotate(90deg)
     --bg:#071326;
     --card:#0f2747;
 
@@ -113,6 +115,18 @@ filter:hue-rotate(90deg)
 
     --message-me:#2563eb;
     --message-other:#17365d;
+}
+
+    body[data-theme="night"]{
+    --hover:rgba(255,255,255,.06);
+}
+
+body[data-theme="blue"]{
+    --hover:rgba(96,165,250,.12);
+}
+
+body[data-theme="green"]{
+    --hover:rgba(34,197,94,.12);
 }
     
 body{
@@ -316,7 +330,7 @@ body{
     height:50px;
     border:none;
     border-radius:18px;
-    background:#6366f1;
+    background:var(--primary);
     display:flex;
     align-items:center;
     justify-content:center;
@@ -325,7 +339,7 @@ body{
 }
 
 .send-btn:hover{
-    background:#7c3aed;
+    filter:brightness(1.08);
     transform:scale(1.03);
 }
 
@@ -883,7 +897,7 @@ body{
 
     padding:14px 18px;
 
-    background:#6366f1;
+    background:var(--primary);
     color:white;
 
     font-size:14px;
@@ -900,7 +914,10 @@ body{
 
 #showInputBtn:hover{
     transform:scale(1.03);
+    filter:brightness(1.08)
     }
+
+    
     #localVideoWrap{
     position:absolute;
 
@@ -1065,8 +1082,7 @@ body{
 
 .menu-item:hover{
 
-    background:
-        rgba(99,102,241,.12);
+    background:var(--hover);
 
     transform:translateX(3px);
 }
