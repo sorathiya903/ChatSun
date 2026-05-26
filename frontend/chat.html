@@ -81,7 +81,7 @@ body[data-theme="night"]{
 
     --text:#ffffff;
     --muted:#888888;
-
+filter:hue-rotate(20deg);
     --primary:#ffffff;
     --primary-hover:#dddddd;
 
@@ -102,7 +102,7 @@ body[data-theme="night"]{
 }
 
 body[data-theme="blue"]{
-
+filter:hue-rotate(90deg)
     --bg:#071326;
     --card:#0f2747;
 
@@ -239,11 +239,7 @@ body{
 }
 
 .me .msg{
-    background:linear-gradient(
-        135deg,
-        #6366f1,
-        #7c3aed
-    );
+    background:var(--message-me);
 
     border-bottom-right-radius:8px;
     box-shadow:0 10px 25px rgba(99,102,241,.15);
@@ -253,6 +249,7 @@ body{
     background:rgba(30,41,59,.88);
     border:1px solid rgba(51,65,85,.9);
     border-bottom-left-radius:8px;
+    background:var(--message-other)
 }
 
 .sender{
