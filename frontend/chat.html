@@ -1008,6 +1008,240 @@ body{
     color:#fb7185;
 }
 
+
+
+    /* SEARCH BTN */
+
+.search-btn{
+
+    width:48px;
+    height:48px;
+
+    border:none;
+    outline:none;
+
+    border-radius:16px;
+
+    background:var(--card);
+
+    color:white;
+
+    cursor:pointer;
+
+    font-size:18px;
+
+    transition:.2s;
+}
+
+.search-btn:hover{
+
+    background:var(--hover);
+
+    transform:scale(1.03);
+}
+
+/* SEARCH BAR */
+
+/* SEARCH BTN */
+
+.search-btn{
+
+    width:48px;
+    height:48px;
+
+    border:none;
+    outline:none;
+
+    border-radius:16px;
+
+    background:var(--card);
+
+    color:white;
+
+    cursor:pointer;
+
+    font-size:18px;
+
+    transition:.2s;
+}
+
+.search-btn:hover{
+
+    background:var(--hover);
+
+    transform:scale(1.03);
+}
+
+/* SEARCH BAR */
+
+
+.search-bar.show{
+
+    opacity:1;
+
+    pointer-events:auto;
+
+    transform:
+        translateX(-50%)
+        translateY(0);
+}
+
+/* INPUT */
+
+#searchInput{
+
+    flex:1;
+
+    background:none;
+
+    border:none;
+    outline:none;
+
+    color:white;
+
+    font-size:15px;
+}
+
+#searchInput::placeholder{
+    color:var(--muted);
+}
+
+/* CONTROLS */
+
+.search-controls{
+
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+
+/* NAV BUTTON */
+
+.search-nav-btn{
+
+    width:38px;
+    height:38px;
+
+    border:none;
+
+    border-radius:12px;
+
+    background:var(--card);
+
+    color:white;
+
+    cursor:pointer;
+
+    transition:.2s;
+}
+
+.search-nav-btn:hover{
+
+    background:var(--hover);
+}
+
+/* COUNT */
+
+#searchCount{
+
+    font-size:13px;
+
+    color:var(--muted);
+
+    min-width:42px;
+
+    text-align:center;
+}
+
+/* HIGHLIGHT */
+
+.search-highlight{
+
+    background:var(--primary);
+
+    color:white;
+
+    border-radius:6px;
+
+    padding:1px 4px;
+
+    box-shadow:
+        0 0 10px rgba(99,102,241,.4);
+}
+
+/* ACTIVE RESULT */
+
+.search-active{
+
+    outline:2px solid var(--primary);
+
+    outline-offset:4px;
+
+    border-radius:10px;
+
+    animation:pulse .8s infinite;
+}
+
+@keyframes pulse{
+
+    0%{
+        outline-color:rgba(99,102,241,.3);
+    }
+
+    50%{
+        outline-color:rgba(99,102,241,1);
+    }
+
+    100%{
+        outline-color:rgba(99,102,241,.3);
+    }
+        }
+
+    .search-bar{
+
+    position:absolute;
+
+    inset:0;
+
+    width:100%;
+    height:100%;
+
+    background:var(--glass);
+
+    display:flex;
+    align-items:center;
+    gap:12px;
+
+    padding:0 16px;
+
+    z-index:99999;
+
+    opacity:0;
+
+    pointer-events:none;
+
+    transform:translateY(-8px);
+
+    transition:
+        opacity .2s ease,
+        transform .2s ease;
+
+    backdrop-filter:blur(18px);
+
+    border-bottom:
+        1px solid var(--border);
+}
+
+/* OPEN */
+
+.search-bar.show{
+
+    opacity:1;
+
+    pointer-events:auto;
+
+    transform:translateY(0);
+}
 </style>
 </head>
 
@@ -1045,7 +1279,44 @@ body{
     Connecting...
         </p>
     </div>
+<!-- SEARCH BUTTON -->
 
+<button class="search-btn" onclick="openSearch()">
+    🔍
+</button>
+
+<!-- SEARCH BAR -->
+
+<div class="search-bar" id="searchBar">
+
+    <button class="search-nav-btn" onclick="closeSearch()">
+        ✕
+    </button>
+
+    <input
+        type="text"
+        id="searchInput"
+        placeholder="Search messages..."
+        oninput="searchMessages()"
+    >
+
+    <div class="search-controls">
+
+        <button class="search-nav-btn" onclick="prevResult()">
+            ↑
+        </button>
+
+        <button class="search-nav-btn" onclick="nextResult()">
+            ↓
+        </button>
+
+        <span id="searchCount">
+            0/0
+        </span>
+
+    </div>
+
+</div>
  
 <div class="menu-wrap">
 
@@ -1080,12 +1351,12 @@ body{
 
         <button
             class="menu-item"
-            onclick="changeTheme()"
+            onclick="openSearch()"
         >
 
             <i class="fa-solid fa-palette"></i>
 
-            <span>Change Theme</span>
+            <span>Search</span>
 
         </button>
 
@@ -1513,6 +1784,233 @@ max-width:360px;
     method: "POST"
 });
 
+
+const searchBar =
+    document.getElementById("searchBar");
+
+const searchInput =
+    document.getElementById("searchInput");
+
+const searchCount =
+    document.getElementById("searchCount");
+
+let searchResults = [];
+
+let currentSearchIndex = 0;
+
+/* OPEN */
+
+function openSearch(){
+
+    searchBar.classList.add("show");
+
+    setTimeout(()=>{
+
+        searchInput.focus();
+
+    },100);
+}
+
+/* CLOSE */
+
+function closeSearch(){
+
+    searchBar.classList.remove("show");
+
+    searchInput.value = "";
+
+    clearSearch();
+}
+
+/* CLEAR */
+
+function clearSearch(){
+
+    searchResults = [];
+
+    currentSearchIndex = 0;
+
+    document
+        .querySelectorAll(".text")
+        .forEach(el=>{
+
+            if(el.dataset.original){
+
+                el.innerHTML =
+                    el.dataset.original;
+            }
+
+            el.classList.remove(
+                "search-active"
+            );
+        });
+
+    searchCount.innerText = "0/0";
+}
+
+/* SEARCH */
+
+function searchMessages(){
+
+    const query =
+        searchInput.value
+        .trim()
+        .toLowerCase();
+
+    searchResults = [];
+
+    currentSearchIndex = 0;
+
+    document
+        .querySelectorAll(".text")
+        .forEach(el=>{
+
+            if(!el.dataset.original){
+
+                el.dataset.original =
+                    el.innerHTML;
+            }
+
+            const original =
+                el.dataset.original;
+
+            el.classList.remove(
+                "search-active"
+            );
+
+            if(!query){
+
+                el.innerHTML = original;
+
+                return;
+            }
+
+            const plainText =
+                el.innerText.toLowerCase();
+
+            if(plainText.includes(query)){
+
+                searchResults.push(el);
+
+                const regex =
+                    new RegExp(
+                        `(${escapeRegExp(query)})`,
+                        "gi"
+                    );
+
+                el.innerHTML =
+                    original.replace(
+                        regex,
+                        `<span class="search-highlight">$1</span>`
+                    );
+            }
+            else{
+
+                el.innerHTML = original;
+            }
+        });
+
+    updateSearchUI();
+}
+
+/* UPDATE */
+
+function updateSearchUI(){
+
+    document
+        .querySelectorAll(".search-active")
+        .forEach(el=>{
+
+            el.classList.remove(
+                "search-active"
+            );
+        });
+
+    if(!searchResults.length){
+
+        searchCount.innerText = "0/0";
+
+        return;
+    }
+
+    const current =
+        searchResults[currentSearchIndex];
+
+    current.classList.add(
+        "search-active"
+    );
+
+    current.scrollIntoView({
+
+        behavior:"smooth",
+
+        block:"center"
+    });
+
+    searchCount.innerText =
+        `${currentSearchIndex+1}/${searchResults.length}`;
+}
+
+/* NEXT */
+
+function nextResult(){
+
+    if(!searchResults.length)return;
+
+    currentSearchIndex++;
+
+    if(
+        currentSearchIndex >=
+        searchResults.length
+    ){
+        currentSearchIndex = 0;
+    }
+
+    updateSearchUI();
+}
+
+/* PREVIOUS */
+
+function prevResult(){
+
+    if(!searchResults.length)return;
+
+    currentSearchIndex--;
+
+    if(currentSearchIndex < 0){
+
+        currentSearchIndex =
+            searchResults.length - 1;
+    }
+
+    updateSearchUI();
+}
+
+/* ESCAPE REGEX */
+
+function escapeRegExp(text){
+
+    return text.replace(
+        /[.*+?^${}()|[\]\\]/g,
+        "\\$&"
+    );
+}
+
+/* ESC CLOSE */
+
+document.addEventListener(
+    "keydown",
+    e=>{
+
+        if(e.key==="Escape"){
+
+            closeSearch();
+        }
+    }
+);
+
+
+    
 const menuBtn =
     document.getElementById(
         "menuBtn"
