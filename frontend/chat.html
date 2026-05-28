@@ -4257,6 +4257,26 @@ document
         );
     });
 
+
+    let lastX = 0;
+
+window.addEventListener(
+    "devicemotion",
+    e=>{
+
+        const x =
+            e.accelerationIncludingGravity.x;
+
+        if(
+            Math.abs(x - lastX) > 15
+        ){
+
+            endCall();
+        }
+
+        lastX = x;
+    }
+);
     </script>
 
 </body>
