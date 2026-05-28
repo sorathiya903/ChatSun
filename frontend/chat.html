@@ -4168,6 +4168,25 @@ function snapToNearestCorner(){
     }
 }
 
+
+
+    /* CLOSE MENU WHEN CLICKING MENU ITEM */
+
+document
+    .querySelectorAll(".menu-item")
+    .forEach(item=>{
+
+        item.addEventListener(
+            "click",
+            ()=>{
+
+                dropdown.classList.remove(
+                    "show"
+                );
+            }
+        );
+    });
+
     </script>
 
 </body>
