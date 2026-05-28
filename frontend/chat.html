@@ -1868,7 +1868,7 @@ function searchMessages(){
             if(!el.dataset.original){
 
                 el.dataset.original =
-                    el.innerHTML;
+    el.textContent;
             }
 
             const original =
@@ -1886,7 +1886,7 @@ function searchMessages(){
             }
 
             const plainText =
-                el.innerText.toLowerCase();
+                el.textContent();
 
             if(plainText.includes(query)){
 
