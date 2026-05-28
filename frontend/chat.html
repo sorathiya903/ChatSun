@@ -3742,11 +3742,11 @@ async function detectHandGesture(){
                 "HAND DETECTED"
             );
 
-            alert(
-                "Hand detected. Ending call."
-            );
-
             endCall();
+            showCallToast(
+                "Video call ended due to hand detection.")
+
+            
 
             break;
         }
