@@ -4383,7 +4383,13 @@ function showCallToast(text){
 window.addEventListener(
     "devicemotion",
     e=>{
-
+ if(
+            document.getElementById(
+                "callModal"
+            ).style.display !== "flex"
+        ){
+            return;
+ }
         const x =
             e.accelerationIncludingGravity.x;
 
