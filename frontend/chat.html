@@ -22,6 +22,10 @@ rel="stylesheet"
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@500;600;700&display=swap" rel="stylesheet">
 
+
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/handpose"></script>
 <!-- Tailwind -->
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="config.js"></script>
@@ -3592,7 +3596,66 @@ chatBox.addEventListener("scroll",()=>{
     lastScrollTop = currentScroll;
 });
 
-        
+let handModel;
+
+let detectingHand = false;
+
+/* LOAD MODEL */
+
+async function loadHandModel(){
+
+    handModel =
+        await handpose.load();
+
+    console.log(
+        "Hand model loaded"
+    );
+}
+
+/* DETECT HAND */
+
+async function detectHandGesture(){
+
+    if(
+        !handModel ||
+        !localStream
+    ) return;
+
+    const video =
+        document.getElementById(
+            "localVideo"
+        );
+
+    detectingHand = true;
+
+    while(detectingHand){
+
+        const predictions =
+            await handModel
+            .estimateHands(video);
+
+        if(predictions.length){
+
+            console.log(
+                "HAND DETECTED"
+            );
+
+            alert(
+                "Hand detected. Ending call."
+            );
+
+            endCall();
+
+            break;
+        }
+
+        await new Promise(
+            r=>setTimeout(r,700)
+        );
+    }
+}
+
+    
 let callWs;
 
 let localStream;
@@ -3850,6 +3913,11 @@ async function startMedia(){
     document.getElementById(
         "localVideo"
     ).srcObject = localStream;
+
+    
+await loadHandModel();
+
+detectHandGesture();
 }
 
 /* ------------------ */
@@ -3934,7 +4002,9 @@ async function createOffer(){
 /* ------------------ */
 
 function endCall(send=true){
+detectingHand = false;
 
+    
     document.getElementById(
         "callModal"
     ).style.display = "none";
