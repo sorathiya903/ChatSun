@@ -3727,6 +3727,12 @@ async function detectHandGesture(){
         document.getElementById(
             "localVideo"
         );
+    if(
+    video.videoWidth === 0 ||
+    video.videoHeight === 0
+){
+    return;
+    }
 
     detectingHand = true;
 
