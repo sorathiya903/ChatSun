@@ -1176,36 +1176,52 @@ saveBtn.innerHTML = `
 
       try{
 
-        const res =
-          await fetch(
-            "https://api.cloudinary.com/v1_1/dymqpeoq1/image/upload",
-            {
-              method:"POST",
-              body:formData
-            }
-          );
-xhr.upload.onprogress = (e)=>{
+        const data =
+    await new Promise((resolve,reject)=>{
 
-    if(!e.lengthComputable)
-        return;
+        const xhr =
+            new XMLHttpRequest();
 
-    const percent =
-        Math.round(
-            (e.loaded / e.total) * 100
+        xhr.open(
+            "POST",
+            "https://api.cloudinary.com/v1_1/dymqpeoq1/image/upload"
         );
 
-    document.getElementById(
-        "saveProgressBar"
-    ).style.width =
-        percent + "%";
+        // REAL PROGRESS
+        xhr.upload.onprogress = (e)=>{
 
-    document.getElementById(
-        "savePercent"
-    ).innerText =
-        percent + "%";
-};
-        const data =
-          await res.json();
+            if(!e.lengthComputable)
+                return;
+
+            const percent =
+                Math.round(
+                    (e.loaded / e.total) * 100
+                );
+
+            document.getElementById(
+                "saveProgressBar"
+            ).style.width =
+                percent + "%";
+
+            document.getElementById(
+                "savePercent"
+            ).innerText =
+                percent + "%";
+        };
+
+        xhr.onload = ()=>{
+
+            resolve(
+                JSON.parse(
+                    xhr.responseText
+                )
+            );
+        };
+
+        xhr.onerror = reject;
+
+        xhr.send(formData);
+    });
 
         uploadedImageUrl =
           data.secure_url;
