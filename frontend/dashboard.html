@@ -757,7 +757,7 @@ async function searchUser(query) {
     };
 
     div.innerHTML = `
-      <div class="flex items-center justify-between">
+      <div class="w-4/5 flex items-center justify-between">
 
         <div class="flex items-center gap-4">
 
@@ -777,7 +777,7 @@ async function searchUser(query) {
 
               ${
                 data.user.phone
-                  ? `📱 ${data.user.phone}`
+                  ? `${data.user.phone}`
                   : "Tap to start chatting"
               }
 
