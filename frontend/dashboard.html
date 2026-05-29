@@ -103,6 +103,81 @@
   }
 }
     .zMax{z-index:99999999999999}
+
+    #profileMenu{
+
+  position:absolute;
+  top:0;
+  right:0;
+
+  width:56px;
+  height:56px;
+
+  border-radius:24px;
+
+  background:rgba(15,23,42,.95);
+
+  backdrop-filter:blur(18px);
+
+  border:1px solid rgba(255,255,255,.08);
+
+  overflow:hidden;
+
+  opacity:0;
+  pointer-events:none;
+
+  transition:
+    height .28s ease,
+    width .28s ease .22s,
+    border-radius .25s ease,
+    opacity .15s ease;
+
+  z-index:999999;
+}
+
+#profileMenu.open{
+
+  opacity:1;
+  pointer-events:auto;
+
+  height:170px;
+
+  width:260px;
+
+  border-radius:28px;
+}
+
+#profileMenuContent{
+
+  opacity:0;
+
+  padding-top:70px;
+
+  transition:opacity .2s ease .35s;
+}
+
+#profileMenu.open #profileMenuContent{
+  opacity:1;
+}
+
+.menu-item{
+
+  width:100%;
+
+  display:flex;
+  align-items:center;
+  gap:14px;
+
+  padding:16px 20px;
+
+  transition:.2s;
+
+  font-size:15px;
+}
+
+.menu-item:hover{
+  background:rgba(255,255,255,.05);
+    }
   </style>
 </head>
 
@@ -169,39 +244,43 @@
     <!-- PROFILE -->
     <div class="relative">
 
-      <img
-        id="profilePic"
-        src="https://ui-avatars.com/api/?name=U"
-        class="w-12 h-12 rounded-2xl cursor-pointer object-cover border border-slate-700 hover:border-indigo-500 transition-all"
-      />
+  <!-- PROFILE PIC -->
+  <img
+    id="profilePic"
+    src="https://ui-avatars.com/api/?name=U"
+    class="
+      w-14 h-14 rounded-2xl
+      object-cover cursor-pointer
+      border border-slate-700
+    "
+  />
 
-      <!-- PROFILE DROPDOWN -->
-      <div
-        id="profileDropdown"
-        class="absolute right-0 mt-3 w-60 bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl overflow-hidden opacity-0 scale-95 pointer-events-none transition-all duration-200 origin-top-right z-50"
+  <!-- MORPH MENU -->
+  <div id="profileMenu">
+
+    <div id="profileMenuContent">
+
+      <button
+        onclick="window.location.href='profile.html'"
+        class="menu-item"
       >
+        <i class="fa-solid fa-user-gear"></i>
+        <span>Profile Settings</span>
+      </button>
 
-        <button
-          onclick="window.location.href='profile.html'"
-          class="w-full flex items-center gap-3 px-5 py-4 hover:bg-slate-800 transition-all text-left"
-        >
-          <i class="fa-solid fa-user-gear text-indigo-400"></i>
-          <span>Profile Settings</span>
-        </button>
-
-        <button
-          onclick="logout()"
-          class="w-full flex items-center gap-3 px-5 py-4 hover:bg-rose-500/10 text-rose-400 transition-all text-left"
-        >
-          <i class="fa-solid fa-right-from-bracket"></i>
-          <span>Logout</span>
-        </button>
-
-      </div>
+      <button
+        onclick="logout()"
+        class="menu-item text-rose-400"
+      >
+        <i class="fa-solid fa-right-from-bracket"></i>
+        <span>Logout</span>
+      </button>
 
     </div>
 
   </div>
+
+</div>
 
 </div>
     
@@ -565,8 +644,6 @@ function connectChatSocket(conversationId) {
 const menuBtn = document.getElementById("menuBtn");
 const menuDropdown = document.getElementById("menuDropdown");
 
-const profilePic = document.getElementById("profilePic");
-const profileDropdown = document.getElementById("profileDropdown");
 
 // LEFT MENU
 menuBtn.onclick = (e) => {
@@ -578,18 +655,27 @@ menuBtn.onclick = (e) => {
 };
 
 // PROFILE MENU
+const profilePic =
+  document.getElementById("profilePic");
+
+const profileMenu =
+  document.getElementById("profileDropdown");
+
 profilePic.onclick = (e) => {
+
   e.stopPropagation();
 
-  profileDropdown.classList.toggle("dropdown-open");
-
-  menuDropdown.classList.remove("dropdown-open");
+  profileMenu.classList.toggle("open");
 };
+
+document.addEventListener("click", () => {
+  profileMenu.classList.remove("open");
+});
 
 // CLOSE ON CLICK OUTSIDE
 document.addEventListener("click", () => {
   menuDropdown.classList.remove("dropdown-open");
-  profileDropdown.classList.remove("dropdown-open");
+  profileMenu.classList.remove("dropdown-open");
 });
 
 // -------------------
