@@ -12,7 +12,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@500;600;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+/>
   <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
 <script src="config.js"></script>
@@ -78,6 +81,27 @@
     .input-focus:focus {
       box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12);
     }
+
+    .dropdown-open {
+  opacity: 1 !important;
+  transform: scale(1) !important;
+  pointer-events: auto !important;
+}
+
+.search-result-card {
+  animation: fadeSlide .2s ease;
+}
+
+@keyframes fadeSlide {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
   </style>
 </head>
 
@@ -90,106 +114,96 @@
   <!-- Dashboard -->
   <div id="dashboard" class="relative z-10 min-h-screen p-6 lg:p-10">
 
-    <!-- Top Navbar -->
-    <div class="glass border border-slate-800 rounded-3xl px-6 py-5 mb-8">
+ <!-- SMART HEADER -->
+<div class="glass border border-slate-800 rounded-3xl p-4 mb-8 relative">
 
-      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+  <div class="flex items-center gap-4">
 
-        <!-- Left -->
-        <div class="flex items-center gap-4">
+    <!-- LEFT MENU -->
+    <div class="relative">
+      <button
+        id="menuBtn"
+        class="w-12 h-12 rounded-2xl bg-slate-900 border border-slate-700 hover:border-indigo-500 transition-all flex items-center justify-center"
+      >
+        <i class="fa-solid fa-ellipsis-vertical text-slate-300"></i>
+      </button>
 
-          <div class="w-14 h-14 rounded-2xl bg-indigo-500/15 border border-indigo-500/20 flex items-center justify-center">
+      <!-- MENU DROPDOWN -->
+      <div
+        id="menuDropdown"
+        class="absolute left-0 mt-3 w-56 bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl overflow-hidden opacity-0 scale-95 pointer-events-none transition-all duration-200 origin-top-left z-50"
+      >
 
-            <svg xmlns="http://www.w3.org/2000/svg"
-              class="w-7 h-7 text-indigo-400"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor">
-
-              <path stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-4l-4 4-4-4z" />
-
-            </svg>
-
-          </div>
-
-          <div>
-            <h1 class="font-manrope text-3xl font-bold tracking-tight">
-              ChatSun Dashboard
-            </h1>
-
-            <p class="text-slate-400 text-sm">
-              Realtime conversations with modern UI.
-            </p>
-          </div>
-
-        </div>
-
-        <!-- Right -->
-        <div class="flex items-center gap-4">
-
-          <button onclick="logout()"
-            class="bg-rose-500/10 hover:bg-rose-500 hover:text-white border border-rose-500/20 transition-all px-5 py-3 rounded-2xl text-rose-400 font-medium">
-
-            Logout
-
-          </button>
-<button
-    onclick="window.location.href='group.html'"
-    class="group-btn"
->
-    👥 New Group
-</button>
-          <img
-    id="profilePic"
-    src="https://ui-avatars.com/api/?name=U"
-    onclick="location.href='profile.html'"
-    style="
-        width:46px;
-        height:46px;
-        border-radius:16px;
-        cursor:pointer;
-        object-fit:cover;
-        border:2px solid rgba(255,255,255,.08);
-    "
->
-        </div>
+        <button
+          onclick="window.location.href='group.html'"
+          class="w-full flex items-center gap-3 px-5 py-4 hover:bg-slate-800 transition-all text-left"
+        >
+          <i class="fa-solid fa-users text-indigo-400"></i>
+          <span>Create Group</span>
+        </button>
 
       </div>
+    </div>
+
+    <!-- SEARCH -->
+    <div class="flex-1 relative">
+
+      <i class="fa-solid fa-magnifying-glass absolute left-5 top-1/2 -translate-y-1/2 text-slate-500"></i>
+
+      <input
+        id="searchInput"
+        type="text"
+        placeholder="Search user id or phone number..."
+        class="input-focus w-full bg-slate-900 border border-slate-700 rounded-2xl pl-14 pr-5 py-4 text-white outline-none transition-all focus:border-indigo-500"
+      />
+
+      <!-- SEARCH RESULTS -->
+      <div
+        id="searchResult"
+        class="absolute top-full left-0 right-0 mt-3 space-y-3 z-40"
+      ></div>
 
     </div>
 
-    <!-- Search -->
-    <div class="glass border border-slate-800 rounded-3xl p-6 mb-8">
+    <!-- PROFILE -->
+    <div class="relative">
 
-      <div class="flex flex-col lg:flex-row gap-4">
+      <img
+        id="profilePic"
+        src="https://ui-avatars.com/api/?name=U"
+        class="w-12 h-12 rounded-2xl cursor-pointer object-cover border border-slate-700 hover:border-indigo-500 transition-all"
+      />
 
-        <div class="flex-1 relative">
+      <!-- PROFILE DROPDOWN -->
+      <div
+        id="profileDropdown"
+        class="absolute right-0 mt-3 w-60 bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl overflow-hidden opacity-0 scale-95 pointer-events-none transition-all duration-200 origin-top-right z-50"
+      >
 
-          <input
-            id="searchInput"
-            type="text"
-            placeholder="Search by user id..."
-            class="input-focus w-full bg-slate-900 border border-slate-700 rounded-2xl px-5 py-4 text-white outline-none transition-all focus:border-indigo-500"
-          />
+        <button
+          onclick="window.location.href='profile.html'"
+          class="w-full flex items-center gap-3 px-5 py-4 hover:bg-slate-800 transition-all text-left"
+        >
+          <i class="fa-solid fa-user-gear text-indigo-400"></i>
+          <span>Profile Settings</span>
+        </button>
 
-        </div>
-
-        <button onclick="searchUser()"
-          class="bg-indigo-500 hover:bg-indigo-400 active:scale-[0.98] transition-all rounded-2xl px-8 py-4 font-semibold shadow-lg shadow-indigo-500/10">
-
-          Search User
-
+        <button
+          onclick="logout()"
+          class="w-full flex items-center gap-3 px-5 py-4 hover:bg-rose-500/10 text-rose-400 transition-all text-left"
+        >
+          <i class="fa-solid fa-right-from-bracket"></i>
+          <span>Logout</span>
         </button>
 
       </div>
 
-      <!-- Search Result -->
-      <div id="searchResult" class="mt-6 space-y-4"></div>
-
     </div>
+
+  </div>
+
+</div>
+    
 
     <!-- Users -->
     <div class="glass border border-slate-800 rounded-3xl p-6">
@@ -543,117 +557,169 @@ function connectChatSocket(conversationId) {
     }
   };
   }
-    async function searchUser() {
+// -------------------
+// MENU DROPDOWNS
+// -------------------
 
-      const userId =
-        document.getElementById("searchInput")
-        .value
-        .trim()
-        .toLowerCase();
+const menuBtn = document.getElementById("menuBtn");
+const menuDropdown = document.getElementById("menuDropdown");
 
-      if (!userId) return;
+const profilePic = document.getElementById("profilePic");
+const profileDropdown = document.getElementById("profileDropdown");
 
-      const result =
-        document.getElementById("searchResult");
+// LEFT MENU
+menuBtn.onclick = (e) => {
+  e.stopPropagation();
+
+  menuDropdown.classList.toggle("dropdown-open");
+
+  profileDropdown.classList.remove("dropdown-open");
+};
+
+// PROFILE MENU
+profilePic.onclick = (e) => {
+  e.stopPropagation();
+
+  profileDropdown.classList.toggle("dropdown-open");
+
+  menuDropdown.classList.remove("dropdown-open");
+};
+
+// CLOSE ON CLICK OUTSIDE
+document.addEventListener("click", () => {
+  menuDropdown.classList.remove("dropdown-open");
+  profileDropdown.classList.remove("dropdown-open");
+});
+
+// -------------------
+// SMART SEARCH
+// -------------------
+
+let searchTimeout;
+
+document
+  .getElementById("searchInput")
+  .addEventListener("input", (e) => {
+
+    clearTimeout(searchTimeout);
+
+    const value = e.target.value.trim();
+
+    if (!value) {
+      document.getElementById("searchResult").innerHTML = "";
+      return;
+    }
+
+    searchTimeout = setTimeout(() => {
+      searchUser(value);
+    }, 300);
+
+  });
+
+async function searchUser(query) {
+
+  const result =
+    document.getElementById("searchResult");
+
+  result.innerHTML = `
+    <div class="glass border border-slate-800 rounded-2xl p-4 text-slate-400">
+      Searching...
+    </div>
+  `;
+
+  try {
+
+    const res =
+      await fetch(
+        `${API_URL}/search/${encodeURIComponent(query)}`
+      );
+
+    const data =
+      await res.json();
+
+    result.innerHTML = "";
+
+    if (!data.success) {
 
       result.innerHTML = `
-        <div class="text-slate-400">
-          Searching...
+        <div class="search-result-card glass border border-rose-500/20 bg-rose-500/10 text-rose-300 rounded-2xl px-5 py-4">
+          No user found
         </div>
       `;
 
-      try {
-
-        const res =
-          await fetch(
-            `${API_URL}/search/${userId}`
-          );
-
-        const data =
-          await res.json();
-
-        result.innerHTML = "";
-
-        // Not found
-        if (!data.success) {
-
-          result.innerHTML = `
-            <div class="border border-rose-500/20 bg-rose-500/10 text-rose-300 rounded-2xl px-5 py-4">
-              User not found
-            </div>
-          `;
-
-          return;
-        }
-
-        // Found
-        const div =
-          document.createElement("div");
-
-        div.className =
-          "user-card border border-slate-800 bg-slate-900/60 rounded-3xl p-5 cursor-pointer";
-
-        div.onclick = () => {
-
-          const conversationId = [
-            currentUser.user_id,
-            data.user.user_id
-          ]
-            .sort()
-            .join("_");
-
-          window.location.href =
-            `chat.html?id=${conversationId}`;
-        };
-
-        div.innerHTML = `
-
-          <div class="flex items-center justify-between">
-
-            <div class="flex items-center gap-4">
-
-              <div class="w-14 h-14 rounded-2xl bg-indigo-500/15 border border-indigo-500/20 flex items-center justify-center text-indigo-300 font-semibold text-lg">
-
-                ${data.user.user_id.charAt(0).toUpperCase()}
-
-              </div>
-
-              <div>
-
-                <h3 class="font-semibold text-lg text-white">
-                  ${data.user.user_id}
-                </h3>
-
-                <p class="text-sm text-slate-400">
-                  Click to start conversation
-                </p>
-
-              </div>
-
-            </div>
-
-            <button class="bg-indigo-500 hover:bg-indigo-400 transition-all px-5 py-3 rounded-2xl text-sm font-semibold">
-
-              Message
-
-            </button>
-
-          </div>
-        `;
-
-        result.appendChild(div);
-
-      } catch (err) {
-
-        console.log(err);
-
-        result.innerHTML = `
-          <div class="border border-rose-500/20 bg-rose-500/10 text-rose-300 rounded-2xl px-5 py-4">
-            Server error
-          </div>
-        `;
-      }
+      return;
     }
+
+    const div =
+      document.createElement("div");
+
+    div.className =
+      "search-result-card user-card border border-slate-800 bg-slate-900 rounded-3xl p-4 cursor-pointer";
+
+    div.onclick = () => {
+
+      const conversationId = [
+        currentUser.user_id,
+        data.user.user_id
+      ]
+        .sort()
+        .join("_");
+
+      window.location.href =
+        `chat.html?id=${conversationId}`;
+    };
+
+    div.innerHTML = `
+      <div class="flex items-center justify-between">
+
+        <div class="flex items-center gap-4">
+
+          <div class="w-14 h-14 rounded-2xl bg-indigo-500/15 border border-indigo-500/20 flex items-center justify-center text-indigo-300 font-semibold text-lg">
+
+            ${data.user.user_id.charAt(0).toUpperCase()}
+
+          </div>
+
+          <div>
+
+            <h3 class="font-semibold text-lg text-white">
+              ${data.user.user_id}
+            </h3>
+
+            <p class="text-sm text-slate-400 mt-1">
+
+              ${
+                data.user.phone
+                  ? `📱 ${data.user.phone}`
+                  : "Tap to start chatting"
+              }
+
+            </p>
+
+          </div>
+
+        </div>
+
+        <div class="text-indigo-400">
+          <i class="fa-solid fa-chevron-right"></i>
+        </div>
+
+      </div>
+    `;
+
+    result.appendChild(div);
+
+  } catch (err) {
+
+    console.log(err);
+
+    result.innerHTML = `
+      <div class="glass border border-rose-500/20 bg-rose-500/10 text-rose-300 rounded-2xl px-5 py-4">
+        Server error
+      </div>
+    `;
+  }
+}
 
     // -------------------
     // LOGOUT
