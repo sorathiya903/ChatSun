@@ -102,6 +102,7 @@
     transform: translateY(0);
   }
 }
+    .zMax{z-index:99999999999999}
   </style>
 </head>
 
@@ -131,7 +132,7 @@
       <!-- MENU DROPDOWN -->
       <div
         id="menuDropdown"
-        class="absolute left-0 mt-3 w-56 bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl overflow-hidden opacity-0 scale-95 pointer-events-none transition-all duration-200 origin-top-left z-50"
+        class="zMax absolute left-0 mt-3 w-56 bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl overflow-hidden opacity-0 scale-95 pointer-events-none transition-all duration-200 origin-top-left z-50"
       >
 
         <button
@@ -177,7 +178,7 @@
       <!-- PROFILE DROPDOWN -->
       <div
         id="profileDropdown"
-        class="absolute right-0 mt-3 w-60 bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl overflow-hidden opacity-0 scale-95 pointer-events-none transition-all duration-200 origin-top-right z-50"
+        class="zMax absolute right-0 mt-3 w-60 bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl overflow-hidden opacity-0 scale-95 pointer-events-none transition-all duration-200 origin-top-right z-50"
       >
 
         <button
