@@ -499,7 +499,7 @@ async def search_user(query: str):
                     ""
                 ),
 
-            "phone_number":
+            "phone":
                 user.get(
                     "phone_number",
                     ""
