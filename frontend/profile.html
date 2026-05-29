@@ -1033,8 +1033,6 @@ let currentUser = null;
 
 let uploadedImageUrl = "";
 
-const IMGUR_CLIENT_ID =
-  "YOUR_IMGUR_CLIENT_ID";
 
 /* -------------------------- */
 /* TOGGLE EDIT */
@@ -1060,6 +1058,8 @@ function toggleEdit(){
 /* IMAGE UPLOAD */
 /* -------------------------- */
 
+let isUploadingImage = false;
+
 document
   .getElementById("imageInput")
   .addEventListener(
@@ -1077,6 +1077,18 @@ document
       avatar.src =
         URL.createObjectURL(file);
 
+      isUploadingImage = true;
+
+      const saveBtn =
+        document.querySelector(
+          ".save-btn"
+        );
+
+      saveBtn.disabled = true;
+
+      saveBtn.innerText =
+        "Uploading Image...";
+
       const formData =
         new FormData();
 
@@ -1087,14 +1099,14 @@ document
 
       formData.append(
         "upload_preset",
-        "Chatsun"
+        "YOUR_UPLOAD_PRESET"
       );
 
       try{
 
         const res =
           await fetch(
-            "https://api.cloudinary.com/v1_1/dymqpeoq1/image/upload",
+            "https://api.cloudinary.com/v1_1/YOUR_CLOUD_NAME/image/upload",
             {
               method:"POST",
               body:formData
@@ -1107,19 +1119,31 @@ document
         uploadedImageUrl =
           data.secure_url;
 
+        isUploadingImage = false;
+
+        saveBtn.disabled = false;
+
+        saveBtn.innerText =
+          "Save Changes";
       }
 
       catch(err){
 
         console.log(err);
 
+        isUploadingImage = false;
+
+        saveBtn.disabled = false;
+
+        saveBtn.innerText =
+          "Save Changes";
+
         alert(
-          "Upload failed"
+          "Image upload failed"
         );
       }
     }
   );
-
 /* -------------------------- */
 /* LOAD PROFILE */
 /* -------------------------- */
@@ -1230,7 +1254,14 @@ async function loadProfile(){
 /* -------------------------- */
 
 async function saveProfile(){
+if(isUploadingImage){
 
+  alert(
+    "Please wait for image upload to finish"
+  );
+
+  return;
+}
   const btn =
     document.querySelector(
       ".save-btn"
