@@ -272,58 +272,44 @@ body{
 
 /* TYPING */
 
-.typing-wrap{
-    position:fixed;
-    bottom:85px;
-    left:12px;
-    z-index:50;
 
-    display:none;
-    align-items:center;
 
-    animation:fadeIn .2s ease;
+
+    .typing-msg .msg{
+    padding:12px 16px;
 }
 
 .typing-bubble{
     display:flex;
     gap:5px;
-
-    padding:10px 14px;
-
-    border-radius:18px;
-
-    background:#1e293b;
-
-    box-shadow:
-    0 4px 12px rgba(0,0,0,.25);
+    align-items:center;
 }
 
 .typing-bubble span{
-    width:7px;
-    height:7px;
-
+    width:8px;
+    height:8px;
     border-radius:50%;
-    background:white;
-
-    animation:typingBounce 1s infinite;
+    background:#94a3b8;
+    animation:typing 1s infinite;
 }
 
 .typing-bubble span:nth-child(2){
-    animation-delay:.15s;
+    animation-delay:.2s;
 }
 
 .typing-bubble span:nth-child(3){
-    animation-delay:.3s;
+    animation-delay:.4s;
 }
 
-@keyframes typingBounce{
+@keyframes typing{
+
     0%,80%,100%{
-        transform:translateY(0);
-        opacity:.4;
+        transform:scale(.7);
+        opacity:.5;
     }
 
     40%{
-        transform:translateY(-4px);
+        transform:scale(1);
         opacity:1;
     }
 }
@@ -1895,7 +1881,7 @@ max-width:360px;
     method: "POST"
 });
 
-
+let typingEl = null;
 const searchBar =
     document.getElementById("searchBar");
 
@@ -3228,38 +3214,46 @@ ws.onmessage = (event)=>{
 
     const data =
         JSON.parse(event.data);
+if(data.type === "typing"){
 
-    if(data.type === "typing"){
+    if(data.sender !== currentUser.user_id){
 
-        if(
-            data.sender !==
-            currentUser.user_id
-        ){
+        // already visible
+        if(typingEl) return;
 
-            const typing =
-                document.getElementById(
-                    "typingIndicator"
-                );
-console.log("other typed")
-            typing.style.display =
-                "block";
-            
+        typingEl = document.createElement("div");
 
-            clearTimeout(
-                window.typingTimeout
-            );
+        typingEl.className =
+            "msg-wrap other typing-msg";
 
-            window.typingTimeout =
-                setTimeout(()=>{
+        typingEl.innerHTML = `
+            <div class="msg">
+                <div class="typing-bubble">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        `;
 
-                    typing.style.display =
-                        "none";
+        chatBox.appendChild(typingEl);
 
-                },1500);
-        }
+        chatBox.scrollTop =
+            chatBox.scrollHeight;
 
-        return;
+        clearTimeout(window.typingTimeout);
+
+        window.typingTimeout =
+            setTimeout(()=>{
+
+                typingEl?.remove();
+                typingEl = null;
+
+            },1500);
     }
+
+    return;
+}
 
 if(data.type === "seen_update"){
 
@@ -3382,7 +3376,11 @@ if(
     );
     return;
     }
+if(typingEl){
 
+    typingEl.remove();
+    typingEl = null;
+    }
     addMessage(data);
 };
 
