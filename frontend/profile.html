@@ -1063,23 +1063,22 @@ document
         new FormData();
 
       formData.append(
-        "image",
+        "file",
         file
+      );
+
+      formData.append(
+        "upload_preset",
+        "YOUR_UPLOAD_PRESET"
       );
 
       try{
 
         const res =
           await fetch(
-            "https://api.imgur.com/3/image",
+            "https://api.cloudinary.com/v1_1/YOUR_CLOUD_NAME/image/upload",
             {
               method:"POST",
-
-              headers:{
-                Authorization:
-                  `Client-ID ${IMGUR_CLIENT_ID}`
-              },
-
               body:formData
             }
           );
@@ -1087,18 +1086,9 @@ document
         const data =
           await res.json();
 
-        if(data.success){
+        uploadedImageUrl =
+          data.secure_url;
 
-          uploadedImageUrl =
-            data.data.link;
-        }
-
-        else{
-
-          alert(
-            "Image upload failed"
-          );
-        }
       }
 
       catch(err){
@@ -1106,7 +1096,7 @@ document
         console.log(err);
 
         alert(
-          "Upload error"
+          "Upload failed"
         );
       }
     }
