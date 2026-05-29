@@ -694,6 +694,56 @@ body{
   }
 }
 
+  .upload-inline{
+
+    width:100%;
+
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.upload-percent{
+
+    min-width:42px;
+
+    text-align:right;
+
+    font-size:13px;
+}
+
+.upload-line{
+
+    flex:1;
+
+    height:6px;
+
+    border-radius:999px;
+
+    background:
+        rgba(255,255,255,.12);
+
+    overflow:hidden;
+}
+
+.upload-line-fill{
+
+    width:0%;
+
+    height:100%;
+
+    border-radius:999px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #3b82f6,
+            #8b5cf6
+        );
+
+    transition:width .12s linear;
+}
+
 </style>
 </head>
 <body>
@@ -1086,9 +1136,31 @@ document
 
       saveBtn.disabled = true;
 
-      saveBtn.innerText =
-        "Uploading Image...";
+saveBtn.innerHTML = `
+  <span class="upload-inline">
 
+    <span>
+      Uploading...
+    </span>
+
+    <span
+      id="savePercent"
+      class="upload-percent"
+    >
+      0%
+    </span>
+
+    <span class="upload-line">
+
+      <span
+        id="saveProgressBar"
+        class="upload-line-fill"
+      ></span>
+
+    </span>
+
+  </span>
+`;
       const formData =
         new FormData();
 
@@ -1112,7 +1184,26 @@ document
               body:formData
             }
           );
+xhr.upload.onprogress = (e)=>{
 
+    if(!e.lengthComputable)
+        return;
+
+    const percent =
+        Math.round(
+            (e.loaded / e.total) * 100
+        );
+
+    document.getElementById(
+        "saveProgressBar"
+    ).style.width =
+        percent + "%";
+
+    document.getElementById(
+        "savePercent"
+    ).innerText =
+        percent + "%";
+};
         const data =
           await res.json();
 
