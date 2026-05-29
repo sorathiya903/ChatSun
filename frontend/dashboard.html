@@ -102,19 +102,19 @@
     transform: translateY(0);
   }
 }
-    .zMax{z-index:99999999999999}
 
-    #profileDropdown{
+#profileDropdown{
 
   position:absolute;
   top:0;
   right:0;
 
   width:56px;
+  max-height:56px;
 
-  border-radius:24px;
+  border-radius:999px;
 
-  background:rgba(15,23,42,.95);
+  background:rgba(15,23,42,.96);
 
   backdrop-filter:blur(18px);
 
@@ -123,17 +123,11 @@
   overflow:hidden;
 
   opacity:0;
-
   pointer-events:none;
 
-  transform-origin:top right;
-
-  transform:
-    scaleX(.22)
-    scaleY(.22);
-
   transition:
-    transform .32s cubic-bezier(.2,.8,.2,1),
+    max-height .28s ease,
+    width .28s ease .22s,
     border-radius .25s ease,
     opacity .15s ease;
 
@@ -143,16 +137,13 @@
 #profileDropdown.open{
 
   opacity:1;
-
   pointer-events:auto;
 
   width:260px;
 
-  border-radius:28px;
+  max-height:400px;
 
-  transform:
-    scaleX(1)
-    scaleY(1);
+  border-radius:28px;
 }
 
 #profileMenuContent{
@@ -162,12 +153,13 @@
   padding-top:70px;
 
   transition:
-    opacity .2s ease .18s;
+    opacity .18s ease .30s;
 }
 
 #profileDropdown.open #profileMenuContent{
   opacity:1;
 }
+    
 .menu-item{
 
   width:100%;
