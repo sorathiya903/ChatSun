@@ -1,516 +1,1011 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Profile</title>
+<meta charset="UTF-8" />
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+/>
+
+<title>ChatSun Profile</title>
 
 <script src="config.js"></script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
 
 :root{
 
-    --bg:#020617;
-    --card:#0f172a;
+  --bg:#050816;
 
-    --border:rgba(255,255,255,.07);
+  --card:#0f172a;
 
-    --text:#ffffff;
-    --muted:#94a3b8;
+  --card2:#111c34;
 
-    --blue:#3b82f6;
-    --purple:#8b5cf6;
+  --border:rgba(255,255,255,.06);
 
-    --gradient:
-        linear-gradient(
-            135deg,
-            #3b82f6,
-            #8b5cf6
-        );
+  --text:#f8fafc;
+
+  --muted:#94a3b8;
+
+  --primary:#6366f1;
+
+  --primary-soft:rgba(99,102,241,.12);
+
+  --danger:#fb7185;
+
+  --shadow:
+    0 10px 40px rgba(0,0,0,.35);
+
 }
 
 *{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
 }
 
 body{
 
-    font-family:'Inter',sans-serif;
+  font-family:'Outfit',sans-serif;
 
-    background:
-        radial-gradient(circle at top left,#172554 0%,transparent 30%),
-        radial-gradient(circle at bottom right,#4c1d95 0%,transparent 30%),
-        var(--bg);
+  background:
+    radial-gradient(circle at top left,
+      rgba(99,102,241,.14),
+      transparent 30%
+    ),
+    radial-gradient(circle at bottom right,
+      rgba(139,92,246,.12),
+      transparent 30%
+    ),
+    var(--bg);
 
-    color:var(--text);
+  min-height:100vh;
 
-    min-height:100vh;
+  color:var(--text);
 
-    padding:24px;
+  overflow-x:hidden;
 
-    overflow-x:hidden;
+  padding:22px;
 }
 
-/* smooth background glow */
+.bg-glow{
 
-.bg{
-    position:fixed;
+  position:fixed;
 
-    width:300px;
-    height:300px;
+  width:320px;
+  height:320px;
 
-    border-radius:50%;
+  border-radius:50%;
 
-    background:rgba(59,130,246,.12);
+  filter:blur(120px);
 
-    filter:blur(120px);
+  opacity:.8;
 
-    z-index:-1;
-
-    top:-120px;
-    left:-120px;
+  z-index:-1;
 }
 
-.bg.two{
+.glow1{
 
-    background:rgba(139,92,246,.12);
+  top:-100px;
+  left:-120px;
 
-    top:auto;
-    left:auto;
+  background:#4f46e5;
+}
 
-    right:-120px;
-    bottom:-120px;
+.glow2{
+
+  right:-100px;
+  bottom:-120px;
+
+  background:#7c3aed;
 }
 
 .container{
-    max-width:650px;
-    margin:auto;
-}
 
-/* loading */
+  width:100%;
+  max-width:620px;
+
+  margin:auto;
+}
 
 .loading{
 
-    min-height:100vh;
+  min-height:100vh;
 
-    display:flex;
+  display:flex;
+  align-items:center;
+  justify-content:center;
 
-    align-items:center;
-    justify-content:center;
+  flex-direction:column;
 
-    flex-direction:column;
-
-    gap:22px;
+  gap:24px;
 }
 
 .loader{
 
-    width:58px;
-    height:58px;
+  width:60px;
+  height:60px;
 
-    border-radius:50%;
+  border-radius:50%;
 
-    border:4px solid rgba(255,255,255,.08);
+  border:4px solid rgba(255,255,255,.08);
 
-    border-top-color:#3b82f6;
+  border-top-color:#6366f1;
 
-    animation:spin 1s linear infinite;
+  animation:spin 1s linear infinite;
 }
 
 @keyframes spin{
-    to{
-        transform:rotate(360deg);
-    }
+  to{
+    transform:rotate(360deg);
+  }
 }
 
 .loading-text{
 
-    font-size:15px;
+  color:var(--muted);
 
-    color:var(--muted);
-
-    font-weight:500;
+  font-size:15px;
 }
 
-/* card */
+.profile-card{
 
-.card{
+  position:relative;
 
-    background:
-        linear-gradient(
-            180deg,
-            rgba(255,255,255,.03),
-            rgba(255,255,255,.015)
-        );
+  overflow:hidden;
 
-    border:1px solid var(--border);
+  border-radius:38px;
 
-    border-radius:32px;
+  border:1px solid var(--border);
 
-    padding:32px;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255,255,255,.03),
+      rgba(255,255,255,.015)
+    );
 
-    backdrop-filter:blur(24px);
+  backdrop-filter:blur(30px);
 
-    box-shadow:
-        0 20px 60px rgba(0,0,0,.4);
+  box-shadow:var(--shadow);
 }
 
-/* top */
+.cover{
 
-.profile-top{
+  position:relative;
 
-    display:flex;
+  height:180px;
 
-    align-items:center;
-
-    justify-content:space-between;
-
-    gap:20px;
-
-    flex-wrap:wrap;
+  background:
+    linear-gradient(
+      135deg,
+      #4338ca,
+      #6366f1 45%,
+      #7c3aed
+    );
 }
 
-.profile-left{
+.cover::after{
 
-    display:flex;
+  content:"";
 
-    align-items:center;
+  position:absolute;
 
-    gap:20px;
+  inset:0;
+
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(255,255,255,.18),
+      transparent 35%
+    );
+}
+
+.topbar{
+
+  position:absolute;
+
+  top:20px;
+  left:20px;
+  right:20px;
+
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+
+  z-index:3;
+}
+
+.back-btn{
+
+  width:46px;
+  height:46px;
+
+  border:none;
+
+  border-radius:18px;
+
+  cursor:pointer;
+
+  background:rgba(255,255,255,.14);
+
+  backdrop-filter:blur(10px);
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  transition:.2s ease;
+}
+
+.back-btn:hover{
+  transform:translateY(-2px);
+}
+
+.back-btn svg{
+  width:22px;
+  height:22px;
+  stroke:white;
+}
+
+.edit-toggle{
+
+  border:none;
+
+  padding:13px 18px;
+
+  border-radius:18px;
+
+  font-size:14px;
+
+  font-weight:600;
+
+  cursor:pointer;
+
+  background:white;
+
+  color:#111827;
+
+  transition:.2s ease;
+}
+
+.edit-toggle:hover{
+  transform:translateY(-2px);
+}
+
+.avatar-wrap{
+
+  position:relative;
+
+  width:128px;
+  height:128px;
+
+  margin:auto;
+
+  margin-top:-70px;
+
+  z-index:5;
+}
+
+.avatar-ring{
+
+  position:absolute;
+
+  inset:-6px;
+
+  border-radius:50%;
+
+  background:
+    linear-gradient(
+      135deg,
+      #818cf8,
+      #c084fc
+    );
+
+  animation:ringRotate 6s linear infinite;
+}
+
+@keyframes ringRotate{
+
+  from{
+    transform:rotate(0deg);
+  }
+
+  to{
+    transform:rotate(360deg);
+  }
 }
 
 .avatar{
 
-    width:110px;
-    height:110px;
+  position:relative;
 
-    border-radius:28px;
+  width:100%;
+  height:100%;
 
-    object-fit:cover;
+  border-radius:50%;
 
-    border:2px solid rgba(255,255,255,.08);
+  object-fit:cover;
+
+  border:6px solid #0f172a;
+
+  background:#0f172a;
+}
+
+.upload-btn{
+
+  position:absolute;
+
+  right:4px;
+  bottom:4px;
+
+  width:38px;
+  height:38px;
+
+  border:none;
+
+  border-radius:50%;
+
+  background:#6366f1;
+
+  cursor:pointer;
+
+  display:none;
+  align-items:center;
+  justify-content:center;
+
+  box-shadow:
+    0 10px 25px rgba(99,102,241,.4);
+}
+
+.upload-btn svg{
+
+  width:18px;
+  height:18px;
+
+  stroke:white;
+}
+
+.profile-body{
+
+  padding:20px 24px 28px;
 }
 
 .name{
 
-    font-size:34px;
+  font-family:'Manrope',sans-serif;
 
-    font-weight:800;
+  text-align:center;
 
-    letter-spacing:-1px;
+  font-size:34px;
+
+  font-weight:800;
+
+  letter-spacing:-1.5px;
+
+  margin-top:18px;
 }
 
 .userid{
 
-    margin-top:8px;
+  text-align:center;
 
-    color:var(--muted);
+  color:var(--muted);
 
-    font-size:15px;
+  margin-top:6px;
 
-    font-weight:500;
+  font-size:15px;
 }
 
-/* button */
+.stats{
 
-.edit-btn{
+  margin-top:28px;
 
-    border:none;
+  display:grid;
 
-    background:var(--gradient);
+  grid-template-columns:1fr 1fr;
 
-    color:white;
-
-    padding:14px 20px;
-
-    border-radius:18px;
-
-    cursor:pointer;
-
-    font-size:14px;
-
-    font-weight:700;
-
-    transition:.2s ease;
+  gap:14px;
 }
 
-.edit-btn:hover{
-    transform:translateY(-2px);
+.stat{
+
+  background:
+    rgba(255,255,255,.03);
+
+  border:1px solid var(--border);
+
+  border-radius:24px;
+
+  padding:18px;
 }
 
-/* form */
+.stat-label{
+
+  color:var(--muted);
+
+  font-size:13px;
+
+  margin-bottom:10px;
+}
+
+.stat-value{
+
+  font-size:16px;
+
+  font-weight:600;
+}
 
 .section{
-    margin-top:34px;
+
+  margin-top:28px;
 }
 
-.form-group{
-    margin-bottom:18px;
+.section-title{
+
+  font-size:13px;
+
+  font-weight:600;
+
+  letter-spacing:.8px;
+
+  color:#cbd5e1;
+
+  margin-bottom:16px;
+
+  text-transform:uppercase;
+}
+
+.form{
+
+  display:grid;
+
+  gap:16px;
+}
+
+.field{
+
+  background:
+    rgba(255,255,255,.025);
+
+  border:1px solid rgba(255,255,255,.06);
+
+  border-radius:24px;
+
+  padding:16px 18px;
 }
 
 .label{
 
-    margin-bottom:10px;
+  font-size:13px;
 
-    font-size:14px;
+  color:var(--muted);
 
-    color:#cbd5e1;
-
-    font-weight:600;
+  margin-bottom:10px;
 }
 
 .input{
 
-    width:100%;
+  width:100%;
 
-    background:
-        rgba(255,255,255,.03);
+  background:none;
 
-    border:1px solid rgba(255,255,255,.06);
+  border:none;
 
-    border-radius:18px;
+  outline:none;
 
-    padding:16px;
+  color:white;
 
-    color:white;
+  font-size:15px;
 
-    outline:none;
-
-    font-size:15px;
-
-    transition:.2s ease;
-}
-
-.input:focus{
-
-    border-color:rgba(59,130,246,.7);
-
-    box-shadow:
-        0 0 0 4px rgba(59,130,246,.12);
+  font-family:'Outfit',sans-serif;
 }
 
 .input::placeholder{
-    color:#64748b;
+  color:#64748b;
+}
+
+.readonly{
+
+  opacity:.55;
+
+  cursor:not-allowed;
+}
+
+.actions{
+
+  margin-top:22px;
+
+  display:flex;
+
+  gap:14px;
 }
 
 .save-btn{
 
-    width:100%;
+  flex:1;
 
-    margin-top:8px;
+  border:none;
 
-    border:none;
+  background:#6366f1;
 
-    background:var(--gradient);
+  color:white;
 
-    color:white;
+  height:56px;
 
-    padding:16px;
+  border-radius:22px;
 
-    border-radius:18px;
+  font-size:15px;
 
-    cursor:pointer;
+  font-weight:700;
 
-    font-size:15px;
+  cursor:pointer;
 
-    font-weight:700;
-
-    transition:.2s ease;
+  transition:.2s ease;
 }
 
 .save-btn:hover{
-    transform:translateY(-2px);
+  transform:translateY(-2px);
 }
 
-/* hidden */
+.cancel-btn{
+
+  width:56px;
+  height:56px;
+
+  border:none;
+
+  border-radius:22px;
+
+  cursor:pointer;
+
+  background:
+    rgba(255,255,255,.04);
+
+  border:1px solid rgba(255,255,255,.06);
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.cancel-btn svg{
+
+  width:22px;
+  height:22px;
+
+  stroke:#cbd5e1;
+}
 
 .hidden{
-    display:none;
+  display:none !important;
 }
 
-/* mobile */
+.info-grid{
+
+  display:grid;
+
+  gap:14px;
+}
+
+.info-card{
+
+  display:flex;
+  align-items:center;
+  gap:16px;
+
+  padding:18px;
+
+  border-radius:24px;
+
+  background:
+    rgba(255,255,255,.025);
+
+  border:1px solid rgba(255,255,255,.05);
+}
+
+.info-icon{
+
+  width:48px;
+  height:48px;
+
+  border-radius:18px;
+
+  background:
+    rgba(99,102,241,.12);
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  flex-shrink:0;
+}
+
+.info-icon svg{
+
+  width:22px;
+  height:22px;
+
+  stroke:#818cf8;
+}
+
+.info-label{
+
+  color:var(--muted);
+
+  font-size:13px;
+
+  margin-bottom:4px;
+}
+
+.info-value{
+
+  font-size:15px;
+
+  font-weight:500;
+
+  word-break:break-word;
+}
 
 @media(max-width:640px){
 
-    body{
-        padding:18px;
-    }
+  body{
+    padding:14px;
+  }
 
-    .card{
-        padding:24px;
-    }
+  .cover{
+    height:160px;
+  }
 
-    .profile-top{
-        flex-direction:column;
-        align-items:flex-start;
-    }
+  .name{
+    font-size:28px;
+  }
 
-    .profile-left{
-        flex-direction:column;
-        align-items:flex-start;
-    }
+  .stats{
+    grid-template-columns:1fr;
+  }
 
-    .avatar{
-        width:95px;
-        height:95px;
-    }
-
-    .name{
-        font-size:28px;
-    }
+  .profile-body{
+    padding:18px;
+  }
 }
 
 </style>
 </head>
 <body>
 
-<div class="bg"></div>
-<div class="bg two"></div>
+<div class="bg-glow glow1"></div>
+<div class="bg-glow glow2"></div>
 
 <div class="container">
 
-    <!-- Loading -->
+  <!-- LOADING -->
 
-    <div
-        id="loading"
-        class="loading"
-    >
+  <div
+    id="loading"
+    class="loading"
+  >
 
-        <div class="loader"></div>
+    <div class="loader"></div>
 
-        <div class="loading-text">
-            Loading your profile...
-        </div>
-
+    <div class="loading-text">
+      Loading your profile...
     </div>
 
-    <!-- Profile -->
+  </div>
 
-    <div
-        id="profileCard"
-        class="card hidden"
-    >
+  <!-- PROFILE -->
 
-        <div class="profile-top">
+  <div
+    id="profileCard"
+    class="profile-card hidden"
+  >
 
-            <div class="profile-left">
+    <div class="cover">
 
-                <img
-                    id="avatar"
-                    class="avatar"
-                >
+      <div class="topbar">
 
-                <div>
-
-                    <div
-                        id="name"
-                        class="name"
-                    >
-                        Loading...
-                    </div>
-
-                    <div
-                        id="userid"
-                        class="userid"
-                    ></div>
-
-                </div>
-
-            </div>
-
-            <button
-                class="edit-btn"
-                onclick="toggleEdit()"
-            >
-                Edit Profile
-            </button>
-
-        </div>
-
-        <!-- Edit Section -->
-
-        <div
-            id="editSection"
-            class="section hidden"
+        <button
+          class="back-btn"
+          onclick="history.back()"
         >
 
-            <div class="form-group">
+          <svg
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M15 19l-7-7 7-7"
+            />
+          </svg>
 
-                <div class="label">
-                    Full Name
-                </div>
+        </button>
 
-                <input
-                    id="fullName"
-                    class="input"
-                    placeholder="Enter full name"
-                >
+        <button
+          class="edit-toggle"
+          onclick="toggleEdit()"
+        >
+          Edit Profile
+        </button>
+
+      </div>
+
+    </div>
+
+    <!-- AVATAR -->
+
+    <div class="avatar-wrap">
+
+      <div class="avatar-ring"></div>
+
+      <img
+        id="avatar"
+        class="avatar"
+      >
+
+      <button
+        id="uploadBtn"
+        class="upload-btn"
+        onclick="document.getElementById('imageInput').click()"
+      >
+
+        <svg
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="2"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M12 16V4m0 0l-4 4m4-4l4 4M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1"
+          />
+        </svg>
+
+      </button>
+
+      <input
+        id="imageInput"
+        type="file"
+        accept="image/*"
+        class="hidden"
+      >
+
+    </div>
+
+    <!-- BODY -->
+
+    <div class="profile-body">
+
+      <div
+        id="name"
+        class="name"
+      >
+        Loading...
+      </div>
+
+      <div
+        id="userid"
+        class="userid"
+      >
+        @user
+      </div>
+
+      <!-- INFO -->
+
+      <div class="section">
+
+        <div class="info-grid">
+
+          <div class="info-card">
+
+            <div class="info-icon">
+
+              <svg
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="2"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+              </svg>
 
             </div>
 
-            <div class="form-group">
+            <div>
 
-                <div class="label">
-                    Profile Picture URL
-                </div>
+              <div class="info-label">
+                Full Name
+              </div>
 
-                <input
-                    id="profilePicture"
-                    class="input"
-                    placeholder="https://..."
-                >
-
-            </div>
-
-            <div class="form-group">
-
-                <div class="label">
-                    User ID
-                </div>
-
-                <input
-                    id="userId"
-                    class="input"
-                    readonly
-                    oninput="this.value=this.value.toLowerCase()"
-                >
+              <div
+                id="displayName"
+                class="info-value"
+              >
+                -
+              </div>
 
             </div>
 
-            <div class="form-group">
+          </div>
 
-                <div class="label">
-                    Phone Number
-                </div>
+          <div class="info-card">
 
-                <input
-                    type="tel"
-                    id="phoneNumber"
-                    class="input"
-                    placeholder="+91..."
-                >
+            <div class="info-icon">
+
+              <svg
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="2"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M3 5h18M9 3v2m6-2v2m-9 4h12M5 8h14v11H5z"
+                />
+              </svg>
 
             </div>
 
-            <button
-                class="save-btn"
-                onclick="saveProfile()"
-            >
-                Save Changes
-            </button>
+            <div>
+
+              <div class="info-label">
+                Phone Number
+              </div>
+
+              <div
+                id="displayPhone"
+                class="info-value"
+              >
+                Not added
+              </div>
+
+            </div>
+
+          </div>
+
+          <div
+            id="passwordCard"
+            class="info-card hidden"
+          >
+
+            <div class="info-icon">
+
+              <svg
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="2"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M12 15v2m6-6V9a6 6 0 10-12 0v2m-1 0h14v8H5v-8z"
+                />
+              </svg>
+
+            </div>
+
+            <div>
+
+              <div class="info-label">
+                Password
+              </div>
+
+              <div class="info-value">
+                Protected
+              </div>
+
+            </div>
+
+          </div>
 
         </div>
 
+      </div>
+
+      <!-- EDIT -->
+
+      <div
+        id="editSection"
+        class="section hidden"
+      >
+
+        <div class="section-title">
+          Edit Details
+        </div>
+
+        <div class="form">
+
+          <div class="field">
+
+            <div class="label">
+              Full Name
+            </div>
+
+            <input
+              id="fullName"
+              class="input"
+              placeholder="Your name"
+            >
+
+          </div>
+
+          <div class="field">
+
+            <div class="label">
+              User ID
+            </div>
+
+            <input
+              id="userId"
+              class="input readonly"
+              readonly
+            >
+
+          </div>
+
+          <div class="field">
+
+            <div class="label">
+              Phone Number
+            </div>
+
+            <input
+              id="phoneNumber"
+              class="input"
+              placeholder="+91..."
+            >
+
+          </div>
+
+          <div class="actions">
+
+            <button
+              class="save-btn"
+              onclick="saveProfile()"
+            >
+              Save Changes
+            </button>
+
+            <button
+              class="cancel-btn"
+              onclick="toggleEdit()"
+            >
+
+              <svg
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="2"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+
     </div>
+
+  </div>
 
 </div>
 
@@ -518,154 +1013,317 @@ body{
 
 let currentUser = null;
 
-async function loadProfile(){
+let uploadedImageUrl = "";
 
-    try{
+const IMGUR_CLIENT_ID =
+  "YOUR_IMGUR_CLIENT_ID";
 
-        const res = await fetch(
-            `${API_URL}/me`,
-            {
-                credentials:"include"
-            }
-        );
-
-        const data = await res.json();
-
-        if(!data.success){
-
-            location.href="/";
-            return;
-        }
-
-        currentUser = data.user;
-
-        document.getElementById(
-            "avatar"
-        ).src =
-            currentUser.profile_picture ||
-            `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.full_name)}&background=3b82f6&color=fff`;
-
-        document.getElementById(
-            "name"
-        ).innerText =
-            currentUser.full_name;
-
-        document.getElementById(
-            "userid"
-        ).innerText =
-            "@" + currentUser.user_id;
-
-        document.getElementById(
-            "fullName"
-        ).value =
-            currentUser.full_name;
-
-        document.getElementById(
-            "profilePicture"
-        ).value =
-            currentUser.profile_picture || "";
-
-        document.getElementById(
-            "userId"
-        ).value =
-            currentUser.user_id;
-
-        document.getElementById(
-            "phoneNumber"
-        ).value =
-            currentUser.phone_number || "";
-
-        document.getElementById(
-            "loading"
-        ).classList.add("hidden");
-
-        document.getElementById(
-            "profileCard"
-        ).classList.remove("hidden");
-    }
-
-    catch(err){
-
-        alert("Failed to load profile");
-    }
-}
+/* -------------------------- */
+/* TOGGLE EDIT */
+/* -------------------------- */
 
 function toggleEdit(){
 
-    document.getElementById(
-        "editSection"
-    ).classList.toggle("hidden");
+  document
+    .getElementById("editSection")
+    .classList.toggle("hidden");
+
+  document
+    .getElementById("uploadBtn")
+    .style.display =
+      document
+        .getElementById("editSection")
+        .classList.contains("hidden")
+      ? "none"
+      : "flex";
 }
+
+/* -------------------------- */
+/* IMAGE UPLOAD */
+/* -------------------------- */
+
+document
+  .getElementById("imageInput")
+  .addEventListener(
+    "change",
+    async (e)=>{
+
+      const file =
+        e.target.files[0];
+
+      if(!file) return;
+
+      const avatar =
+        document.getElementById("avatar");
+
+      avatar.src =
+        URL.createObjectURL(file);
+
+      const formData =
+        new FormData();
+
+      formData.append(
+        "image",
+        file
+      );
+
+      try{
+
+        const res =
+          await fetch(
+            "https://api.imgur.com/3/image",
+            {
+              method:"POST",
+
+              headers:{
+                Authorization:
+                  `Client-ID ${IMGUR_CLIENT_ID}`
+              },
+
+              body:formData
+            }
+          );
+
+        const data =
+          await res.json();
+
+        if(data.success){
+
+          uploadedImageUrl =
+            data.data.link;
+        }
+
+        else{
+
+          alert(
+            "Image upload failed"
+          );
+        }
+      }
+
+      catch(err){
+
+        console.log(err);
+
+        alert(
+          "Upload error"
+        );
+      }
+    }
+  );
+
+/* -------------------------- */
+/* LOAD PROFILE */
+/* -------------------------- */
+
+async function loadProfile(){
+
+  try{
+
+    const res =
+      await fetch(
+        `${API_URL}/me`,
+        {
+          credentials:"include"
+        }
+      );
+
+    const data =
+      await res.json();
+
+    if(!data.success){
+
+      location.href =
+        "index.html";
+
+      return;
+    }
+
+    currentUser =
+      data.user;
+
+    const avatarUrl =
+      currentUser.profile_picture ||
+      `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.full_name)}&background=6366f1&color=fff`;
+
+    document
+      .getElementById("avatar")
+      .src =
+        avatarUrl;
+
+    document
+      .getElementById("name")
+      .innerText =
+        currentUser.full_name;
+
+    document
+      .getElementById("userid")
+      .innerText =
+        "@" +
+        currentUser.user_id;
+
+    document
+      .getElementById("displayName")
+      .innerText =
+        currentUser.full_name;
+
+    document
+      .getElementById("displayPhone")
+      .innerText =
+        currentUser.phone_number ||
+        "Not added";
+
+    document
+      .getElementById("fullName")
+      .value =
+        currentUser.full_name;
+
+    document
+      .getElementById("userId")
+      .value =
+        currentUser.user_id;
+
+    document
+      .getElementById("phoneNumber")
+      .value =
+        currentUser.phone_number ||
+        "";
+
+    /* show password only if exists */
+
+    if(currentUser.password){
+
+      document
+        .getElementById("passwordCard")
+        .classList.remove("hidden");
+    }
+
+    document
+      .getElementById("loading")
+      .classList.add("hidden");
+
+    document
+      .getElementById("profileCard")
+      .classList.remove("hidden");
+  }
+
+  catch(err){
+
+    console.log(err);
+
+    alert(
+      "Failed to load profile"
+    );
+  }
+}
+
+/* -------------------------- */
+/* SAVE */
+/* -------------------------- */
 
 async function saveProfile(){
 
-    const button =
-        document.querySelector(
-            ".save-btn"
-        );
-
-    button.innerText = "Saving...";
-
-    const full_name =
-        document.getElementById(
-            "fullName"
-        ).value.trim();
-
-    const profile_picture =
-        document.getElementById(
-            "profilePicture"
-        ).value.trim();
-
-    
-
-    const phone_number =
-        document.getElementById(
-            "phoneNumber"
-        ).value.trim();
-
-    const res = await fetch(
-        `${API_URL}/edit-profile`,
-        {
-            method:"POST",
-
-            credentials:"include",
-
-            headers:{
-                "Content-Type":"application/json"
-            },
-
-            body:JSON.stringify({
-                full_name,
-                profile_picture,
-                
-                phone_number
-            })
-        }
+  const btn =
+    document.querySelector(
+      ".save-btn"
     );
 
-    const data = await res.json();
+  btn.innerText =
+    "Saving...";
+
+  btn.disabled = true;
+
+  try{
+
+    const full_name =
+      document
+        .getElementById("fullName")
+        .value
+        .trim();
+
+    const phone_number =
+      document
+        .getElementById("phoneNumber")
+        .value
+        .trim();
+
+    const profile_picture =
+      uploadedImageUrl ||
+      currentUser.profile_picture ||
+      "";
+
+    const res =
+      await fetch(
+        `${API_URL}/edit-profile`,
+        {
+          method:"POST",
+
+          credentials:"include",
+
+          headers:{
+            "Content-Type":"application/json"
+          },
+
+          body:JSON.stringify({
+
+            full_name,
+
+            phone_number,
+
+            profile_picture
+
+          })
+        }
+      );
+
+    const data =
+      await res.json();
 
     if(data.success){
 
-        button.innerText = "Saved ✓";
+      btn.innerText =
+        "Saved ✓";
 
-        loadProfile();
+      await loadProfile();
 
-        setTimeout(()=>{
+      setTimeout(()=>{
 
-            button.innerText =
-                "Save Changes";
+        btn.innerText =
+          "Save Changes";
 
-        },1500);
+        btn.disabled = false;
+
+      },1200);
+
+      toggleEdit();
     }
 
     else{
 
-        button.innerText =
-            "Save Changes";
+      btn.innerText =
+        "Save Changes";
 
-        alert("Update failed");
+      btn.disabled = false;
+
+      alert(
+        "Failed to update profile"
+      );
     }
+  }
+
+  catch(err){
+
+    console.log(err);
+
+    btn.innerText =
+      "Save Changes";
+
+    btn.disabled = false;
+
+    alert(
+      "Server error"
+    );
+  }
 }
 
 loadProfile();
