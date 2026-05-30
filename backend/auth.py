@@ -14,7 +14,7 @@ from datetime import datetime, timedelta, timezone
 import os
 import re
 import resend
-from random import randint
+import random
 
 
 resend.api_key = os.getenv("RESEND_API_KEY")
