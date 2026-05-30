@@ -662,11 +662,13 @@ async def delete_account(
     }
 
 
-@router.post("/verify-otp")
-async def verifyOtp(
-    request: Request,
+class OTPModel(BaseModel):
     otp: str
-):
+
+
+@router.post("/verify-otp")
+async def verifyOtp(request: Request, data: OTPModel):
+    otp = data.otp
 
     user = get_current_user(request)
 
