@@ -21,6 +21,8 @@ import re
 
 router = APIRouter()
 
+OTP_COOLDOWN = 60  # seconds
+OTP_EXPIRY_MINUTES = 10
 # =========================
 # DATABASE
 # =========================
@@ -637,19 +639,47 @@ async def delete_account(
     }
 
 
-@app.post("/verify-otp")
+@router.post("/verify-otp")
 async def verifyOtp(
     request: Request,
-    otp: str = Body(...)
+    otp: str
 ):
 
     user = get_current_user(request)
 
-    db_user = users.find_one(
-        {"_id": user["_id"]}
-    )
+    db_user = users.find_one({
+        "_id": user["_id"]
+    })
 
-    if db_user["otp_hash"] != ph.hash(otp):
+    if db_user.get("is_verified"):
+        return {
+            "success": True,
+            "message": "Already verified"
+        }
+
+    expiry = db_user.get("otp_expiry")
+
+    if not expiry:
+        return {
+            "success": False,
+            "message": "No OTP found"
+        }
+
+    if datetime.utcnow() > expiry:
+        return {
+            "success": False,
+            "message": "OTP expired"
+        }
+
+    try:
+
+        ph.verify(
+            db_user["otp_hash"],
+            otp
+        )
+
+    except Exception:
+
         return {
             "success": False,
             "message": "Invalid OTP"
@@ -662,36 +692,14 @@ async def verifyOtp(
                 "is_verified": True
             },
             "$unset": {
-                "otp": "",
-                "otp_expiry": ""
+                "otp_hash": "",
+                "otp_expiry": "",
+                "otp_sent_at": ""
             }
         }
     )
 
     return {
-        "success": True
-        }
-
-
-@app.post("/send-verification-otp")
-async def sendVerificationOtp(request: Request):
-
-    user = get_current_user(request)
-
-    otp = str(random.randint(100000, 999999))
-    otp_hash = ph.hash(otp)
-    users.update_one(
-        {"_id": user["_id"]},
-        {
-            "$set": {
-                "otp": otp_hash,
-                "otp_expiry": datetime.utcnow() + timedelta(minutes=10)
-            }
-        }
-    )
-
-    send_email(user["email"], otp)
-
-    return {
-        "success": True
+        "success": True,
+        "message": "Email verified"
     }
