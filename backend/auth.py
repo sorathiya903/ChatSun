@@ -251,10 +251,14 @@ async def register(
 
         "auth_type": "password",
 
-        "created_at":
-            datetime.now(timezone.utc),
-        "phone_number":data.phone_number,
+        "created_at": datetime.now(timezone.utc),
+        "phone_number": data.phone_number,
         
+        "is_verified":False,
+
+        "otp": None,
+        
+        "otp_expiry": None
     }
 
     users.insert_one(user_data)
@@ -645,7 +649,7 @@ async def verifyOtp(
         {"_id": user["_id"]}
     )
 
-    if db_user["otp"] != otp:
+    if db_user["otp_hash"] != ph.hash(otp):
         return {
             "success": False,
             "message": "Invalid OTP"
@@ -675,12 +679,12 @@ async def sendVerificationOtp(request: Request):
     user = get_current_user(request)
 
     otp = str(random.randint(100000, 999999))
-
+    otp_hash = ph.hash(otp)
     users.update_one(
         {"_id": user["_id"]},
         {
             "$set": {
-                "otp": otp,
+                "otp": otp_hash,
                 "otp_expiry": datetime.utcnow() + timedelta(minutes=10)
             }
         }
