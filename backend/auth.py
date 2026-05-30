@@ -14,7 +14,29 @@ from datetime import datetime, timedelta, timezone
 
 import os
 import re
+import resend
 
+resend.api_key = os.getenv("RESEND_API_KEY")
+
+
+def send_email(to_email: str, otp: str):
+
+    resend.Emails.send({
+        "from": "onboarding@resend.dev",
+        "to": [to_email],
+        "subject": "ChatSun Email Verification",
+        "html": f"""
+        <div style="font-family:sans-serif">
+            <h2>Verify your ChatSun account</h2>
+
+            <p>Your verification code is:</p>
+
+            <h1>{otp}</h1>
+
+            <p>This code expires in 10 minutes.</p>
+        </div>
+        """
+    })
 # =========================
 # ROUTER
 # =========================
@@ -702,4 +724,66 @@ async def verifyOtp(
     return {
         "success": True,
         "message": "Email verified"
+    }
+
+@router.post("/send-verification-otp")
+async def sendVerificationOtp(request: Request):
+
+    user = get_current_user(request)
+
+    db_user = users.find_one({
+        "_id": user["_id"]
+    })
+
+    if db_user.get("is_verified"):
+        return {
+            "success": False,
+            "message": "Email already verified"
+        }
+
+    now = datetime.utcnow()
+
+    last_sent = db_user.get("otp_sent_at")
+
+    if (
+        last_sent and
+        (now - last_sent).total_seconds() < OTP_COOLDOWN
+    ):
+        remaining = OTP_COOLDOWN - int(
+            (now - last_sent).total_seconds()
+        )
+
+        return {
+            "success": False,
+            "message": f"Wait {remaining}s before requesting another OTP"
+        }
+
+    otp = str(
+        random.randint(
+            100000,
+            999999
+        )
+    )
+
+    otp_hash = ph.hash(otp)
+
+    users.update_one(
+        {"_id": user["_id"]},
+        {
+            "$set": {
+                "otp_hash": otp_hash,
+                "otp_expiry": now + timedelta(minutes=OTP_EXPIRY_MINUTES),
+                "otp_sent_at": now
+            }
+        }
+    )
+
+    send_email(
+        db_user["email"],
+        otp
+    )
+
+    return {
+        "success": True,
+        "message": "OTP sent"
     }
