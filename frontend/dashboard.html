@@ -757,6 +757,17 @@ async function checkVerification() {
       loadUsers();
       loadProfilePic();
 
+      
+    // ------------------------
+    // AUTO REFRESH
+    // ------------------------
+
+    setInterval(
+      loadUsers,
+      10000
+    );
+
+
     } else {
 
       document
@@ -1147,7 +1158,7 @@ async function checkVerification() {
           data.type === "unread_update" ||
           data.message_id
         ){
-          loadUsers();
+          checkVerification();
         }
       };
     }
@@ -1444,7 +1455,7 @@ async function checkVerification() {
 
     }
 
-    loadProfilePic();
+    checkVerification();
 
     // ------------------------
     // LOGOUT
@@ -1456,15 +1467,6 @@ async function checkVerification() {
 
       location.href = "index.html";
     }
-
-    // ------------------------
-    // AUTO REFRESH
-    // ------------------------
-
-    setInterval(
-      loadUsers,
-      10000
-    );
 
   </script>
 
