@@ -572,7 +572,7 @@ async def delete_message(message_id: str):
 
 
 @app.get("/chats/{user_id}")
-async def get_chats(user_id: str ,user=Depends(require_verified_user)):
+async def get_chats(user_id: str ,request: Request,user=Depends(require_verified_user)):
 
     conversations = list(
         db.conversations.find({
