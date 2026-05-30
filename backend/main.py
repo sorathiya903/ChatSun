@@ -16,6 +16,8 @@ from argon2.exceptions import VerifyMismatchError
 from functools import wraps
 from fastapi import HTTPException
 
+
+
 def verificationRequired(func):
 
     @wraps(func)
@@ -31,10 +33,21 @@ def verificationRequired(func):
         if not request:
             request = kwargs.get("request")
 
+        if not request:
+            raise HTTPException(
+                status_code=401,
+                detail="Missing request"
+            )
+
         user = get_current_user(request)
 
-        if not user["is_verified"]:
+        if not user:
+            raise HTTPException(
+                status_code=401,
+                detail="Unauthorized"
+            )
 
+        if not user.get("is_verified", False):
             raise HTTPException(
                 status_code=403,
                 detail="Email verification required"
@@ -43,8 +56,6 @@ def verificationRequired(func):
         return await func(*args, **kwargs)
 
     return wrapper
-
-
 
 ph = PasswordHasher()
 
