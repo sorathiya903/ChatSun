@@ -947,7 +947,10 @@ async function checkVerification() {
 
         const res =
           await fetch(
-            `${API_URL}/chats/${currentUser.user_id}`
+            `${API_URL}/chats/${currentUser.user_id}`,
+            {
+              credentials:"include"
+            }
           );
 
         const data =
