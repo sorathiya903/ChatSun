@@ -13,6 +13,36 @@ from fastapi.staticfiles import StaticFiles
 from auth import router, get_current_user 
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
+from functools import wraps
+from fastapi import HTTPException
+
+def verificationRequired(func):
+
+    @wraps(func)
+    async def wrapper(*args, **kwargs):
+
+        request = None
+
+        for arg in args:
+            if isinstance(arg, Request):
+                request = arg
+                break
+
+        if not request:
+            request = kwargs.get("request")
+
+        user = get_current_user(request)
+
+        if not user["is_verified"]:
+
+            raise HTTPException(
+                status_code=403,
+                detail="Email verification required"
+            )
+
+        return await func(*args, **kwargs)
+
+    return wrapper
 
 
 
