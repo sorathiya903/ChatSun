@@ -16,46 +16,22 @@ from argon2.exceptions import VerifyMismatchError
 from functools import wraps
 from fastapi import HTTPException
 
+def require_verified_user(request: Request):
+
+    user = get_current_user(request)
+
+    if not user:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+
+    if not user.get("is_verified"):
+        raise HTTPException(
+            status_code=403,
+            detail="Email verification required"
+        )
+
+    return user
 
 
-def verificationRequired(func):
-
-    @wraps(func)
-    async def wrapper(*args, **kwargs):
-
-        request = None
-
-        for arg in args:
-            if isinstance(arg, Request):
-                request = arg
-                break
-
-        if not request:
-            request = kwargs.get("request")
-
-        if not request:
-            raise HTTPException(
-                status_code=401,
-                detail="Missing request"
-            )
-
-        user = get_current_user(request)
-
-        if not user:
-            raise HTTPException(
-                status_code=401,
-                detail="Unauthorized"
-            )
-
-        if not user.get("is_verified", False):
-            raise HTTPException(
-                status_code=403,
-                detail="Email verification required"
-            )
-
-        return await func(*args, **kwargs)
-
-    return wrapper
 
 ph = PasswordHasher()
 
@@ -551,7 +527,6 @@ async def search_user(query: str):
 
 
 @app.get("/messages/{conversation_id}")
-@verificationRequired
 async def get_messages(conversation_id: str):
 
     convo = conversations.find_one({
@@ -566,7 +541,6 @@ async def get_messages(conversation_id: str):
 
 
 @app.put("/message/{message_id}")
-@verificationRequired
 async def edit_message(message_id: str, data: dict = Body(...)):
 
     result = conversations.update_one(
@@ -584,7 +558,6 @@ async def edit_message(message_id: str, data: dict = Body(...)):
     return {"success": True}
 
 @app.delete("/message/{message_id}")
-@verificationRequired
 async def delete_message(message_id: str):
 
     result = conversations.update_one(
@@ -599,8 +572,7 @@ async def delete_message(message_id: str):
 
 
 @app.get("/chats/{user_id}")
-@verificationRequired
-async def get_chats(user_id: str):
+async def get_chats(user_id: str ,user=Depends(require_verified_user)):
 
     conversations = list(
         db.conversations.find({
@@ -695,7 +667,6 @@ async def get_chats(user_id: str):
 
 
 @app.post("/delivered/{message_id}")
-@verificationRequired
 async def mark_delivered(message_id: str):
 
     convo = conversations.find_one({
@@ -755,7 +726,6 @@ async def mark_delivered(message_id: str):
     }
     
 @app.get("/api/unread-count/{conversation_id}/{user_id}")
-@verificationRequired
 async def get_unread_count(conversation_id: str, user_id: str):
 
     chat = conversations.find_one({
@@ -774,7 +744,6 @@ async def get_unread_count(conversation_id: str, user_id: str):
 
 
 @app.post("/create-group")
-@verificationRequired
 async def create_group(data: dict):
 
     creator = data["creator"]
@@ -849,7 +818,6 @@ async def create_group(data: dict):
 
 
 @app.post("/read/{message_id}/{user_id}")
-@verificationRequired
 async def mark_read(message_id: str, user_id: str):
 
     convo = conversations.find_one({
@@ -925,7 +893,6 @@ async def mark_read(message_id: str, user_id: str):
 
 
 @app.post("/group/name/{conversation_id}")
-@verificationRequired
 async def change_group_name(
     conversation_id: str,
     data: dict
@@ -954,7 +921,6 @@ async def change_group_name(
 
 
 @app.post("/group/make-admin/{conversation_id}")
-@verificationRequired
 async def make_admin(
     conversation_id: str,
     data: dict
@@ -983,7 +949,6 @@ async def make_admin(
 
 
 @app.post("/group/remove-admin/{conversation_id}")
-@verificationRequired
 async def remove_admin(
     conversation_id: str,
     data: dict
@@ -1012,7 +977,6 @@ async def remove_admin(
 
 
 @app.post("/group/remove-member/{conversation_id}")
-@verificationRequired
 async def remove_member(
     conversation_id: str,
     data: dict
@@ -1053,7 +1017,6 @@ async def debug_cookies(request: Request):
 
 
 @app.post("/group/add-member/{conversation_id}")
-@verificationRequired
 async def add_member(
     conversation_id: str,
     data: dict
@@ -1111,7 +1074,6 @@ async def add_member(
 
 
 @app.post("/edit-profile")
-@verificationRequired
 async def edit_profile(
     request: Request,
     data: dict
@@ -1152,7 +1114,7 @@ async def edit_profile(
 # -------------------------
 
 @app.websocket("/ws-call/{user_id}")
-@verificationRequired
+
 async def call_ws(websocket: WebSocket, user_id: str):
 
     await websocket.accept()
@@ -1191,4 +1153,3 @@ async def call_ws(websocket: WebSocket, user_id: str):
 
         if user_id in call_connections:
             del call_connections[user_id]
-
