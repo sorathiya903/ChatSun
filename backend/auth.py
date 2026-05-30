@@ -566,6 +566,7 @@ async def get_me(
                 user["email"],
             "phone_number":
             user.get( "phone_number",  ""  ),
+             "is_verified": user["is_verified"],
 
             "user_id":
                 user["user_id"],
@@ -626,6 +627,66 @@ async def delete_account(
     response.delete_cookie(
         "access_token"
     )
+
+    return {
+        "success": True
+    }
+
+
+@app.post("/verify-otp")
+async def verifyOtp(
+    request: Request,
+    otp: str = Body(...)
+):
+
+    user = get_current_user(request)
+
+    db_user = users.find_one(
+        {"_id": user["_id"]}
+    )
+
+    if db_user["otp"] != otp:
+        return {
+            "success": False,
+            "message": "Invalid OTP"
+        }
+
+    users.update_one(
+        {"_id": user["_id"]},
+        {
+            "$set": {
+                "is_verified": True
+            },
+            "$unset": {
+                "otp": "",
+                "otp_expiry": ""
+            }
+        }
+    )
+
+    return {
+        "success": True
+        }
+
+
+@app.post("/send-verification-otp")
+async def sendVerificationOtp(request: Request):
+
+    user = get_current_user(request)
+
+    otp = str(random.randint(100000, 999999))
+
+    users.update_one(
+        {"_id": user["_id"]},
+        {
+            "$set": {
+                "otp": otp,
+                "otp_expiry": datetime.utcnow() + timedelta(minutes=10)
+            }
+        }
+    )
+
+    send_email(user["email"], otp)
 
     return {
         "success": True
