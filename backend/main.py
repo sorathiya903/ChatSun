@@ -472,7 +472,7 @@ async def search_user(query: str,user=Depends(require_verified_user)):
 
     query = query.strip()
 
-    user = users.find_one({
+    userFound = users.find_one({
 
         "$or": [
 
@@ -488,7 +488,7 @@ async def search_user(query: str,user=Depends(require_verified_user)):
         ]
     })
 
-    if not user:
+    if not userFound:
 
         return {
             "success": False
@@ -501,22 +501,22 @@ async def search_user(query: str,user=Depends(require_verified_user)):
         "user": {
 
             "full_name":
-                user["full_name"],
+                userFound["full_name"],
 
             "email":
-                user["email"],
+                userFound["email"],
 
             "user_id":
-                user["user_id"],
+                userFound["user_id"],
 
             "profile_picture":
-                user.get(
+                userFound.get(
                     "profile_picture",
                     ""
                 ),
 
             "phone":
-                user.get(
+                userFound.get(
                     "phone_number",
                     ""
                 )
