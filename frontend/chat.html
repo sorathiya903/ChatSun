@@ -1911,7 +1911,19 @@ preloadRingtone();
 let ringAudio = new Audio("ring.wav");
 ringAudio.loop = true;
 ringAudio.volume = 0.6;
+  
+function stopRingtone() {
+  ringtone.pause();
+  ringtone.currentTime = 0;
+}
 
+function startRingtone() {
+  ringtone.currentTime = 0;
+
+  ringtone.play().catch(err => {
+    console.log("User gesture required:", err);
+  });
+}
 function startRinging() {
   ringAudio.currentTime = 0;
   ringAudio.play().catch(err => {
@@ -3837,6 +3849,12 @@ let incomingCaller = null;
 
 let currentCallUser = null;
 
+const STOP_CALL_TYPES = new Set([
+  "call_accepted",
+  "call_rejected",
+  "call_ended",
+  "call_missed"
+]);
 /* ------------------ */
 /* CALL WS */
 /* ------------------ */
@@ -3846,6 +3864,9 @@ callWs = new WebSocket(
 );
 
 callWs.onmessage = async (event)=>{
+  if (STOP_CALL_TYPES.has(data.type)) {
+    stopRingtone();
+  }
 
     const data = JSON.parse(event.data);
 
@@ -3865,7 +3886,7 @@ callWs.onmessage = async (event)=>{
             "incomingText"
         ).innerText =
             `${data.from} is calling you`;
-
+startRingtone();
         return;
     }
 
@@ -4047,12 +4068,14 @@ async function acceptCall(){
 
         target:incomingCaller
     }));
+  stopRingtone();
 }
 
 /* ------------------ */
 /* REJECT */
 /* ------------------ */
 
+  
 function rejectCall(){
 
     document.getElementById(
@@ -4067,6 +4090,7 @@ function rejectCall(){
 
         target:incomingCaller
     }));
+  stopRingtone();
 }
 
 /* ------------------ */
