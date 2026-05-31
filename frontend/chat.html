@@ -1887,6 +1887,27 @@ max-width:360px;
     fetch(`${API_URL}/online/${currentUser.user_id}`, {
     method: "POST"
 });
+let ringtone = new Audio("ringtone.mp3");
+
+//  preload (critical)
+ringtone.preload = "auto";
+ringtone.loop = true;
+ringtone.volume = 0.7;
+
+ function preloadRingtone() {
+  ringtone.load();
+
+  // small trick to warm up decoder
+  ringtone.play().then(() => {
+    ringtone.pause();
+    ringtone.currentTime = 0;
+  }).catch(() => {
+    // autoplay blocked is fine
+  });
+ } 
+preloadRingtone();
+
+  
 let ringAudio = new Audio("ring.wav");
 ringAudio.loop = true;
 ringAudio.volume = 0.6;
