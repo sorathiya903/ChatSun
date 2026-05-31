@@ -495,8 +495,8 @@ async def google_login(
                 "profile_picture":
                     picture,
                 "phone_number": "",
-
-
+                "is_verified":True,
+                
                 "auth_type":
                     "google",
 
