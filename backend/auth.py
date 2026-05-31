@@ -560,26 +560,10 @@ async def get_me(request: Request):
 # =========================
 # LOGOUT
 # =========================
-
 @router.post("/logout")
-async def logout(
-    response: Response
-):
-
-    response.delete_cookie(
-
-        key="access_token",
-
-        httponly=True,
-
-        secure=True,
-
-        samesite="none"
-    )
-
-    return {
-        "success": True
-    }
+def logout(response: Response):
+    response.delete_cookie("access_token")
+    return {"success": True}
 
 # =========================
 # DELETE ACCOUNT
