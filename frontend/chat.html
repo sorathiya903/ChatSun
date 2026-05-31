@@ -3807,7 +3807,7 @@ async function loadHandModel(){
         "Hand model loaded"
     );
 }
-
+loadHandModel();
 /* DETECT HAND */
 
 async function detectHandGesture(){
@@ -4159,7 +4159,8 @@ async function createPeer(){
             credential: "openrelayproject"
         }
     ],
-    iceCandidatePoolSize: 10 // pre-gather candidates
+    iceCandidatePoolSize: 10, // pre-gather candidates
+  iceTransportPolicy: "all"
 });
 
     localStream.getTracks().forEach(track=>{
