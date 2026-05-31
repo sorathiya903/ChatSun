@@ -3844,7 +3844,7 @@ callWs.onmessage = async (event)=>{
     // REJECTED
 
     if(data.type === "call_rejected"){
-
+stopRinging();
         alert(`${data.from} rejected the call`);
 
         endCall();
@@ -3855,7 +3855,7 @@ callWs.onmessage = async (event)=>{
     // ACCEPTED
 
     if(data.type === "call_accepted"){
-
+stopRinging();
         currentCallUser = data.from;
 
         document.getElementById(
