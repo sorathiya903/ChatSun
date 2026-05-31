@@ -96,7 +96,7 @@ UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 @app.post("/upload")
-async def upload_file(file: UploadFile = File(...)):
+async def upload_file(file: UploadFile = File(...),user=Depends(require_verified_user)):
 
     ext = file.filename.split(".")[-1]
 
@@ -370,7 +370,7 @@ async def chat(ws: WebSocket, conversation_id: str):
 
             
 @app.post("/clear-unread/{conversation_id}/{user_id}")
-async def clear_unread(conversation_id: str, user_id: str):
+async def clear_unread(conversation_id: str, user_id: str,user=Depends(require_verified_user)):
 
     conversations.update_one(
         {"conversation_id": conversation_id},
@@ -386,7 +386,7 @@ async def clear_unread(conversation_id: str, user_id: str):
 
 
 @app.get("/users")
-async def get_users():
+async def get_users(user=Depends(require_verified_user)):
 
     all_users = users.find()
 
@@ -399,12 +399,12 @@ async def get_users():
     ]
 
 @app.get("/conversation/{conversation_id}")
-async def get_conversation(conversation_id: str, request:Request):
+async def get_conversation(conversation_id: str, user=Depends(require_verified_user)):
 
     convo = conversations.find_one({
         "conversation_id": conversation_id
     })
-    user = get_current_user(request)
+    
 
     if not convo:
         return {
@@ -468,7 +468,7 @@ async def set_offline(user_id: str):
 
 
 @app.get("/search/{query}")
-async def search_user(query: str):
+async def search_user(query: str,user=Depends(require_verified_user)):
 
     query = query.strip()
 
@@ -527,7 +527,7 @@ async def search_user(query: str):
 
 
 @app.get("/messages/{conversation_id}")
-async def get_messages(conversation_id: str):
+async def get_messages(conversation_id: str, user=Depends(require_verified_user)):
 
     convo = conversations.find_one({
         "conversation_id": conversation_id
@@ -572,7 +572,16 @@ async def delete_message(message_id: str):
 
 
 @app.get("/chats/{user_id}")
-async def get_chats(user_id: str ,request: Request,user=Depends(require_verified_user)):
+async def get_chats(
+    user_id: str,
+    user=Depends(require_verified_user)
+):
+
+    if user["user_id"] != user_id:
+        raise HTTPException(
+            status_code=403,
+            detail="Forbidden"
+        )
 
     conversations = list(
         db.conversations.find({
