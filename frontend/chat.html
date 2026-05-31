@@ -2614,7 +2614,9 @@ let groupData = null;
 async function loadConversationInfo(){
 
     const res = await fetch(
-        `${API_URL}/conversation/${conversationId}`
+        `${API_URL}/conversation/${conversationId}`,
+      {
+        credentials:"include"}
     );
 
     const data = await res.json();
