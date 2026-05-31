@@ -1017,7 +1017,8 @@ async function checkVerification() {
             await fetch(
               `${API_URL}/clear-unread/${chat.conversation_id}/${currentUser.user_id}`,
               {
-                method:"POST"
+                method:"POST",
+                credentials:"include"
               }
             );
 
@@ -1309,7 +1310,10 @@ async function checkVerification() {
 
         const res =
           await fetch(
-            `${API_URL}/search/${encodeURIComponent(query)}`
+            `${API_URL}/search/${encodeURIComponent(query)}`,
+          {
+    credentials:"include"
+    }
           );
 
         const data =
@@ -1478,19 +1482,26 @@ async function checkVerification() {
 
     }
 
-    checkVerification();
+    
 
     // ------------------------
     // LOGOUT
     // ------------------------
 
-    function logout(){
+    async function logout(){
 
-      localStorage.removeItem("user");
-
-      location.href = "index.html";
+  await fetch(
+    `${API_URL}/logout`,
+    {
+      method:"POST",
+      credentials:"include"
     }
+  );
 
+  localStorage.removeItem("user");
+
+  location.href="index.html";
+    }
   </script>
 
 </body>
