@@ -3863,6 +3863,7 @@ callWs.onmessage = async (event)=>{
 
     if(data.type === "call_rejected"){
 stopRinging();
+      console.log("Ring stopped")
         alert(`${data.from} rejected the call`);
 
         endCall();
@@ -3874,6 +3875,7 @@ stopRinging();
 
     if(data.type === "call_accepted"){
 stopRinging();
+      console.log("Ring stopped")
         currentCallUser = data.from;
 
         document.getElementById(
@@ -3998,6 +4000,7 @@ async function startVideoCall(){
         target:otherUser
     }));
     startRinging();
+  console.log("Ring started")
 }
 
 /* ------------------ */
@@ -4164,8 +4167,10 @@ async function createOffer(){
 function endCall(send=true){
 detectingHand = false;
 
+    stopRinging();
+  console.log("Ring stopped")
     
-    document.getElementById(
+  document.getElementById(
         "callModal"
     ).style.display = "none";
 
