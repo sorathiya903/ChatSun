@@ -3877,11 +3877,14 @@ callWs = new WebSocket(
 );
 
 callWs.onmessage = async (event)=>{
+
+  const data = JSON.parse(event.data);
+  
   if (STOP_CALL_TYPES.has(data.type)) {
     stopRingtone();
   }
 
-    const data = JSON.parse(event.data);
+    
 
     console.log("CALL DATA:", data);
 
