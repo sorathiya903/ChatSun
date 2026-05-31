@@ -1880,7 +1880,23 @@ max-width:360px;
     fetch(`${API_URL}/online/${currentUser.user_id}`, {
     method: "POST"
 });
+let ringAudio = new Audio("ring.wav");
+ringAudio.loop = true;
+ringAudio.volume = 0.6;
 
+function startRinging() {
+  ringAudio.currentTime = 0;
+  ringAudio.play().catch(err => {
+    console.log("Audio blocked until user interaction", err);
+  });
+}
+
+function stopRinging() {
+  ringAudio.pause();
+  ringAudio.currentTime = 0;
+}
+
+    
 let typingEl = null;
 const searchBar =
     document.getElementById("searchBar");
