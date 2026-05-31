@@ -23,7 +23,7 @@ resend.api_key = os.getenv("RESEND_API_KEY")
 def send_email(to_email: str, otp: str):
 
     resend.Emails.send({
-        "from": "onboarding@resend.dev",
+        "from": "ChatSun <verify@chatsun.run.place>",
         "to": [to_email],
         "subject": "ChatSun Email Verification",
         "html": f"""
