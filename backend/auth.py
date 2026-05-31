@@ -118,7 +118,17 @@ def validate_user_id(user_id):
 # =========================
 # JWT
 # =========================
-
+def set_auth_cookie(response: Response, token: str):
+    response.set_cookie(
+        key="access_token",
+        value=token,
+        httponly=True,
+        secure=True,
+        samesite="none",
+        path="/",
+        max_age=60 * 60 * 24 * 30
+    )
+    
 def create_access_token(data: dict):
 
     to_encode = data.copy()
@@ -300,23 +310,8 @@ async def register(
     # SET COOKIE
     # -------------------------
 
-    response.set_cookie(
-
-        key="access_token",
-
-        value=token,
-
-        httponly=True,
-
-        secure=True,
-
-        path="/",
-
-        samesite="none",
-
-        max_age=60 * 60 * 24 * 30
-    )
-
+    set_auth_cookie(response, token)
+    
     return {
 
         "success": True,
@@ -383,23 +378,8 @@ async def login(
         "email": email
     })
 
-    response.set_cookie(
-
-        key="access_token",
-
-        value=token,
-
-        httponly=True,
-
-        secure=True,
-
-        path="/",
-
-        samesite="none",
-
-        max_age=60 * 60 * 24 * 30
-    )
-
+    set_auth_cookie(response, token)
+    
     return {
 
         "success": True,
@@ -520,23 +500,8 @@ async def google_login(
             "email": email
         })
 
-        response.set_cookie(
-
-            key="access_token",
-
-            value=token,
-
-            httponly=True,
-
-            secure=True,
-
-            path="/",
-
-            samesite="none",
-
-            max_age=60 * 60 * 24 * 30
-        )
-
+        set_auth_cookie(response, token)
+        
         return {
 
             "success": True,
@@ -566,41 +531,29 @@ async def google_login(
 # =========================
 # GET ME
 # =========================
-
 @router.get("/me")
-async def get_me(
-    request: Request
-):
+async def get_me(request: Request):
 
-    user = get_current_user(
-        request
-    )
+    user = get_current_user(request)
 
     if not user:
-
         return {
-            "success": False
+            "success": False,
+            "message": "Unauthorized"
         }
 
     return {
-
         "success": True,
-
         "user": {
-
-            "full_name":
-                user["full_name"],
-
-            "email":
-                user["email"],
-            "phone_number":
-            user.get( "phone_number",  ""  ),
-             "is_verified": user["is_verified"],
-
-            "user_id":
-                user["user_id"],
-            "profile_picture":
-    user.get("profile_picture", "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQjoowYAeUbwx01s1wuzsFwoaoONtdK2qCu5Yb50rRzxQ&s=10")
+            "full_name": user["full_name"],
+            "email": user["email"],
+            "phone_number": user.get("phone_number", ""),
+            "is_verified": user.get("is_verified", False),
+            "user_id": user["user_id"],
+            "profile_picture": user.get(
+                "profile_picture",
+                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQjoowYAeUbwx01s1wuzsFwoaoONtdK2qCu5Yb50rRzxQ&s=10"
+            )
         }
     }
 
@@ -668,13 +621,26 @@ class OTPModel(BaseModel):
 
 @router.post("/verify-otp")
 async def verifyOtp(request: Request, data: OTPModel):
-    otp = data.otp
 
     user = get_current_user(request)
+
+    if not user:
+        return {
+            "success": False,
+            "message": "Unauthorized"
+        }
+
+    otp = data.otp.strip()
 
     db_user = users.find_one({
         "_id": user["_id"]
     })
+
+    if not db_user:
+        return {
+            "success": False,
+            "message": "User not found"
+        }
 
     if db_user.get("is_verified"):
         return {
@@ -697,14 +663,12 @@ async def verifyOtp(request: Request, data: OTPModel):
         }
 
     try:
-
         ph.verify(
             db_user["otp_hash"],
             otp
         )
 
     except Exception:
-
         return {
             "success": False,
             "message": "Invalid OTP"
@@ -727,16 +691,29 @@ async def verifyOtp(request: Request, data: OTPModel):
     return {
         "success": True,
         "message": "Email verified"
-    }
+        }
+
 
 @router.post("/send-verification-otp")
 async def sendVerificationOtp(request: Request):
 
     user = get_current_user(request)
 
+    if not user:
+        return {
+            "success": False,
+            "message": "Unauthorized"
+        }
+
     db_user = users.find_one({
         "_id": user["_id"]
     })
+
+    if not db_user:
+        return {
+            "success": False,
+            "message": "User not found"
+        }
 
     if db_user.get("is_verified"):
         return {
