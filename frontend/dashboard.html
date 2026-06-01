@@ -262,6 +262,83 @@ if(
       }
     }
 
+
+    /* Add to your <style> */
+
+@keyframes waterRipple {
+    0% {
+        background-position: 0% 50%;
+    }
+    25% {
+        background-position: 100% 50%;
+    }
+    50% {
+        background-position: 100% 0%;
+    }
+    75% {
+        background-position: 0% 100%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+@keyframes ripplePulse {
+    0% {
+        transform: scale(0);
+        opacity: 0.4;
+    }
+    100% {
+        transform: scale(2.5);
+        opacity: 0;
+    }
+}
+
+.typing-ripple {
+    background: linear-gradient(
+        135deg,
+        rgba(30,41,59,0.9),
+        rgba(15,23,42,0.88),
+        rgba(30,41,59,0.95),
+        rgba(15,23,42,0.88)
+    ) !important;
+    background-size: 300% 300% !important;
+    animation: waterRipple 2.5s ease infinite !important;
+    border-color: rgba(99,102,241,0.2) !important;
+    position: relative;
+    overflow: hidden;
+}
+
+/* The actual ripple ring from center */
+.typing-ripple::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 80px;
+    height: 80px;
+    margin: -40px 0 0 -40px;
+    border-radius: 50%;
+    border: 1px solid rgba(148,163,184,0.15);
+    animation: ripplePulse 2s ease-out infinite;
+    pointer-events: none;
+}
+
+/* Second ripple ring — offset timing */
+.typing-ripple::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 80px;
+    height: 80px;
+    margin: -40px 0 0 -40px;
+    border-radius: 50%;
+    border: 1px solid rgba(148,163,184,0.1);
+    animation: ripplePulse 2s ease-out 0.8s infinite;
+    pointer-events: none;
+    z-index: 0;
+      }
   </style>
 </head>
 
@@ -1070,7 +1147,7 @@ chatList=[...data]
 
           div.className =
             "chat-card rounded-[30px] p-4 sm:p-5 cursor-pointer";
-
+div.setAttribute("data-conv", chat.conversation_id);
           div.onclick = async () => {
 
             await fetch(
@@ -1236,6 +1313,26 @@ chatList=[...data]
 
         const data =
           JSON.parse(event.data);
+        if (data.type === "typing" && data.sender !== currentUser.user_id) {
+
+        // Find the chat card for this conversation
+        const card = document.querySelector(
+            `[data-conv="${conversationId}"]`
+        );
+
+        if (!card) return;
+
+        // Add ripple effect
+        card.classList.add("typing-ripple");
+
+        // Clear existing timer
+        clearTimeout(card._typingTimer);
+
+        // Remove after 2s of no typing
+        card._typingTimer = setTimeout(() => {
+            card.classList.remove("typing-ripple");
+        }, 2000);
+        }
 
         if(
           data.type === "unread_update" ||
