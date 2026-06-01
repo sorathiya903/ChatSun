@@ -118,10 +118,9 @@ async def upload_file(file: UploadFile = File(...),user=Depends(require_verified
     }
 
 
-
+                    
 @app.websocket("/ws/{conversation_id}")
 async def chat(ws: WebSocket, conversation_id: str):
-
     await ws.accept()
 
     if conversation_id not in connections:
@@ -130,111 +129,122 @@ async def chat(ws: WebSocket, conversation_id: str):
     connections[conversation_id].append(ws)
 
     try:
-
         while True:
-
             raw = await ws.receive_text()
-
             data = json.loads(raw)
+
             # -------------------------
-# REACTION EVENT
-# -------------------------
-if data.get("type") == "reaction":
-
-    message_id = data.get("message_id")
-    emoji      = data.get("emoji")
-    sender     = data.get("sender")
-
-    if not message_id or not emoji or not sender:
-        continue
-
-    # Find the conversation containing this message
-    convo = conversations.find_one({
-        "messages.message_id": message_id
-    })
-
-    if not convo:
-        continue
-
-    # Get current reactions for this message
-    message = next(
-        (m for m in convo["messages"]
-         if m["message_id"] == message_id),
-        None
-    )
-
-    if not message:
-        continue
-
-    current_reactions = message.get("reactions", {})
-
-    # Remove user's previous reaction (one per user)
-    for e in list(current_reactions.keys()):
-        if sender in current_reactions[e]:
-            current_reactions[e].remove(sender)
-            if len(current_reactions[e]) == 0:
-                del current_reactions[e]
-
-    # Toggle — if same emoji clicked again, just remove (already removed above)
-    # If different emoji, add it
-    was_same = (
-        emoji not in current_reactions or
-        sender not in message.get("reactions", {}).get(emoji, [])
-    )
-
-    if was_same:
-        if emoji not in current_reactions:
-            current_reactions[emoji] = []
-        current_reactions[emoji].append(sender)
-
-    # Save to DB
-    conversations.update_one(
-        {"messages.message_id": message_id},
-        {"$set": {
-            "messages.$.reactions": current_reactions
-        }}
-    )
-
-    # Broadcast to everyone in conversation
-    broadcast_data = {
-        "type":       "reaction",
-        "message_id": message_id,
-        "emoji":      emoji,
-        "sender":     sender,
-        "reactions":  current_reactions  # send full state
-    }
-
-    disconnected = []
-
-    for conn in connections.get(conversation_id, []):
-        try:
-            await conn.send_text(json.dumps(broadcast_data))
-        except:
-            disconnected.append(conn)
-
-    for conn in disconnected:
-        if conn in connections.get(conversation_id, []):
-            connections[conversation_id].remove(conn)
-
-    continue
-            # TYPING EVENT
+            # REACTION EVENT
             # -------------------------
-            if data.get("type") == "typing":
+            if data.get("type") == "reaction":
+                message_id = data.get("message_id")
+                emoji = data.get("emoji")
+                sender = data.get("sender")
+
+                if not message_id or not emoji or not sender:
+                    continue
+
+                convo = conversations.find_one({
+                    "messages.message_id": message_id
+                })
+
+                if not convo:
+                    continue
+
+                message = next(
+                    (
+                        m for m in convo["messages"]
+                        if m["message_id"] == message_id
+                    ),
+                    None
+                )
+
+                if not message:
+                    continue
+
+                current_reactions = message.get(
+                    "reactions",
+                    {}
+                )
+
+                # remove old reaction
+                for e in list(current_reactions.keys()):
+                    if sender in current_reactions[e]:
+                        current_reactions[e].remove(sender)
+
+                        if not current_reactions[e]:
+                            del current_reactions[e]
+
+                # toggle reaction
+                if (
+                    emoji not in current_reactions
+                    or sender not in current_reactions.get(
+                        emoji,
+                        []
+                    )
+                ):
+                    current_reactions.setdefault(
+                        emoji,
+                        []
+                    ).append(sender)
+
+                conversations.update_one(
+                    {"messages.message_id": message_id},
+                    {
+                        "$set": {
+                            "messages.$.reactions":
+                            current_reactions
+                        }
+                    }
+                )
+
+                broadcast_data = {
+                    "type": "reaction",
+                    "message_id": message_id,
+                    "emoji": emoji,
+                    "sender": sender,
+                    "reactions": current_reactions
+                }
+
+                disconnected = []
 
                 for conn in connections.get(
                     conversation_id,
                     []
                 ):
-
                     try:
+                        await conn.send_text(
+                            json.dumps(broadcast_data)
+                        )
+                    except:
+                        disconnected.append(conn)
 
+                for conn in disconnected:
+                    if conn in connections.get(
+                        conversation_id,
+                        []
+                    ):
+                        connections[
+                            conversation_id
+                        ].remove(conn)
+
+                continue
+
+            # -------------------------
+            # TYPING EVENT
+            # -------------------------
+            if data.get("type") == "typing":
+                for conn in connections.get(
+                    conversation_id,
+                    []
+                ):
+                    try:
                         await conn.send_text(
                             json.dumps({
                                 "type": "typing",
                                 "sender": data["sender"]
                             })
                         )
-
                     except:
                         pass
 
@@ -244,25 +254,18 @@ if data.get("type") == "reaction":
             # NORMAL MESSAGE
             # -------------------------
             sender = data["sender"]
-
             text = data["text"]
 
             convo = conversations.find_one({
                 "conversation_id": conversation_id
             })
 
-            # -------------------------
-            # GROUP / PRIVATE RECEIVERS
-            # -------------------------
             if convo and convo.get("is_group"):
-
                 receivers = [
                     u for u in convo["users"]
                     if u != sender
                 ]
-
             else:
-
                 users_list = conversation_id.split("_")
 
                 receivers = [
@@ -270,72 +273,48 @@ if data.get("type") == "reaction":
                     if u != sender
                 ]
 
-            # -------------------------
-            # CREATE MESSAGE
-            # -------------------------
             message = {
-
                 "message_id": str(uuid.uuid4()),
-
                 "conversation_id": conversation_id,
-
                 "sender": sender,
-
                 "text": text,
-
-                "type": data.get(
-                    "type",
-                    "text"
-                ),
-
-                "file_name": data.get(
-                    "file_name"
-                ),
-
+                "type": data.get("type", "text"),
+                "file_name": data.get("file_name"),
                 "seen_by": [sender],
-
                 "timestamp": datetime.now(
                     ZoneInfo("Asia/Kolkata")
                 ).isoformat(),
                 "reply_to": data.get("reply_to"),
+                "reactions": {}
             }
 
-            # -------------------------
-            # CREATE CONVERSATION
-            # -------------------------
             if not convo:
-
                 users_list = conversation_id.split("_")
 
                 conversations.insert_one({
-
                     "conversation_id":
                         conversation_id,
-
                     "users":
                         users_list,
-
                     "messages":
                         [message],
-
-                    "unread":
-                        {
-                            u: 0
-                            for u in users_list
-                        }, 
-                    "settings":{  u:{    "theme":"default"   }
-                                for u in users_list}
+                    "unread": {
+                        u: 0
+                        for u in users_list
+                    },
+                    "settings": {
+                        u: {
+                            "theme": "default"
+                        }
+                        for u in users_list
+                    }
                 })
-
             else:
-
                 conversations.update_one(
-
                     {
                         "conversation_id":
                             conversation_id
                     },
-
                     {
                         "$push": {
                             "messages": message
@@ -343,16 +322,12 @@ if data.get("type") == "reaction":
                     }
                 )
 
-                # increment unread
                 for receiver in receivers:
-
                     conversations.update_one(
-
                         {
                             "conversation_id":
                                 conversation_id
                         },
-
                         {
                             "$inc": {
                                 f"unread.{receiver}": 1
@@ -369,25 +344,18 @@ if data.get("type") == "reaction":
                 conversation_id,
                 []
             ):
-
                 try:
-
                     await conn.send_text(
                         json.dumps(message)
                     )
-
                 except:
-
                     disconnected.append(conn)
 
-            # cleanup dead sockets
             for conn in disconnected:
-
                 if conn in connections.get(
                     conversation_id,
                     []
                 ):
-
                     connections[
                         conversation_id
                     ].remove(conn)
@@ -396,12 +364,9 @@ if data.get("type") == "reaction":
             # UNREAD UPDATE
             # -------------------------
             update = {
-
                 "type": "unread_update",
-
                 "conversation_id":
                     conversation_id,
-
                 "receivers":
                     receivers
             }
@@ -410,18 +375,14 @@ if data.get("type") == "reaction":
                 conversation_id,
                 []
             ):
-
                 try:
-
                     await conn.send_text(
                         json.dumps(update)
                     )
-
                 except:
                     pass
 
     except WebSocketDisconnect:
-
         print(
             "WS disconnected:",
             conversation_id
@@ -431,24 +392,22 @@ if data.get("type") == "reaction":
             conversation_id,
             []
         ):
-
             connections[
                 conversation_id
             ].remove(ws)
 
     except Exception as e:
-
         print("WS ERROR:", e)
 
         if ws in connections.get(
             conversation_id,
             []
         ):
-
             connections[
                 conversation_id
-            ].remove(ws)
+            ].remove(ws)                
 
+            
             
 @app.post("/clear-unread/{conversation_id}/{user_id}")
 async def clear_unread(conversation_id: str, user_id: str,user=Depends(require_verified_user)):
