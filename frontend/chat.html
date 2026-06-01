@@ -1360,6 +1360,142 @@ body{
             rotate(-2deg);
     }
         }
+
+  /* EMOJI PICKER */
+.emoji-picker {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.85);
+    background: #0f172a;
+    border: 1px solid rgba(51,65,85,.9);
+    border-radius: 24px;
+    padding: 16px;
+    z-index: 999999999;
+    display: none;
+    flex-direction: column;
+    gap: 12px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.6);
+    opacity: 0;
+    transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1);
+    width: 280px;
+}
+
+.emoji-picker.show {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.emoji-picker-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: #64748b;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.emoji-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 6px;
+}
+
+.emoji-btn {
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.04);
+    font-size: 22px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+    border: 1px solid transparent;
+}
+
+.emoji-btn:hover {
+    background: rgba(99,102,241,0.15);
+    border-color: rgba(99,102,241,0.3);
+    transform: scale(1.2);
+}
+
+.emoji-btn:active {
+    transform: scale(0.95);
+}
+
+.emoji-picker-close {
+    align-self: flex-end;
+    width: 30px;
+    height: 30px;
+    border: none;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.06);
+    color: #94a3b8;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: .2s;
+}
+
+.emoji-picker-close:hover {
+    background: rgba(239,68,68,0.15);
+    color: #f87171;
+}
+
+/* REACTION ROW below message */
+.reaction-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 6px;
+}
+
+.reaction-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(99,102,241,0.12);
+    border: 1px solid rgba(99,102,241,0.22);
+    border-radius: 999px;
+    padding: 4px 10px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    animation: reactionPop 0.3s cubic-bezier(0.34,1.56,0.64,1);
+}
+
+.reaction-chip:hover {
+    background: rgba(99,102,241,0.22);
+    transform: scale(1.08);
+}
+
+.reaction-chip.mine {
+    background: rgba(99,102,241,0.25);
+    border-color: rgba(99,102,241,0.5);
+}
+
+.reaction-count {
+    font-size: 12px;
+    font-weight: 600;
+    color: #a5b4fc;
+}
+
+@keyframes reactionPop {
+    0%   { transform: scale(0); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+/* Emoji overlay backdrop */
+.emoji-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 999999998;
+    display: none;
+  }
 </style>
 </head>
 
@@ -1879,6 +2015,18 @@ max-width:360px;
 
 </div>
     <div id="callToast"></div>
+
+
+  <!-- EMOJI PICKER -->
+<div class="emoji-backdrop" id="emojiBackdrop" onclick="closeEmojiPicker()"></div>
+
+<div class="emoji-picker" id="emojiPicker">
+    <div style="display:flex; align-items:center; justify-content:space-between;">
+        <span class="emoji-picker-title">React to message</span>
+        <button class="emoji-picker-close" onclick="closeEmojiPicker()">✕</button>
+    </div>
+    <div class="emoji-grid" id="emojiGrid"></div>
+</div>
 <script>
     const currentUser =
     JSON.parse(localStorage.getItem("user"));
@@ -2565,12 +2713,29 @@ console.log("Successfully sent request")
     }
 
 
+function sendReaction(emoji) {
+    closeEmojiPicker();
+    if (!currentReactMsgId) return;
 
+    // Optimistic update immediately
+    applyReaction(currentReactMsgId, emoji, currentUser.user_id);
+
+    // Send to server — server will broadcast back with full state
+    ws.send(JSON.stringify({
+        type:       'reaction',
+        message_id: currentReactMsgId,
+        emoji:      emoji,
+        sender:     currentUser.user_id
+    }));
+}
          
 
     function buildDropdown(msg) {
     let html = `
         <button onclick='copyMsg(${JSON.stringify(msg.text)})'>Copy</button>
+        <button onclick='openEmojiPicker(${JSON.stringify(msg)})'>
+            😊 React
+        </button>
     `;
 
     if (msg.sender === currentUser.user_id) {
@@ -2758,7 +2923,14 @@ let currentX = 0;
     if(renderedMessages.has(msg.message_id)) return;
 
     renderedMessages.add(msg.message_id);
-
+// Load reactions that came from server
+if (msg.reactions && Object.keys(msg.reactions).length > 0) {
+    reactionsStore[msg.message_id] = msg.reactions;
+    // Render after box is added to DOM
+    requestAnimationFrame(() => {
+        renderReactions(msg.message_id);
+    });
+  }
     const msgDate = formatDate(msg.timestamp);
 
     if(msgDate !== lastDate){
@@ -3332,6 +3504,20 @@ if(data.type === "typing"){
     return;
 }
 
+
+// In ws.onmessage, update the reaction handler:
+if (data.type === 'reaction') {
+
+    // Use full server state instead of local toggle
+    if (data.reactions) {
+        reactionsStore[data.message_id] = data.reactions;
+        renderReactions(data.message_id);
+    } else {
+        applyReaction(data.message_id, data.emoji, data.sender);
+    }
+    return;
+}
+  
 if(data.type === "seen_update"){
 
     const msgEl = document.querySelector(
