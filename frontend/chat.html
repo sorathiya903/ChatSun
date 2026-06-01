@@ -2444,16 +2444,43 @@ function sendReaction(emoji) {
 
     if (!currentReactMsgId) return;
 
-    ws.send(JSON.stringify({
-        type:       'reaction',
-        message_id: currentReactMsgId,
-        emoji:      emoji,
-        sender:     currentUser.user_id
-    }));
+    const messageId = currentReactMsgId;
+    const reactions = reactionsStore[messageId] || {};
 
-    // Optimistic update — show immediately
-    applyReaction(currentReactMsgId, emoji, currentUser.user_id);
-}
+    // Check if current user already reacted with this emoji
+    const hasReacted = reactions[emoji]?.includes(currentUser.user_id);
+
+    if (hasReacted) {
+        // DELETE the reaction
+        ws.send(JSON.stringify({
+            type:       'reaction_delete',
+            message_id: messageId,
+            emoji:      emoji,
+            sender:     currentUser.user_id
+        }));
+
+        // Optimistic update
+        reactions[emoji].splice(
+            reactions[emoji].indexOf(currentUser.user_id),
+            1
+        );
+        if (reactions[emoji].length === 0) {
+            delete reactions[emoji];
+        }
+        renderReactions(messageId);
+
+    } else {
+        // ADD the reaction (existing code)
+        ws.send(JSON.stringify({
+            type:       'reaction',
+            message_id: messageId,
+            emoji:      emoji,
+            sender:     currentUser.user_id
+        }));
+
+        applyReaction(messageId, emoji, currentUser.user_id);
+    }
+  }
 
 /* Apply reaction to UI */
 function applyReaction(messageId, emoji, fromUser) {
@@ -2499,7 +2526,6 @@ function renderReactions(messageId) {
     const msgEl = document.querySelector(`[data-id="${messageId}"]`);
     if (!msgEl) return;
 
-    // Remove existing row
     const existing = msgEl.querySelector('.reaction-row');
     if (existing) existing.remove();
 
@@ -2523,32 +2549,42 @@ function renderReactions(messageId) {
             <span class="reaction-count">${users.length}</span>
         `;
 
-        // Click chip to toggle your reaction
+        // Click chip to toggle — if you reacted, removes it; if not, adds it
         chip.onclick = (e) => {
             e.stopPropagation();
-            ws.send(JSON.stringify({
-                type:       'reaction',
-                message_id: messageId,
-                emoji:      emoji,
-                sender:     currentUser.user_id
-            }));
+
+            if (isMine) {
+                // DELETE
+                ws.send(JSON.stringify({
+                    type:       'reaction_delete',
+                    message_id: messageId,
+                    emoji:      emoji,
+                    sender:     currentUser.user_id
+                }));
+            } else {
+                // ADD (you haven't reacted yet)
+                ws.send(JSON.stringify({
+                    type:       'reaction',
+                    message_id: messageId,
+                    emoji:      emoji,
+                    sender:     currentUser.user_id
+                }));
+            }
+
+            // Optimistic update
             applyReaction(messageId, emoji, currentUser.user_id);
         };
 
         row.appendChild(chip);
     });
 
-    // Insert after .time div
     const timeEl = msgEl.querySelector('.time');
     if (timeEl) {
         timeEl.after(row);
     } else {
         msgEl.appendChild(row);
     }
-  }
-
-
-
+}
   
 
     
@@ -3681,14 +3717,14 @@ if(data.type === "typing"){
 }
 
 
-// In ws.onmessage, update the reaction handler:
-if (data.type === 'reaction') {
+if (data.type === 'reaction' || data.type === 'reaction_delete') {
 
-    // Use full server state instead of local toggle
     if (data.reactions) {
+        // Full server state — use it
         reactionsStore[data.message_id] = data.reactions;
         renderReactions(data.message_id);
     } else {
+        // Fallback (shouldn't happen with updated backend)
         applyReaction(data.message_id, data.emoji, data.sender);
     }
     return;
