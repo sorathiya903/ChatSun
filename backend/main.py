@@ -621,9 +621,9 @@ async def get_messages(conversation_id: str, user=Depends(require_verified_user)
     msgs = convo.get("messages", [])
 
     # Ensure every message has a reactions field
-        for m in msgs:
-            if "reactions" not in m:
-                m["reactions"] = {}
+    for m in msgs:
+        if "reactions" not in m:
+            m["reactions"] = {}
 
     return msgs
 
