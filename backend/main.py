@@ -134,8 +134,7 @@ async def chat(ws: WebSocket, conversation_id: str):
             raw = await ws.receive_text()
 
             data = json.loads(raw)
-
-            # -------------------------
+            
             # TYPING EVENT
             # -------------------------
             if data.get("type") == "typing":
@@ -537,7 +536,14 @@ async def get_messages(conversation_id: str, user=Depends(require_verified_user)
 
         return []
 
-    return convo["messages"]
+    msgs = convo.get("messages", [])
+
+    # Ensure every message has a reactions field
+        for m in msgs:
+            if "reactions" not in m:
+                m["reactions"] = {}
+
+    return msgs
 
 
 @app.put("/message/{message_id}")
