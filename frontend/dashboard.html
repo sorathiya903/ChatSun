@@ -286,34 +286,9 @@ if(
     }
 }
 
-/* Smooth transition INTO ripple state */
-.chat-card {
-    background:
-        linear-gradient(
-            180deg,
-            rgba(30,41,59,.9),
-            rgba(15,23,42,.88)
-        );
-    border: 1px solid rgba(255,255,255,.06);
-    transition:
-        transform .2s ease,
-        border-color .4s ease,        /* ← smooth border */
-        background-color .4s ease,    /* ← smooth bg */
-        box-shadow .4s ease;
-    position: relative;               /* ← needed for ripple child */
-    overflow: hidden;                 /* keep this */
-}
 
 .typing-ripple {
-    background: linear-gradient(
-        135deg,
-        rgba(30,41,59,0.9),
-        rgba(20,30,55,0.92),
-        rgba(30,41,59,0.95),
-        rgba(15,23,42,0.88)
-    ) !important;
-    background-size: 300% 300% !important;
-    animation: waterRipple 2.5s ease infinite !important;
+    
     border-color: rgba(99,102,241,0.25) !important;
     box-shadow: 0 0 0 1px rgba(99,102,241,0.08) !important;
 }
@@ -342,6 +317,61 @@ if(
     animation-delay: 1.4s;
     border-color: rgba(148,163,184,0.07);
     }
+
+
+    .chat-card {
+    background:
+        linear-gradient(
+            180deg,
+            rgba(30,41,59,.9),
+            rgba(15,23,42,.88)
+        );
+    border: 1px solid rgba(255,255,255,.06);
+    position: relative;
+    overflow: hidden;
+    transition:
+        transform .2s ease,
+        border-color .5s ease,
+        box-shadow .5s ease;
+}
+
+/* Overlay that fades in/out smoothly */
+.chat-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        135deg,
+        rgba(20,30,55,0.0),
+        rgba(30,41,59,0.0),
+        rgba(15,23,42,0.0)
+    );
+    background-size: 300% 300%;
+    opacity: 0;
+    transition: opacity 0.5s ease;  /* ← smooth fade */
+    pointer-events: none;
+    z-index: 0;
+    border-radius: inherit;
+}
+
+/* When typing — fade the overlay IN */
+.typing-ripple::before {
+    background: linear-gradient(
+        135deg,
+        rgba(20,30,55,0.6),
+        rgba(30,41,59,0.5),
+        rgba(15,23,42,0.55)
+    );
+    background-size: 300% 300%;
+    opacity: 1;                      /* ← fades in smoothly */
+    animation: waterRipple 2.5s ease infinite;
+}
+
+/* Make sure card content sits above overlay */
+.chat-card > * {
+    position: relative;
+    z-index: 1;
+}
   </style>
 </head>
 
