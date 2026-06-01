@@ -422,6 +422,27 @@ if(
                 </div>
               </button>
 
+
+<button onclick="handleMarkAllRead(this)" class="menu-item">
+
+    <div class="w-10 h-10 rounded-xl bg-indigo-500/15 flex items-center justify-center">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+             stroke="#a5b4fc" stroke-width="2.2"
+             stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 12l5 5L17 5"/>
+            <path d="M8 12l5 5L23 5" opacity="0.5"/>
+        </svg>
+    </div>
+
+    <div class="text-left">
+        <p class="font-medium btn-label">Mark all read</p>
+        <p class="text-xs text-slate-400 mt-0.5">Clear all unread badges</p>
+    </div>
+
+</button>
+
+
+              
             </div>
 
           </div>
@@ -691,39 +712,15 @@ async function verifyOtp() {
 
     }
 
-const icons = {
-    default: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-      stroke="currentColor" stroke-width="2.2"
-      stroke-linecap="round" stroke-linejoin="round">
-      <path d="M2 12l5 5L17 5"/>
-      <path d="M8 12l5 5L23 5" opacity="0.5"/>
-    </svg>`,
-
-    loading: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-      stroke="currentColor" stroke-width="2.5"
-      stroke-linecap="round">
-      <circle cx="12" cy="12" r="9" stroke-opacity="0.2"/>
-      <path d="M12 3a9 9 0 0 1 9 9"/>
-    </svg>`,
-
-    done: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-      stroke="#86efac" stroke-width="2.5"
-      stroke-linecap="round" stroke-linejoin="round">
-      <path d="M5 13l4 4L19 7"/>
-    </svg>`
-};
-
 async function handleMarkAllRead(btnEl) {
     const label = btnEl.querySelector('.btn-label');
-    const iconWrap = btnEl.querySelector('.btn-icon');
 
-    // LOADING STATE
-    btnEl.classList.add('loading');
-    iconWrap.innerHTML = icons.loading;
+    // LOADING
     label.textContent = 'Clearing...';
+    btnEl.style.opacity = '0.6';
+    btnEl.style.pointerEvents = 'none';
 
     try {
-        // YOUR ACTUAL LOGIC
         await Promise.all(
             chatList.map(chat =>
                 fetch(
@@ -734,31 +731,25 @@ async function handleMarkAllRead(btnEl) {
         );
         loadUsers();
 
-        // DONE STATE
-        btnEl.classList.remove('loading');
-        btnEl.classList.add('done');
-        iconWrap.innerHTML = icons.done;
-        label.textContent = 'All read!';
-
-        // RESET AFTER 2.5s
-        setTimeout(() => {
-            btnEl.classList.remove('done');
-            iconWrap.innerHTML = icons.default;
-            label.textContent = 'Mark all read';
-        }, 2500);
-
-    } catch (e) {
-        // ERROR STATE
-        btnEl.classList.remove('loading');
-        iconWrap.innerHTML = icons.default;
-        label.textContent = 'Try again';
+        // DONE
+        label.textContent = 'All read! ✓';
+        btnEl.style.opacity = '1';
 
         setTimeout(() => {
             label.textContent = 'Mark all read';
+            btnEl.style.pointerEvents = 'auto';
         }, 2000);
+
+    } catch(e) {
+        label.textContent = 'Try again';
+        btnEl.style.opacity = '1';
+        btnEl.style.pointerEvents = 'auto';
     }
           }
 
+
+
+    
 async function sendVerificationOtp() {
 
   const btn =
