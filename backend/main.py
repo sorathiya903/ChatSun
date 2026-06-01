@@ -117,6 +117,8 @@ async def upload_file(file: UploadFile = File(...),user=Depends(require_verified
         file.filename
     }
 
+
+
 @app.websocket("/ws/{conversation_id}")
 async def chat(ws: WebSocket, conversation_id: str):
 
@@ -134,7 +136,87 @@ async def chat(ws: WebSocket, conversation_id: str):
             raw = await ws.receive_text()
 
             data = json.loads(raw)
-            
+            # -------------------------
+# REACTION EVENT
+# -------------------------
+if data.get("type") == "reaction":
+
+    message_id = data.get("message_id")
+    emoji      = data.get("emoji")
+    sender     = data.get("sender")
+
+    if not message_id or not emoji or not sender:
+        continue
+
+    # Find the conversation containing this message
+    convo = conversations.find_one({
+        "messages.message_id": message_id
+    })
+
+    if not convo:
+        continue
+
+    # Get current reactions for this message
+    message = next(
+        (m for m in convo["messages"]
+         if m["message_id"] == message_id),
+        None
+    )
+
+    if not message:
+        continue
+
+    current_reactions = message.get("reactions", {})
+
+    # Remove user's previous reaction (one per user)
+    for e in list(current_reactions.keys()):
+        if sender in current_reactions[e]:
+            current_reactions[e].remove(sender)
+            if len(current_reactions[e]) == 0:
+                del current_reactions[e]
+
+    # Toggle — if same emoji clicked again, just remove (already removed above)
+    # If different emoji, add it
+    was_same = (
+        emoji not in current_reactions or
+        sender not in message.get("reactions", {}).get(emoji, [])
+    )
+
+    if was_same:
+        if emoji not in current_reactions:
+            current_reactions[emoji] = []
+        current_reactions[emoji].append(sender)
+
+    # Save to DB
+    conversations.update_one(
+        {"messages.message_id": message_id},
+        {"$set": {
+            "messages.$.reactions": current_reactions
+        }}
+    )
+
+    # Broadcast to everyone in conversation
+    broadcast_data = {
+        "type":       "reaction",
+        "message_id": message_id,
+        "emoji":      emoji,
+        "sender":     sender,
+        "reactions":  current_reactions  # send full state
+    }
+
+    disconnected = []
+
+    for conn in connections.get(conversation_id, []):
+        try:
+            await conn.send_text(json.dumps(broadcast_data))
+        except:
+            disconnected.append(conn)
+
+    for conn in disconnected:
+        if conn in connections.get(conversation_id, []):
+            connections[conversation_id].remove(conn)
+
+    continue
             # TYPING EVENT
             # -------------------------
             if data.get("type") == "typing":
