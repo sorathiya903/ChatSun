@@ -286,23 +286,6 @@ if(
     }
 }
 
-/* Smooth transition INTO ripple state */
-.chat-card {
-    background:
-        linear-gradient(
-            180deg,
-            rgba(30,41,59,.9),
-            rgba(15,23,42,.88)
-        );
-    border: 1px solid rgba(255,255,255,.06);
-    transition:
-        transform .2s ease,
-        border-color .4s ease,        /* ← smooth border */
-        background-color .4s ease,    /* ← smooth bg */
-        box-shadow .4s ease;
-    position: relative;               /* ← needed for ripple child */
-    overflow: hidden;                 /* keep this */
-}
 
 .typing-ripple {
     background: linear-gradient(
