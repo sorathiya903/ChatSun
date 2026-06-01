@@ -265,80 +265,83 @@ if(
 
     /* Add to your <style> */
 
+/* REMOVE your old typing-ripple CSS and replace with this */
+
 @keyframes waterRipple {
-    0% {
-        background-position: 0% 50%;
-    }
-    25% {
-        background-position: 100% 50%;
-    }
-    50% {
-        background-position: 100% 0%;
-    }
-    75% {
-        background-position: 0% 100%;
-    }
-    100% {
-        background-position: 0% 50%;
-    }
+    0%   { background-position: 0% 50%;   }
+    25%  { background-position: 100% 50%; }
+    50%  { background-position: 100% 0%;  }
+    75%  { background-position: 0% 100%;  }
+    100% { background-position: 0% 50%;   }
 }
 
 @keyframes ripplePulse {
     0% {
-        transform: scale(0);
-        opacity: 0.4;
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 0.5;
     }
     100% {
-        transform: scale(2.5);
+        transform: translate(-50%, -50%) scale(4);
         opacity: 0;
     }
+}
+
+/* Smooth transition INTO ripple state */
+.chat-card {
+    background:
+        linear-gradient(
+            180deg,
+            rgba(30,41,59,.9),
+            rgba(15,23,42,.88)
+        );
+    border: 1px solid rgba(255,255,255,.06);
+    transition:
+        transform .2s ease,
+        border-color .4s ease,        /* ← smooth border */
+        background-color .4s ease,    /* ← smooth bg */
+        box-shadow .4s ease;
+    position: relative;               /* ← needed for ripple child */
+    overflow: hidden;                 /* keep this */
 }
 
 .typing-ripple {
     background: linear-gradient(
         135deg,
         rgba(30,41,59,0.9),
-        rgba(15,23,42,0.88),
+        rgba(20,30,55,0.92),
         rgba(30,41,59,0.95),
         rgba(15,23,42,0.88)
     ) !important;
     background-size: 300% 300% !important;
     animation: waterRipple 2.5s ease infinite !important;
-    border-color: rgba(99,102,241,0.2) !important;
-    position: relative;
-    overflow: hidden;
+    border-color: rgba(99,102,241,0.25) !important;
+    box-shadow: 0 0 0 1px rgba(99,102,241,0.08) !important;
 }
 
-/* The actual ripple ring from center */
-.typing-ripple::after {
-    content: '';
+/* Ripple rings — use a CHILD div, not pseudo elements */
+.ripple-ring {
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 80px;
-    height: 80px;
-    margin: -40px 0 0 -40px;
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
-    border: 1px solid rgba(148,163,184,0.15);
+    border: 1px solid rgba(148,163,184,0.18);
+    transform: translate(-50%, -50%) scale(0);
     animation: ripplePulse 2s ease-out infinite;
     pointer-events: none;
+    z-index: 0;
 }
 
-/* Second ripple ring — offset timing */
-.typing-ripple::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 80px;
-    height: 80px;
-    margin: -40px 0 0 -40px;
-    border-radius: 50%;
-    border: 1px solid rgba(148,163,184,0.1);
-    animation: ripplePulse 2s ease-out 0.8s infinite;
-    pointer-events: none;
-    z-index: 0;
-      }
+.ripple-ring:nth-child(2) {
+    animation-delay: 0.7s;
+    border-color: rgba(148,163,184,0.12);
+}
+
+.ripple-ring:nth-child(3) {
+    animation-delay: 1.4s;
+    border-color: rgba(148,163,184,0.07);
+    }
   </style>
 </head>
 
@@ -1313,26 +1316,42 @@ div.setAttribute("data-conv", chat.conversation_id);
 
         const data =
           JSON.parse(event.data);
-        if (data.type === "typing" && data.sender !== currentUser.user_id) {
+        
+          if (data.type === "typing" && data.sender !== currentUser.user_id) {
 
-        // Find the chat card for this conversation
         const card = document.querySelector(
             `[data-conv="${conversationId}"]`
         );
-
         if (!card) return;
 
-        // Add ripple effect
+        // Add water bg animation
         card.classList.add("typing-ripple");
 
-        // Clear existing timer
+        // Inject ripple rings if not already there
+        if (!card.querySelector(".ripple-ring")) {
+            card.insertAdjacentHTML("afterbegin", `
+                <div class="ripple-ring"></div>
+                <div class="ripple-ring"></div>
+                <div class="ripple-ring"></div>
+            `);
+        }
+
+        // Reset timer
         clearTimeout(card._typingTimer);
 
-        // Remove after 2s of no typing
         card._typingTimer = setTimeout(() => {
+
+            // Smooth fade out
             card.classList.remove("typing-ripple");
+
+            // Remove rings after transition
+            setTimeout(() => {
+                card.querySelectorAll(".ripple-ring")
+                    .forEach(r => r.remove());
+            }, 400);
+
         }, 2000);
-        }
+          }
 
         if(
           data.type === "unread_update" ||
