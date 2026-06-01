@@ -2372,8 +2372,184 @@ document.addEventListener(
 
 
 
+/* ─────────────────────────────
+   REACTIONS
+───────────────────────────── */
+
+const EMOJIS = [
+    '👍','❤️','😂','😮','😢','😡',
+    '🔥','🎉','👏','🙏','💯','✅',
+    '😍','🤔','😭','😎','🥳','💪',
+    '👀','🫡','💀','🤣','😤','🫶'
+];
+
+// Local reactions store
+// { message_id: { emoji: [user1, user2] } }
+const reactionsStore = {};
+
+let currentReactMsgId = null;
+let currentReactMsg   = null;
+
+/* Build emoji grid */
+function buildEmojiGrid() {
+    const grid = document.getElementById('emojiGrid');
+    grid.innerHTML = '';
+    EMOJIS.forEach(emoji => {
+        const btn = document.createElement('button');
+        btn.className    = 'emoji-btn';
+        btn.textContent  = emoji;
+        btn.onclick = () => sendReaction(emoji);
+        grid.appendChild(btn);
+    });
+}
+buildEmojiGrid();
+
+/* Open picker */
+function openEmojiPicker(msg) {
+    currentReactMsgId = msg.message_id;
+    currentReactMsg   = msg;
+
+    // Close the dropdown first
+    const dd = document.getElementById('globalDropdown');
+    hideDropdown(dd);
+
+    // Show backdrop + picker
+    const backdrop = document.getElementById('emojiBackdrop');
+    const picker   = document.getElementById('emojiPicker');
+
+    backdrop.style.display = 'block';
+    picker.style.display   = 'flex';
+
+    requestAnimationFrame(() => {
+        picker.classList.add('show');
+    });
+}
+
+/* Close picker */
+function closeEmojiPicker() {
+    const backdrop = document.getElementById('emojiBackdrop');
+    const picker   = document.getElementById('emojiPicker');
+
+    picker.classList.remove('show');
+
+    setTimeout(() => {
+        picker.style.display   = 'none';
+        backdrop.style.display = 'none';
+    }, 200);
+}
+
+/* Send reaction via WebSocket */
+function sendReaction(emoji) {
+    closeEmojiPicker();
+
+    if (!currentReactMsgId) return;
+
+    ws.send(JSON.stringify({
+        type:       'reaction',
+        message_id: currentReactMsgId,
+        emoji:      emoji,
+        sender:     currentUser.user_id
+    }));
+
+    // Optimistic update — show immediately
+    applyReaction(currentReactMsgId, emoji, currentUser.user_id);
+}
+
+/* Apply reaction to UI */
+function applyReaction(messageId, emoji, fromUser) {
+
+    // Update store
+    if (!reactionsStore[messageId]) {
+        reactionsStore[messageId] = {};
+    }
+
+    const msgReactions = reactionsStore[messageId];
+
+    if (!msgReactions[emoji]) {
+        msgReactions[emoji] = [];
+    }
+
+    // Toggle — if user already reacted with this emoji, remove it
+    const idx = msgReactions[emoji].indexOf(fromUser);
+    if (idx > -1) {
+        msgReactions[emoji].splice(idx, 1);
+        if (msgReactions[emoji].length === 0) {
+            delete msgReactions[emoji];
+        }
+    } else {
+        // Remove user's previous reaction (one reaction per user)
+        Object.keys(msgReactions).forEach(e => {
+            const i = msgReactions[e].indexOf(fromUser);
+            if (i > -1) {
+                msgReactions[e].splice(i, 1);
+                if (msgReactions[e].length === 0) {
+                    delete msgReactions[e];
+                }
+            }
+        });
+        msgReactions[emoji].push(fromUser);
+    }
+
+    // Re-render reaction row
+    renderReactions(messageId);
+}
+
+/* Render reaction chips below message */
+function renderReactions(messageId) {
+    const msgEl = document.querySelector(`[data-id="${messageId}"]`);
+    if (!msgEl) return;
+
+    // Remove existing row
+    const existing = msgEl.querySelector('.reaction-row');
+    if (existing) existing.remove();
+
+    const reactions = reactionsStore[messageId];
+    if (!reactions || Object.keys(reactions).length === 0) return;
+
+    const row = document.createElement('div');
+    row.className = 'reaction-row';
+
+    Object.entries(reactions).forEach(([emoji, users]) => {
+        if (users.length === 0) return;
+
+        const isMine = users.includes(currentUser.user_id);
+        const chip   = document.createElement('div');
+
+        chip.className = `reaction-chip ${isMine ? 'mine' : ''}`;
+        chip.title     = users.join(', ');
+
+        chip.innerHTML = `
+            ${emoji}
+            <span class="reaction-count">${users.length}</span>
+        `;
+
+        // Click chip to toggle your reaction
+        chip.onclick = (e) => {
+            e.stopPropagation();
+            ws.send(JSON.stringify({
+                type:       'reaction',
+                message_id: messageId,
+                emoji:      emoji,
+                sender:     currentUser.user_id
+            }));
+            applyReaction(messageId, emoji, currentUser.user_id);
+        };
+
+        row.appendChild(chip);
+    });
+
+    // Insert after .time div
+    const timeEl = msgEl.querySelector('.time');
+    if (timeEl) {
+        timeEl.after(row);
+    } else {
+        msgEl.appendChild(row);
+    }
+  }
 
 
+
+  
 
     
 let replyMessage = null;
