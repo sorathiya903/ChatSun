@@ -233,72 +233,72 @@ async def chat(ws: WebSocket, conversation_id: str):
             # -------------------------
 # REACTION DELETE EVENT
 # -------------------------
-                if data.get("type") == "reaction_delete":
+            if data.get("type") == "reaction_delete":
 
-                    message_id = data.get("message_id")
-                    emoji      = data.get("emoji")
-                    sender     = data.get("sender")
+                message_id = data.get("message_id")
+                emoji      = data.get("emoji")
+                sender     = data.get("sender")
 
-                    if not message_id or not emoji or not sender:
-                        continue
+                if not message_id or not emoji or not sender:
+                    continue
 
-                    convo = conversations.find_one({
-                        "messages.message_id": message_id
-                    })
+                convo = conversations.find_one({
+                    "messages.message_id": message_id
+                })
 
-                    if not convo:
-                        continue
+                if not convo:
+                    continue
 
-                    message = next(
-                        (m for m in convo["messages"]
-                         if m["message_id"] == message_id),
-                        None
+                message = next(
+                    (m for m in convo["messages"]
+                    if m["message_id"] == message_id),
+                    None
                     )
 
-                    if not message:
-                        continue
+                if not message:
+                    continue
 
-                    current_reactions = message.get("reactions", {})
+                current_reactions = message.get("reactions", {})
 
                     # Remove this user from the emoji
-                    if emoji in current_reactions:
-                        if sender in current_reactions[emoji]:
-                            current_reactions[emoji].remove(sender)
+                if emoji in current_reactions:
+                    if sender in current_reactions[emoji]:
+                        current_reactions[emoji].remove(sender)
 
                         # If no one reacted with this emoji, delete it
-                        if len(current_reactions[emoji]) == 0:
-                            del current_reactions[emoji]
+                    if len(current_reactions[emoji]) == 0:
+                        del current_reactions[emoji]
 
     # Save to DB
-                    conversations.update_one(
-                        {"messages.message_id": message_id},
-                        {"$set": {
-                            "messages.$.reactions": current_reactions
-                        }}
-                    )
+                conversations.update_one(
+                    {"messages.message_id": message_id},
+                    {"$set": {
+                        "messages.$.reactions": current_reactions
+                    }}
+                )
 
     # Broadcast deletion to everyone
-                    broadcast_data = {
-                        "type":       "reaction_delete",
-                        "message_id": message_id,
-                        "emoji":      emoji,
-                        "sender":     sender,
-                        "reactions":  current_reactions  # full state after deletion
-                    }
+                broadcast_data = {
+                    "type":       "reaction_delete",
+                    "message_id": message_id,
+                    "emoji":      emoji,
+                    "sender":     sender,
+                    "reactions":  current_reactions  # full state after deletion
+                }
 
-                    disconnected = []
+                disconnected = []
 
-                    for conn in connections.get(conversation_id, []):
-                        try:
-                            await conn.send_text(json.dumps(broadcast_data))
-                        except:
-                            disconnected.append(conn)
+                for conn in connections.get(conversation_id, []):
+                    try:
+                        await conn.send_text(json.dumps(broadcast_data))
+                    except:
+                        disconnected.append(conn)
 
-                    for conn in disconnected:
-                        if conn in connections.get(conversation_id, []):
-                            connections[conversation_id].remove(conn)
+                for conn in disconnected:
+                    if conn in connections.get(conversation_id, []):
+                        connections[conversation_id].remove(conn)
 
-                    continue
+                continue
 
             # -------------------------
             # TYPING EVENT
