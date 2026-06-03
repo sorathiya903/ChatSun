@@ -1,4 +1,4 @@
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Body, UploadFile, File, Response, Request, Depends, HTTPException
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Body, UploadFile, File, Response, Request, Depends, HTTPException, status
 from pymongo import MongoClient
 from pydantic import BaseModel
 import os
@@ -94,6 +94,16 @@ online_users = set()
 UPLOAD_DIR = "uploads"
 
 os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+
+@app.api_route("/health", methods=["GET", "HEAD"])
+async def health_check(response: Response):
+    # Set standard cache-control headers to prevent stale status reports
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    
+    # Returns 200 OK with empty body for HEAD, or JSON for GET
+    return {"status": "healthy"}
+    
 
 @app.get("/")
 def welcome():
