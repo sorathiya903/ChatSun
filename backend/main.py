@@ -95,6 +95,10 @@ UPLOAD_DIR = "uploads"
 
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
+@app.get("/")
+def welcome():
+    return {"message":"Server Running"}
+
 @app.post("/upload")
 async def upload_file(file: UploadFile = File(...),user=Depends(require_verified_user)):
 
