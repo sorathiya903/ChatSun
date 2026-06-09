@@ -3882,7 +3882,8 @@ async function sendMsg(){
             `${API_URL}/upload`,
             {
                 method:"POST",
-                body:formData
+                body:formData,
+              credentials:"include"
             }
         );
 
