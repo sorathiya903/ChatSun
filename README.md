@@ -175,7 +175,7 @@ https://chatsun.netlify.app
 Clone the repository:
 
 ```
-git clone https://github.com/your-username/chatsun.git
+git clone https://github.com/sorathiya903/ChatSun.git
 ```
 
 Enter project directory:
@@ -217,6 +217,28 @@ ChatSun aims to become a complete browser-based communication platform that comb
 without requiring users to install any software.
 
 ---
+
+## 🐍 Why Python FastAPI?
+
+ChatSun relies on **Python FastAPI** as its primary infrastructure and orchestration layer for several critical architectural reasons:
+
+1. **Native Asynchronous WebSocket Handling:** Messaging apps require persistent, long-lived server connections. FastAPI is built natively on top of Starlette and ASGI, allowing it to handle thousands of concurrent WebSocket connections asynchronously (`async/def`) with minimal memory overhead.
+2. **Blazing Fast Performance:** FastAPI matches the execution speeds of Node.js and Go. This ensures that typing indicators, reactions, and WebRTC signaling payloads travel between clients in under 5 milliseconds.
+3. **Automated Pydantic Data Validation:** Managing unstructured JSON data coming out of MongoDB Atlas is simplified using Pydantic schemas. FastAPI validates user inputs, token payloads, and profile changes automatically at the API boundary, preventing runtime errors.
+4. **Clean Concurrency for Background Tasks:** Sending OTP emails and updating dynamic global unread indicators are offloaded to background worker threads natively supported by FastAPI, keeping the main communication thread unblocked.
+
+
+## 📊 Feature Matrix & Implementation
+
+| Core Feature Category | Implementation Status & Architecture Badges |
+| :--- | :--- |
+| **Real-Time Engine** | ![WebSockets](https://img.shields.io/badge/WebSockets-Active-blue) ![Python](https://img.shields.io/badge/Python-Asyncio-blueviolet) |
+| **Call Hardware Control** | ![Hardware](https://img.shields.io/badge/Accelerometer-Shake_to_End-red) ![WebRTC](https://img.shields.io/badge/WebRTC-Signaling-orange) |
+| **Message States** | ![Status](https://img.shields.io/badge/Tracking-Sent_Delivered_Read-green) |
+| **Advanced Messaging** | ![Actions](https://img.shields.io/badge/UI_Interactions-Swipe_Reply_Reactions-teal) |
+| **Security & Auth** | ![JWT](https://img.shields.io/badge/Auth-JWT_Tokens-black) ![OAuth](https://img.shields.io/badge/OAuth-Google_Login-brightgreen) |
+| **Media Operations** | ![Storage](https://img.shields.io/badge/File_Sharing-Images_Audio_PDFs-yellow) |
+
 
 ## 👨‍💻 Author
 
