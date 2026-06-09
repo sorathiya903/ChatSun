@@ -1588,7 +1588,7 @@ body{
         id="dropdownMenu"
     >
 
-        <button
+        <button id="videoCallBtn"
             class="menu-item"
             onclick="startVideoCall()"
         >
@@ -2380,7 +2380,7 @@ const EMOJIS = [
     '👍','❤️','😂','😮','😢','😡',
     '🔥','🎉','👏','🙏','💯','✅',
     '😍','🤔','😭','😎','🥳','💪',
-    '👀','🫡','💀','🤣','😤','🫶'
+    '👀','🇮🇳','💀','🤣','😤','📈'
 ];
 
 // Local reactions store
@@ -3001,6 +3001,9 @@ async function loadConversationInfo(){
     if(!data.success) return;
 
     if(data.is_group){
+      
+    document.getElementById("videoCallBtn").remove();
+      
 
         isGroup = true;
 
